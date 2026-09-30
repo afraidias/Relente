@@ -99,7 +99,7 @@ struct ReviewStats: View {
                 label: LocalizedStringResource(
                     "WILL BE INSTALLED", comment: "Review screen figure: size of the installer copied to the drive."),
                 value: Text(verbatim: summary.installedBytes.formatted(.byteCount(style: .file))),
-                caption: installerName
+                caption: Text(verbatim: installerName)
             )
             .frame(maxWidth: .infinity)
 
