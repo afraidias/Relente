@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/afraidias/Relente/compare/v0.2.0...v0.3.0) (2026-09-30)
+
+
+### Features
+
+* add Review screen ([#11](https://github.com/afraidias/Relente/issues/11)) ([d043e82](https://github.com/afraidias/Relente/commit/d043e82d167044f23c9fba949eb95efb20dfa673))
+
 ## [0.2.0](https://github.com/afraidias/Relente/compare/v0.1.0...v0.2.0) (2026-09-30)
 
 

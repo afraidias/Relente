@@ -8,7 +8,7 @@
 //
 
 // User-facing version (semver).
-MARKETING_VERSION = 0.2.0 // x-release-please-version
+MARKETING_VERSION = 0.3.0 // x-release-please-version
 
 // Build number. It must increase with every published build.
 CURRENT_PROJECT_VERSION = 1
