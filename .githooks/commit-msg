@@ -1,0 +1,21 @@
+#!/bin/sh
+# Rejects commit messages that don't follow Conventional Commits,
+# e.g. "feat(installer): add installer picker".
+
+first_line=$(head -n 1 "$1")
+
+# Let git's own messages through (merges, reverts, fixups).
+case "$first_line" in
+    Merge\ *|Revert\ *|fixup!\ *|squash!\ *) exit 0 ;;
+esac
+
+pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: .+'
+if ! echo "$first_line" | grep -Eq "$pattern"; then
+    echo "✗ The commit message doesn't follow Conventional Commits:"
+    echo "  $first_line"
+    echo ""
+    echo "Use: <type>(<optional scope>): <description>"
+    echo "Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+    echo "Example: feat(installer): add installer picker"
+    exit 1
+fi

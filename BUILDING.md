@@ -19,6 +19,26 @@
 
 The app is not sandboxed (it needs a privileged helper to erase disks), so it can't be distributed through the Mac App Store.
 
+## Git hooks
+
+The repository has two git hooks in `.githooks/`: one checks formatting with swift-format before each commit, and the other checks that the commit message follows [Conventional Commits](https://www.conventionalcommits.org/). Turn them on once after cloning:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+To format all the code:
+
+```bash
+xcrun swift-format format -i -r Relente RelenteTests RelenteUITests
+```
+
+## Versions
+
+The app version lives in `Config/Version.xcconfig` (`MARKETING_VERSION` and `CURRENT_PROJECT_VERSION`), shared by every target. Don't set it in Xcode's target settings.
+
+Releases are managed by [release-please](https://github.com/googleapis/release-please): on every push to `main` it opens or updates a release pull request with the next version (based on the Conventional Commits since the last release) and the `CHANGELOG.md`. Merging that pull request creates the `vX.Y.Z` tag and the GitHub release.
+
 ## Build from the command line
 
 If `xcode-select` points to the Command Line Tools instead of Xcode, set `DEVELOPER_DIR`:
