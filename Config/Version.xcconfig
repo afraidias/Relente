@@ -1,0 +1,14 @@
+//
+//  Version.xcconfig
+//  Relente
+//
+//  App version, shared by every target. release-please updates
+//  MARKETING_VERSION automatically in its release pull requests;
+//  don't change it by hand.
+//
+
+// User-facing version (semver).
+MARKETING_VERSION = 0.1.0 // x-release-please-version
+
+// Build number. It must increase with every published build.
+CURRENT_PROJECT_VERSION = 1

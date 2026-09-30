@@ -42,7 +42,8 @@ struct FileIcon: View {
 
 #Preview {
     HStack {
-        FileIcon(url: URL(filePath: "/System/Applications/Utilities/Disk Utility.app"), fallbackType: .applicationBundle)
+        FileIcon(
+            url: URL(filePath: "/System/Applications/Utilities/Disk Utility.app"), fallbackType: .applicationBundle)
         FileIcon(url: URL(filePath: "/missing.dmg"), fallbackType: .diskImage)
     }
     .frame(width: 240, height: 96)
