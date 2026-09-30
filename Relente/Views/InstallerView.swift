@@ -45,7 +45,7 @@ struct InstallerView: View {
             }
             .buttonStyle(.secondary)
         }
-        .padding(.top, 8)
+        .padding(.top, Theme.Sizes.headerTopPadding)
     }
 }
 

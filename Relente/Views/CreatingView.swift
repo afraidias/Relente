@@ -62,7 +62,7 @@ struct CreatingView: View {
             // states are the same height, so it's shared the same way and nothing jumps.
             Spacer(minLength: 8)
         }
-        .padding(.top, 8)
+        .padding(.top, Theme.Sizes.headerTopPadding)
     }
 
     /// The Error screen's subtitle: why it stopped, in the primary color, then what to do.

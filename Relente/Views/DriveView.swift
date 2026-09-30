@@ -43,7 +43,7 @@ struct DriveView: View {
 
                 Spacer()
             }
-            .padding(.top, 8)
+            .padding(.top, Theme.Sizes.headerTopPadding)
         }
     }
 }

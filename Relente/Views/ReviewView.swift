@@ -47,7 +47,7 @@ struct ReviewView: View {
             }
             .frame(width: contentWidth)
         }
-        .padding(.top, 8)
+        .padding(.top, Theme.Sizes.headerTopPadding)
         .onAppear { hasConfirmed = false }
     }
 }
