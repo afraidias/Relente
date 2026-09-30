@@ -3,17 +3,28 @@
 //  Relente
 //
 //  Bottom bar of the assistant: step indicator on the left,
-//  primary button on the right.
+//  the screen's buttons on the right.
 //
 
 import SwiftUI
 
-struct AssistantFooter: View {
+struct AssistantFooter<Actions: View>: View {
     let step: Int
     let totalSteps: Int
     let stepName: LocalizedStringResource
-    let canContinue: Bool
-    let onContinue: () -> Void
+    let actions: Actions
+
+    init(
+        step: Int,
+        totalSteps: Int,
+        stepName: LocalizedStringResource,
+        @ViewBuilder actions: () -> Actions
+    ) {
+        self.step = step
+        self.totalSteps = totalSteps
+        self.stepName = stepName
+        self.actions = actions()
+    }
 
     var body: some View {
         HStack {
@@ -21,10 +32,9 @@ struct AssistantFooter: View {
 
             Spacer()
 
-            Button("Continue", action: onContinue)
-                .buttonStyle(.primary)
-                .keyboardShortcut(.defaultAction)
-                .disabled(!canContinue)
+            HStack(spacing: 12) {
+                actions
+            }
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
@@ -32,6 +42,10 @@ struct AssistantFooter: View {
 }
 
 #Preview {
-    AssistantFooter(step: 1, totalSteps: 4, stepName: "Installer", canContinue: true, onContinue: {})
-        .frame(width: 800)
+    AssistantFooter(step: 1, totalSteps: 4, stepName: "Installer") {
+        Button("Continue") {}
+            .buttonStyle(.primary)
+            .keyboardShortcut(.defaultAction)
+    }
+    .frame(width: 800)
 }

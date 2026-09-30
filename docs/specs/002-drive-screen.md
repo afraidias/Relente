@@ -1,6 +1,6 @@
 # 002 · USB drive screen
 
-**Status:** Approved · **Roadmap step:** 3 (static screen with sample data)
+**Status:** Done · **Roadmap step:** 3 (static screen with sample data)
 
 ## Goal
 Let the user pick the USB drive or SD card that will become the bootable installer, and make it obvious which drives can be used and what will be lost. Second step of the assistant.
