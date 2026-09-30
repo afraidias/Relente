@@ -1,0 +1,77 @@
+# Checks every pull request to main (and every push to main):
+# formatting, build, tests, a universal Release build, and the PR title.
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, synchronize, reopened]
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+# A new push to the same PR cancels the run still in progress.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pr-title:
+    name: PR title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check that the title follows Conventional Commits
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: .+'
+          if ! printf '%s' "$TITLE" | grep -Eq "$pattern"; then
+            echo "::error::The PR title doesn't follow Conventional Commits: $TITLE"
+            echo "Use <type>(<optional scope>): <description>, e.g. feat(installer): add installer picker"
+            exit 1
+          fi
+          echo "✓ $TITLE"
+
+  lint:
+    name: Lint
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: swift-format lint
+        run: xcrun swift-format lint -r --strict Relente RelenteTests RelenteUITests
+
+  build-and-test:
+    name: Build & test
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Show Xcode version
+        run: xcodebuild -version
+      - name: Build and run unit tests (Debug)
+        run: >
+          xcodebuild test
+          -scheme Relente
+          -configuration Debug
+          -destination 'platform=macOS'
+          -only-testing:RelenteTests
+          CODE_SIGNING_ALLOWED=NO
+      - name: Build universal Release (warnings as errors)
+        run: >
+          xcodebuild build
+          -scheme Relente
+          -configuration Release
+          -destination 'generic/platform=macOS'
+          CODE_SIGNING_ALLOWED=NO
+      - name: Check architectures and minimum macOS
+        run: |
+          app=$(find ~/Library/Developer/Xcode/DerivedData -path '*/Build/Products/Release/Relente.app' -maxdepth 5 | head -n 1)
+          binary="$app/Contents/MacOS/Relente"
+          archs=$(lipo -archs "$binary")
+          echo "Architectures: $archs"
+          [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || { echo "::error::Release build is not universal"; exit 1; }
+          echo "Minimum macOS: $(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$app/Contents/Info.plist")"

@@ -26,6 +26,7 @@ These are the rules the project follows, for reference:
 - **Warnings:** none allowed. Release builds treat warnings as errors.
 - **Tests:** [Swift Testing](https://developer.apple.com/documentation/testing) for unit tests, XCTest only for UI tests. Logic and every security check must have tests.
 - **Versions:** semantic versioning (`v0.1.0`), managed by [release-please](https://github.com/googleapis/release-please) from the Conventional Commits. See [BUILDING.md](BUILDING.md#versions).
+- **CI:** every pull request runs the [CI workflow](.github/workflows/ci.yml): PR title (Conventional Commits), swift-format lint, Debug build with unit tests, and a universal Release build. All checks must pass before merging.
 - **Git hooks:** run `git config core.hooksPath .githooks` once, so formatting and commit messages are checked before each commit.
 
 ## Code of conduct
