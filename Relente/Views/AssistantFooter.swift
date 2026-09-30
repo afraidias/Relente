@@ -12,23 +12,27 @@ struct AssistantFooter<Actions: View>: View {
     let step: Int
     let totalSteps: Int
     let stepName: LocalizedStringResource
+    /// Color of the current step's pill; danger when the step failed.
+    let stepTint: Color
     let actions: Actions
 
     init(
         step: Int,
         totalSteps: Int,
         stepName: LocalizedStringResource,
+        stepTint: Color = Theme.Colors.accent,
         @ViewBuilder actions: () -> Actions
     ) {
         self.step = step
         self.totalSteps = totalSteps
         self.stepName = stepName
+        self.stepTint = stepTint
         self.actions = actions()
     }
 
     var body: some View {
         HStack {
-            StepIndicator(current: step, total: totalSteps, name: stepName)
+            StepIndicator(current: step, total: totalSteps, name: stepName, currentTint: stepTint)
 
             Spacer()
 

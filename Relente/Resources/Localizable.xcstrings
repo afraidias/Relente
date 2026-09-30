@@ -1,6 +1,23 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ %@" : {
+      "comment" : "Error screen subtitle. First value: why it stopped; second: what to do. Both are full sentences.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
     "%@ will be erased" : {
       "comment" : "Status chip under a drive that has data. The value is the space in use, e.g. 9.8 GB.",
       "localizations" : {
@@ -23,6 +40,39 @@
         }
       }
     },
+    "%@/s" : {
+      "comment" : "Creating screen, SPEED. The value is an amount of data, e.g. 48 MB; the figure is per second.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/s"
+          }
+        }
+      }
+    },
+    "About %@" : {
+      "comment" : "Creating screen, REMAINING: estimated time left. The value is a duration, e.g. 4 min or 1 hr, 20 min.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unos %@"
+          }
+        }
+      }
+    },
+    "Almost done" : {
+      "comment" : "Creating screen, REMAINING: a last phase that doesn't report its progress.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casi listo"
+          }
+        }
+      }
+    },
     "Back" : {
       "comment" : "Secondary button in the assistant footer that goes to the previous step.",
       "localizations" : {
@@ -30,6 +80,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Atrás"
+          }
+        }
+      }
+    },
+    "COPIED" : {
+      "comment" : "Creating screen figure: bytes of the installer copied to the drive so far.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "COPIADO"
+          }
+        }
+      }
+    },
+    "Calculating…" : {
+      "comment" : "Creating screen, REMAINING: not enough data yet to estimate the time left.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculando…"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Secondary button in the Creating screen's footer; asks before stopping.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         }
       }
@@ -78,6 +161,61 @@
         }
       }
     },
+    "Copy" : {
+      "comment" : "Creation phase: copying the installer to the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar"
+          }
+        }
+      }
+    },
+    "Couldn't Create the Installer" : {
+      "comment" : "Title of the Error screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo crear el instalador"
+          }
+        }
+      }
+    },
+    "Creating" : {
+      "comment" : "Name of the fourth assistant step, where the installer is being made.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear"
+          }
+        }
+      }
+    },
+    "Creating Installer" : {
+      "comment" : "Title of the Creating screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creando el instalador"
+          }
+        }
+      }
+    },
+    "Creating installer" : {
+      "comment" : "VoiceOver label of the progress ring.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creando el instalador"
+          }
+        }
+      }
+    },
     "Download from Apple…" : {
       "comment" : "Button on the Installer screen that opens the installer download screen.",
       "localizations" : {
@@ -85,6 +223,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descargar desde Apple…"
+          }
+        }
+      }
+    },
+    "Download the installer again, then try again." : {
+      "comment" : "Error screen: what to do when the installer is damaged.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a descargar el instalador e inténtalo de nuevo."
           }
         }
       }
@@ -144,6 +293,17 @@
         }
       }
     },
+    "Format" : {
+      "comment" : "Creation phase: erasing and formatting the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formatear"
+          }
+        }
+      }
+    },
     "Free" : {
       "comment" : "Usage bar legend: free space on the drive.",
       "localizations" : {
@@ -173,6 +333,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instalador"
+          }
+        }
+      }
+    },
+    "Keep Going" : {
+      "comment" : "Alert button: don't stop, keep creating the installer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        }
+      }
+    },
+    "Keep the drive plugged in. This can take a while." : {
+      "comment" : "Subtitle of the Creating screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén la memoria conectada. Puede tardar un rato."
+          }
+        }
+      }
+    },
+    "Less than a minute" : {
+      "comment" : "Creating screen, REMAINING: under 60 seconds left.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menos de un minuto"
+          }
+        }
+      }
+    },
+    "Make bootable" : {
+      "comment" : "Creation phase: making the drive able to start a Mac.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hacer arrancable"
           }
         }
       }
@@ -210,6 +414,17 @@
         }
       }
     },
+    "Phase %lld of %lld, %@" : {
+      "comment" : "VoiceOver label of the phase bar. Values: phase number, total phases, phase name (e.g. Copy).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fase %1$lld de %2$lld, %3$@"
+          }
+        }
+      }
+    },
     "Pick the version of macOS you want on the USB drive." : {
       "comment" : "Subtitle of the Installer screen.",
       "localizations" : {
@@ -217,6 +432,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elige la versión de macOS que quieres en la memoria USB."
+          }
+        }
+      }
+    },
+    "Plug it in again and try again." : {
+      "comment" : "Error screen: what to do after the drive was unplugged.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a conectarla e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "REMAINING" : {
+      "comment" : "Creating screen figure: estimated time left.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RESTANTE"
           }
         }
       }
@@ -243,6 +480,50 @@
         }
       }
     },
+    "SPEED" : {
+      "comment" : "Creating screen figure: how fast the installer is being copied.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VELOCIDAD"
+          }
+        }
+      }
+    },
+    "STOPPED AT" : {
+      "comment" : "Error screen figure: overall progress when creating stopped.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DETENIDO EN"
+          }
+        }
+      }
+    },
+    "Something went wrong while creating the installer." : {
+      "comment" : "Error screen: a failure with no known cause.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo ha fallado al crear el instalador."
+          }
+        }
+      }
+    },
+    "Start Over" : {
+      "comment" : "Error screen button: go back to the first step.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empezar de nuevo"
+          }
+        }
+      }
+    },
     "Step %lld of %lld · %@" : {
       "comment" : "Assistant footer. First value: current step number; second: total steps; third: step name.",
       "localizations" : {
@@ -250,6 +531,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paso %1$lld de %2$lld · %3$@"
+          }
+        }
+      }
+    },
+    "Stop" : {
+      "comment" : "Alert button: stop creating the installer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detener"
+          }
+        }
+      }
+    },
+    "Stop creating the installer?" : {
+      "comment" : "Title of the alert shown when cancelling the creation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Detener la creación del instalador?"
+          }
+        }
+      }
+    },
+    "Stopped" : {
+      "comment" : "VoiceOver label of the progress ring after a failure.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detenido"
+          }
+        }
+      }
+    },
+    "Stopped in phase %lld of %lld, %@" : {
+      "comment" : "VoiceOver label of the phase bar after a failure. Values: phase number, total phases, phase name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detenido en la fase %1$lld de %2$lld, %3$@"
+          }
+        }
+      }
+    },
+    "The drive didn't pass the final check." : {
+      "comment" : "Error screen: the finished drive failed Relente's verification.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La memoria no ha superado la comprobación final."
+          }
+        }
+      }
+    },
+    "The drive was disconnected." : {
+      "comment" : "Error screen: the drive was unplugged while creating.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La memoria se ha desconectado."
+          }
+        }
+      }
+    },
+    "The installer couldn't be verified." : {
+      "comment" : "Error screen: the macOS installer failed its signature check.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido verificar el instalador."
           }
         }
       }
@@ -276,6 +634,50 @@
         }
       }
     },
+    "Try Again" : {
+      "comment" : "Error screen button: go back to Review with the same drive and installer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
+          }
+        }
+      }
+    },
+    "Try again to erase the drive and start over." : {
+      "comment" : "Error screen: what to do after cancelling.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinténtalo para borrar la memoria y empezar de nuevo."
+          }
+        }
+      }
+    },
+    "Try again, or use a different drive." : {
+      "comment" : "Error screen: what to do when the finished drive failed the check.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inténtalo de nuevo o usa otra memoria."
+          }
+        }
+      }
+    },
+    "Try again. If it keeps happening, use a different drive." : {
+      "comment" : "Error screen: what to do after an unknown failure.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inténtalo de nuevo. Si sigue pasando, usa otra memoria."
+          }
+        }
+      }
+    },
     "Use a USB drive or SD card with at least %@. %@ or more works for any version of macOS." : {
       "comment" : "Empty state when no drive is connected. First value: minimum size for the chosen installer (e.g. 17.8 GB); second: size that works for any installer (32 GB).",
       "localizations" : {
@@ -283,6 +685,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usa una memoria USB o una tarjeta SD de al menos %1$@. Con %2$@ o más sirve para cualquier versión de macOS."
+          }
+        }
+      }
+    },
+    "Verify" : {
+      "comment" : "Creation phase: checking the finished drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificar"
           }
         }
       }
@@ -316,6 +729,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esperando una memoria…"
+          }
+        }
+      }
+    },
+    "You stopped the process." : {
+      "comment" : "Error screen: the user cancelled the creation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has detenido el proceso."
+          }
+        }
+      }
+    },
+    "of %@" : {
+      "comment" : "Creating screen, under COPIED. The value is the installer's size, e.g. 16.8 GB.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "de %@"
+          }
+        }
+      }
+    },
+    "“%@” will be left unusable until it's erased again." : {
+      "comment" : "Message of the cancel alert. The value is the drive's name, e.g. SanDisk Ultra.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%@» quedará inutilizable hasta que se vuelva a borrar."
           }
         }
       }

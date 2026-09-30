@@ -12,8 +12,9 @@ struct BigStat: View {
     let label: LocalizedStringResource
     /// The figure, already formatted, e.g. "9.8 GB". A `Text` so it can also be a localized word.
     let value: Text
-    /// Optional line under the figure, e.g. the installer's name.
-    var caption: String?
+    /// Optional line under the figure, e.g. the installer's name. A `Text` so it can be
+    /// localized, e.g. "of 16.8 GB".
+    var caption: Text?
     /// Color of the figure.
     var tint: Color = .primary
 
@@ -27,7 +28,7 @@ struct BigStat: View {
                 .foregroundStyle(tint)
 
             if let caption {
-                Text(verbatim: caption)
+                caption
                     .font(Theme.Fonts.footnote)
                     .foregroundStyle(Theme.Colors.secondary)
                     .truncationMode(.middle)
@@ -41,7 +42,7 @@ struct BigStat: View {
 #Preview {
     HStack(alignment: .top, spacing: 32) {
         BigStat(label: "WILL BE ERASED", value: Text(verbatim: "9.8 GB"), tint: Theme.Colors.warning)
-        BigStat(label: "WILL BE INSTALLED", value: Text(verbatim: "16.8 GB"), caption: "macOS Tahoe")
+        BigStat(label: "WILL BE INSTALLED", value: Text(verbatim: "16.8 GB"), caption: Text(verbatim: "macOS Tahoe"))
         BigStat(label: "FREE AFTERWARDS", value: Text(verbatim: "15.2 GB"))
     }
     .padding()
