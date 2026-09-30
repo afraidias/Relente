@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/afraidias/Relente/compare/v0.3.0...v0.3.1) (2026-09-30)
+
+
+### Documentation
+
+* adopt agent skills for spec-driven development ([#13](https://github.com/afraidias/Relente/issues/13)) ([dbf058b](https://github.com/afraidias/Relente/commit/dbf058be64cd8368387d30681c818a017006631f))
+
 ## [0.3.0](https://github.com/afraidias/Relente/compare/v0.2.0...v0.3.0) (2026-09-30)
 
 
