@@ -2,8 +2,9 @@
 
 ## Requirements
 
-- macOS 27 or later (to build; the app runs on macOS 26 and later).
-- Xcode 27.
+- Xcode 27, which runs on macOS 26.6 or later.
+
+The app itself runs on **macOS 14 Sonoma and later**, on Apple silicon and Intel Macs (Release builds are universal).
 
 ## Build and run in Xcode
 
@@ -18,6 +19,15 @@
 4. Press **⌘R**.
 
 The app is not sandboxed (it needs a privileged helper to erase disks), so it can't be distributed through the Mac App Store.
+
+## Checking older macOS versions
+
+On macOS 26 and later the app uses Liquid Glass; on macOS 14 and 15 it falls back to the classic control styles. To see the classic look on a newer Mac:
+
+- In Xcode's canvas, pick the **Classic (macOS 14–15)** preview.
+- Or run a Debug build with the `-classicControls YES` launch argument (**Product → Scheme → Edit Scheme… → Run → Arguments**).
+
+For real testing, use a macOS 14 or 15 virtual machine, and Rosetta or an Intel Mac for the Intel build.
 
 ## Git hooks
 

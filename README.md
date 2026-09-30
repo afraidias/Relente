@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
-  <img src="https://img.shields.io/badge/macOS-26%2B-black" alt="macOS 26 or later">
+  <img src="https://img.shields.io/badge/macOS-14%2B-black" alt="macOS 14 or later">
   <img src="https://img.shields.io/badge/Swift-6-orange" alt="Swift 6">
 </p>
 
@@ -21,7 +21,7 @@ It is written in Swift and SwiftUI, and only works with macOS installers and rem
 
 ### Requirements
 
-- A Mac running **macOS 26** or later.
+- A Mac running **macOS 14 Sonoma** or later, with Apple silicon or an Intel processor. Older Macs matter here, so the oldest supported version is only dropped when keeping it becomes costly; this is reviewed once a year.
 - A macOS installer from **Big Sur (11) onwards**, in any of these forms:
   - `Install macOS <name>.app`
   - A `.dmg` that contains the installer app

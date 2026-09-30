@@ -31,6 +31,11 @@ struct ContentView: View {
     }
 }
 
-#Preview {
+#Preview("Liquid Glass (macOS 26+)") {
     ContentView()
+}
+
+#Preview("Classic (macOS 14–15)") {
+    ContentView()
+        .environment(\.usesClassicControls, true)
 }
