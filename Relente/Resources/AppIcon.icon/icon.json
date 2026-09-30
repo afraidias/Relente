@@ -1,0 +1,60 @@
+{
+  "color-space-for-untagged-svg-colors" : "display-p3",
+  "fill" : "system-dark",
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "3_brazo_derecho 3.svg",
+          "name" : "3_brazo_derecho 3"
+        },
+        {
+          "image-name" : "2_brazo_izquierdo 3.svg",
+          "name" : "2_brazo_izquierdo 3"
+        },
+        {
+          "image-name" : "1_tallo 3.svg",
+          "name" : "1_tallo 3"
+        }
+      ],
+      "name" : "Flecha",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.3
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "2_luz 2.svg",
+          "name" : "2_luz 2"
+        },
+        {
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "1_ranura 3.svg",
+          "name" : "1_ranura 3"
+        }
+      ],
+      "name" : "Ranura",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.3
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [
+      "iOS",
+      "macOS"
+    ]
+  }
+}

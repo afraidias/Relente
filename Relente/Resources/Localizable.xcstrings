@@ -1,0 +1,83 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Choose an Installer" : {
+      "comment" : "Title of the Installer screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un instalador"
+          }
+        }
+      }
+    },
+    "Continue" : {
+      "comment" : "Primary button in the assistant footer that goes to the next step.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        }
+      }
+    },
+    "Download from Apple…" : {
+      "comment" : "Button on the Installer screen that opens the installer download screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar desde Apple…"
+          }
+        }
+      }
+    },
+    "Installer" : {
+      "comment" : "Name of the first assistant step, where the macOS installer is chosen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalador"
+          }
+        }
+      }
+    },
+    "Pick the version of macOS you want on the USB drive." : {
+      "comment" : "Subtitle of the Installer screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige la versión de macOS que quieres en la memoria USB."
+          }
+        }
+      }
+    },
+    "Review" : {
+      "comment" : "Name of the third assistant step, where the user reviews and confirms the erase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisar"
+          }
+        }
+      }
+    },
+    "Step %lld of %lld · %@" : {
+      "comment" : "Assistant footer. First value: current step number; second: total steps; third: step name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paso %1$lld de %2$lld · %3$@"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# Claude Code: personal settings
+.claude/settings.local.json
+
+# Apple's agent skills (bundled with Xcode 27, no redistribution license).
+# Recreate them locally with:
+#   DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcrun agent skills export .claude/skills
+.claude/skills/adopt-c-bounds-safety/
+.claude/skills/app-intents-specialist/
+.claude/skills/app-intents-whats-new-27/
+.claude/skills/audit-xcode-security-settings/
+.claude/skills/building-document-based-swiftui-applications/
+.claude/skills/device-interaction/
+.claude/skills/modernize-tests/
+.claude/skills/swiftui-specialist/
+.claude/skills/swiftui-whats-new-27/
+.claude/skills/uikit-app-modernization/
+
+# Local notes for Claude Code (not published)
+CLAUDE.md
