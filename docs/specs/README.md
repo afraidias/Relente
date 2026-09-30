@@ -41,4 +41,5 @@ Decisions still to make.
 | Spec | Status |
 | --- | --- |
 | [001 · Installer screen](001-installer-screen.md) | Done |
-| [002 · USB drive screen](002-drive-screen.md) | Approved |
+| [002 · USB drive screen](002-drive-screen.md) | Done |
+| [003 · Review screen](003-review-screen.md) | Approved |

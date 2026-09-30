@@ -34,6 +34,8 @@ enum Theme {
         static let sectionLabel: Font = .subheadline.weight(.semibold)
         /// Small secondary text, such as the step indicator (12 pt).
         static let footnote: Font = .callout
+        /// Big figures such as "9.8 GB" (22 pt, semibold, digits of equal width).
+        static let figure: Font = .title.weight(.semibold).monospacedDigit()
     }
 
     // MARK: - Sizes

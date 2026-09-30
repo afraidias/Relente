@@ -18,13 +18,13 @@ struct ContentView: View {
                 .padding(.bottom, 24)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            AssistantFooter(
-                step: 1,
-                totalSteps: 4,
-                stepName: "Installer",
-                canContinue: selectedInstallerID != nil
-            ) {
-                // TODO: go to the USB drive screen.
+            AssistantFooter(step: 1, totalSteps: 4, stepName: "Installer") {
+                Button("Continue") {
+                    // TODO: go to the USB drive screen.
+                }
+                .buttonStyle(.primary)
+                .keyboardShortcut(.defaultAction)
+                .disabled(selectedInstallerID == nil)
             }
         }
         .frame(width: Theme.Sizes.window.width, height: Theme.Sizes.window.height)
