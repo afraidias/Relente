@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/afraidias/Relente/compare/v0.1.0...v0.2.0) (2026-09-30)
+
+
+### Features
+
+* add USB drive screen ([#8](https://github.com/afraidias/Relente/issues/8)) ([51b3447](https://github.com/afraidias/Relente/commit/51b3447e91d5b054574b671b914f5b5c423c22cb))
+
 ## 0.1.0 (2026-09-30)
 
 
