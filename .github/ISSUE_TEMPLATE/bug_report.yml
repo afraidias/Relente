@@ -1,0 +1,51 @@
+name: Bug report
+description: Something doesn't work as expected.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Choose the installer…
+        2. Choose the drive…
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: Relente version
+      placeholder: "0.1.0 (or commit hash)"
+    validations:
+      required: true
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version
+      placeholder: "macOS 26.1"
+    validations:
+      required: true
+  - type: input
+    id: installer
+    attributes:
+      label: Installer used
+      placeholder: "Install macOS Tahoe.app 26.0 / InstallAssistant.pkg 15.6 / .dmg…"
+  - type: input
+    id: drive
+    attributes:
+      label: Drive
+      placeholder: "32 GB USB 3 drive / 64 GB SD card…"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Any error message shown by the app, or relevant lines from Console.app.
+      render: text
