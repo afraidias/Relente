@@ -3,7 +3,7 @@
 //  Relente
 //
 //  Step 2b: no USB drive or SD card is connected yet.
-//  Spec: docs/specs/002-drive-screen.md
+//  Spec: specs/002-drive-screen/spec.md
 //
 
 import SwiftUI

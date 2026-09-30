@@ -3,7 +3,7 @@
 //  Relente
 //
 //  Step 2: pick the USB drive or SD card that will become the installer.
-//  Spec: docs/specs/002-drive-screen.md
+//  Spec: specs/002-drive-screen/spec.md
 //
 
 import SwiftUI
