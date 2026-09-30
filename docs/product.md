@@ -43,8 +43,11 @@ buttons on the right.
 3. **Review:** the drive as the hero; WILL BE ERASED / WILL BE INSTALLED / FREE AFTERWARDS; usage
    bar; orange warning with a required checkbox; red "Erase and Create" with Touch ID.
 4. **Creating:** progress ring around the drive; COPIED / SPEED / REMAINING; a 4-phase bar
-   (Format, Copy, Make bootable, Verify).
-   4b. **Error:** same layout with a red badge, "STOPPED AT X %" and "OTHER DISKS · Untouched".
+   (Format, Copy, Make bootable, Verify). "Cancel" asks for confirmation ("Keep Going" is the
+   default; "Stop" leaves the drive unusable until it's erased again).
+   4b. **Error:** same layout, nothing moves, in red: a red badge, the reason and what to do as
+   the subtitle, "STOPPED AT X %", and the current step's pill in red. "Try Again" (default) returns to Review; "Start Over"
+   returns to the Installer screen.
 5. **Done:** green badge, "Verified" and "Took X min", how to boot (Apple silicon / Intel).
    "Eject" returns to the Installer screen, never to Permissions.
 
