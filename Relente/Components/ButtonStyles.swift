@@ -4,7 +4,8 @@
 //
 //  The app's button styles. They use Liquid Glass on macOS 26 and later,
 //  and the classic bordered styles on earlier versions, so screens never
-//  need their own availability checks.
+//  need their own availability checks. Liquid Glass buttons are always
+//  capsules; at the regular control size macOS would draw rounded rectangles.
 //
 
 import SwiftUI
@@ -22,7 +23,7 @@ struct PrimaryButtonStyle: PrimitiveButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         if #available(macOS 26, *), !usesClassicControls {
-            Button(configuration).buttonStyle(.glassProminent)
+            Button(configuration).buttonStyle(.glassProminent).buttonBorderShape(.capsule)
         } else {
             Button(configuration).buttonStyle(.borderedProminent)
         }
@@ -35,7 +36,7 @@ struct SecondaryButtonStyle: PrimitiveButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         if #available(macOS 26, *), !usesClassicControls {
-            Button(configuration).buttonStyle(.glass)
+            Button(configuration).buttonStyle(.glass).buttonBorderShape(.capsule)
         } else {
             Button(configuration).buttonStyle(.bordered)
         }
@@ -43,11 +44,11 @@ struct SecondaryButtonStyle: PrimitiveButtonStyle {
 }
 
 extension PrimitiveButtonStyle where Self == PrimaryButtonStyle {
-    /// Main action: Liquid Glass prominent on macOS 26+, bordered prominent before.
+    /// Main action: Liquid Glass prominent capsule on macOS 26+, bordered prominent before.
     static var primary: PrimaryButtonStyle { PrimaryButtonStyle() }
 }
 
 extension PrimitiveButtonStyle where Self == SecondaryButtonStyle {
-    /// Secondary action: Liquid Glass on macOS 26+, bordered before.
+    /// Secondary action: Liquid Glass capsule on macOS 26+, bordered before.
     static var secondary: SecondaryButtonStyle { SecondaryButtonStyle() }
 }

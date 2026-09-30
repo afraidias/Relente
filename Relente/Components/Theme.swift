@@ -43,6 +43,9 @@ enum Theme {
     enum Sizes {
         /// Size of the assistant window.
         static let window = CGSize(width: 800, height: 560)
+        /// Space above each screen's header. The window has no title bar, so this keeps the
+        /// title clear of the window buttons (close, minimize, zoom) in the top corner.
+        static let headerTopPadding: CGFloat = 28
     }
 }
 

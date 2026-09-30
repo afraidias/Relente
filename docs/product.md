@@ -65,6 +65,9 @@ badge. With Reduce Motion, a crossfade is used instead.
 - Reusable components, one `View` each (e.g. `StatusChip`, `HeroArtwork`, `PickItem`, `BigStat`,
   `PhaseBar`, `StepIndicator`, `WarningCallout`).
 - Buttons: `.buttonStyle(.primary)` for the main action, `.buttonStyle(.secondary)` for others,
-  `role: .destructive` for erasing.
+  `role: .destructive` for erasing. On macOS 26+ they are Liquid Glass capsules at the regular
+  control size; on macOS 14–15, the classic bordered styles.
+- Window: fixed 800×560 content under a hidden title bar. Every screen's header sits
+  `Theme.Sizes.headerTopPadding` (28 pt) below it, clear of the window buttons.
 - Cards only for grouping (Download, error details, "How to boot"); never for picking options or
   showing progress.
