@@ -16,8 +16,9 @@ Bug reports and ideas are welcome. Before opening an issue, please search the ex
 
 ## Conventions
 
-These are the rules the project follows, for reference:
+These are the rules the project follows, for reference. The full set lives in [AGENTS.md](AGENTS.md).
 
+- **Specs:** spec-driven development. Every feature starts as a spec in [`specs/`](specs) (`spec.md`, then `plan.md` and `tasks.md`), is approved, and only then implemented.
 - **Branches:** GitHub Flow. `main` always builds; every change lands through a pull request from a short-lived branch (`feature/…`, `fix/…`, `chore/…`, `docs/…`) with *squash merge*.
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/), in English. For example: `feat(installer): add installer picker`.
 - **Code:** Swift 6 with strict concurrency, SwiftUI, and everything in English (names, comments, docs). UI strings are localized through the String Catalog.

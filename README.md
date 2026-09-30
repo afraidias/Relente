@@ -64,15 +64,19 @@ This is a personal project and **pull requests aren't accepted for now**. Bug re
 
 ## Project status
 
-Early development. The roadmap:
+Early development. The roadmap (specs refer to these as "roadmap step N"):
 
-- [x] Project setup and design system
-- [ ] Static screens with sample data (in progress)
-- [ ] Assistant navigation and animations
-- [ ] Real disk and installer detection
-- [ ] System helper, XPC and security checks
-- [ ] `createinstallmedia` with live progress
-- [ ] Signing, notarization and first release
+1. [x] Project setup
+2. [x] Folder structure and design system
+3. [ ] Static screens with sample data: 001 Installer ✓, 002 USB drive ✓, 003 Review ✓, 004 Creating (+ Error), 005 Done
+4. [ ] Assistant navigation and animations (includes the VoiceOver check deferred from 003)
+5. [ ] Real disk and installer detection
+6. [ ] System helper, XPC and security checks (includes the Permissions screen)
+7. [ ] `createinstallmedia` with live progress
+8. [ ] Signing, notarization and first release
+9. [ ] Download installers from Apple (Download screen)
+
+Relente is built with spec-driven development: every feature has a specification in [`specs/`](specs), and the project's rules are in [AGENTS.md](AGENTS.md).
 
 ## License
 

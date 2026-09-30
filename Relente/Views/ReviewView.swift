@@ -4,7 +4,7 @@
 //
 //  Step 3: last look at the drive that will be erased and what will be put
 //  on it, with a required confirmation before erasing.
-//  Spec: docs/specs/003-review-screen.md
+//  Spec: specs/003-review-screen/spec.md
 //
 
 import SwiftUI
