@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/afraidias/Relente/compare/v0.3.1...v0.4.0) (2026-09-30)
+
+
+### Features
+
+* add Creating screen ([#15](https://github.com/afraidias/Relente/issues/15)) ([721f635](https://github.com/afraidias/Relente/commit/721f63535b6811725fd04d5297c8676d5b0f6491))
+
 ## [0.3.1](https://github.com/afraidias/Relente/compare/v0.3.0...v0.3.1) (2026-09-30)
 
 
