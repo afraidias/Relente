@@ -21,7 +21,12 @@ These are the rules the project follows, for reference:
 - **Branches:** GitHub Flow. `main` always builds; every change lands through a pull request from a short-lived branch (`feature/…`, `fix/…`, `chore/…`, `docs/…`) with *squash merge*.
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/), in English. For example: `feat(installer): add installer picker`.
 - **Code:** Swift 6 with strict concurrency, SwiftUI, and everything in English (names, comments, docs). UI strings are localized through the String Catalog.
-- **Versions:** semantic versioning tags (`v0.1.0`).
+- **Architecture:** views only present data; models are value types; every service sits behind a protocol with a live and a sample implementation, so previews and tests never touch real disks. No third-party dependencies.
+- **Formatting:** [swift-format](https://github.com/swiftlang/swift-format), bundled with Xcode, using the repository's `.swift-format` (4 spaces, 120 columns). `xcrun swift-format lint -r --strict Relente RelenteTests RelenteUITests` must pass.
+- **Warnings:** none allowed. Release builds treat warnings as errors.
+- **Tests:** [Swift Testing](https://developer.apple.com/documentation/testing) for unit tests, XCTest only for UI tests. Logic and every security check must have tests.
+- **Versions:** semantic versioning (`v0.1.0`), managed by [release-please](https://github.com/googleapis/release-please) from the Conventional Commits. See [BUILDING.md](BUILDING.md#versions).
+- **Git hooks:** run `git config core.hooksPath .githooks` once, so formatting and commit messages are checked before each commit.
 
 ## Code of conduct
 

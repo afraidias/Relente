@@ -1,0 +1,20 @@
+#!/bin/sh
+# Blocks the commit if any staged Swift file isn't formatted with swift-format.
+# Fix it with: xcrun swift-format format -i <file>
+
+files=$(git diff --cached --name-only --diff-filter=ACMR -- '*.swift')
+[ -z "$files" ] && exit 0
+
+# Use Xcode's toolchain even if xcode-select points to the Command Line Tools.
+if ! xcrun --find swift-format >/dev/null 2>&1; then
+    export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+fi
+
+echo "$files" | tr '\n' '\0' | xargs -0 xcrun swift-format lint --strict
+status=$?
+if [ $status -ne 0 ]; then
+    echo ""
+    echo "✗ Formatting issues found. Run:"
+    echo "  xcrun swift-format format -i -r Relente RelenteTests RelenteUITests"
+    exit 1
+fi
