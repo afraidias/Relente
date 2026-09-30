@@ -12,6 +12,28 @@
         }
       }
     },
+    "%@ will use %@ of %@" : {
+      "comment" : "VoiceOver label of the usage bar. Values: installer name (e.g. macOS Tahoe), its size (16.8 GB) and the drive's capacity (32 GB).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ocupará %2$@ de %3$@"
+          }
+        }
+      }
+    },
+    "Back" : {
+      "comment" : "Secondary button in the assistant footer that goes to the previous step.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atrás"
+          }
+        }
+      }
+    },
     "Choose a USB Drive" : {
       "comment" : "Title of the USB drive screen.",
       "localizations" : {
@@ -78,6 +100,17 @@
         }
       }
     },
+    "Erase and Create" : {
+      "comment" : "Button that erases the drive and creates the installer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar y crear"
+          }
+        }
+      }
+    },
     "Everything on the drive you choose will be erased." : {
       "comment" : "Subtitle of the USB drive screen.",
       "localizations" : {
@@ -85,6 +118,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se borrará todo lo que haya en la memoria que elijas."
+          }
+        }
+      }
+    },
+    "Everything on “%@” will be permanently erased." : {
+      "comment" : "Review screen warning. The value is the drive's name, e.g. SanDisk Ultra.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se borrará para siempre todo lo que hay en «%@»."
+          }
+        }
+      }
+    },
+    "FREE AFTERWARDS" : {
+      "comment" : "Review screen figure: space left on the drive after creating it.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LIBRE DESPUÉS"
+          }
+        }
+      }
+    },
+    "Free" : {
+      "comment" : "Usage bar legend: free space on the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libre"
+          }
+        }
+      }
+    },
+    "I understand that all data on this drive will be lost." : {
+      "comment" : "Required checkbox before erasing the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entiendo que se perderán todos los datos de esta memoria."
           }
         }
       }
@@ -100,6 +177,17 @@
         }
       }
     },
+    "Make sure this is the right drive. Everything on it will be erased." : {
+      "comment" : "Subtitle of the Review screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asegúrate de que es la memoria correcta. Se borrará todo lo que contiene."
+          }
+        }
+      }
+    },
     "Needs %@" : {
       "comment" : "Under a drive that's too small. The value is the minimum size, e.g. 17.8 GB.",
       "localizations" : {
@@ -107,6 +195,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Necesita %@"
+          }
+        }
+      }
+    },
+    "Nothing" : {
+      "comment" : "Review screen: an empty drive has nothing to erase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada"
           }
         }
       }
@@ -133,6 +232,17 @@
         }
       }
     },
+    "Review and Create" : {
+      "comment" : "Title of the Review screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisar y crear"
+          }
+        }
+      }
+    },
     "Step %lld of %lld · %@" : {
       "comment" : "Assistant footer. First value: current step number; second: total steps; third: step name.",
       "localizations" : {
@@ -140,6 +250,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paso %1$lld de %2$lld · %3$@"
+          }
+        }
+      }
+    },
+    "This can't be undone. Other disks won't be touched." : {
+      "comment" : "Review screen warning, second line.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede deshacer. Los demás discos no se tocarán."
           }
         }
       }
@@ -162,6 +283,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usa una memoria USB o una tarjeta SD de al menos %1$@. Con %2$@ o más sirve para cualquier versión de macOS."
+          }
+        }
+      }
+    },
+    "WILL BE ERASED" : {
+      "comment" : "Review screen figure: space in use on the drive, which will be lost.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SE BORRARÁ"
+          }
+        }
+      }
+    },
+    "WILL BE INSTALLED" : {
+      "comment" : "Review screen figure: size of the installer copied to the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SE INSTALARÁ"
           }
         }
       }
