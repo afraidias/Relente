@@ -51,24 +51,3 @@ extension PrimitiveButtonStyle where Self == SecondaryButtonStyle {
     /// Secondary action: Liquid Glass on macOS 26+, bordered before.
     static var secondary: SecondaryButtonStyle { SecondaryButtonStyle() }
 }
-
-#Preview("Liquid Glass (macOS 26+)") {
-    HStack {
-        Button("Download from Apple…") {}
-            .buttonStyle(.secondary)
-        Button("Continue") {}
-            .buttonStyle(.primary)
-    }
-    .padding()
-}
-
-#Preview("Classic (macOS 14–15)") {
-    HStack {
-        Button("Download from Apple…") {}
-            .buttonStyle(.secondary)
-        Button("Continue") {}
-            .buttonStyle(.primary)
-    }
-    .padding()
-    .environment(\.usesClassicControls, true)
-}
