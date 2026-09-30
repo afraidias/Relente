@@ -40,7 +40,7 @@ struct InstallerView: View {
             Button("Download from Apple…") {
                 // TODO: open the download screen (1b).
             }
-            .buttonStyle(.glass)
+            .buttonStyle(.secondary)
         }
         .padding(.top, 8)
     }

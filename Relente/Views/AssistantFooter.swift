@@ -22,7 +22,7 @@ struct AssistantFooter: View {
             Spacer()
 
             Button("Continue", action: onContinue)
-                .buttonStyle(.glassProminent)
+                .buttonStyle(.primary)
                 .keyboardShortcut(.defaultAction)
                 .disabled(!canContinue)
         }
