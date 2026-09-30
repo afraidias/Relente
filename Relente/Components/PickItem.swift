@@ -5,30 +5,33 @@
 //  Finder-style selectable item: a big icon with its name underneath.
 //  When selected, the icon gets a gray plate behind it and the name
 //  sits in a blue capsule, just like a selected file in Finder.
-//  The icon is any view, so the same item works for installers and drives.
+//  The icon and the details under the name are any views, so the same
+//  item works for installers and drives. Disabled items look dimmed.
 //
 
 import SwiftUI
 
-struct PickItem<Icon: View>: View {
+struct PickItem<Icon: View, Detail: View>: View {
     let title: String
-    let subtitle: String?
     let isSelected: Bool
     let action: () -> Void
     let icon: Icon
+    let detail: Detail
+
+    @Environment(\.isEnabled) private var isEnabled
 
     init(
         title: String,
-        subtitle: String? = nil,
         isSelected: Bool,
         action: @escaping () -> Void,
-        @ViewBuilder icon: () -> Icon
+        @ViewBuilder icon: () -> Icon,
+        @ViewBuilder detail: () -> Detail = { EmptyView() }
     ) {
         self.title = title
-        self.subtitle = subtitle
         self.isSelected = isSelected
         self.action = action
         self.icon = icon()
+        self.detail = detail()
     }
 
     var body: some View {
@@ -56,13 +59,10 @@ struct PickItem<Icon: View>: View {
                             .opacity(isSelected ? 1 : 0)
                     }
 
-                if let subtitle {
-                    Text(subtitle)
-                        .font(.subheadline)
-                        .foregroundStyle(Theme.Colors.secondary)
-                }
+                detail
             }
             .frame(width: 160)
+            .opacity(isEnabled ? 1 : 0.45)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -75,11 +75,14 @@ struct PickItem<Icon: View>: View {
         ForEach(InstallerSource.samples) { installer in
             PickItem(
                 title: installer.name,
-                subtitle: installer.version,
                 isSelected: installer.id == InstallerSource.samples.first?.id,
                 action: {}
             ) {
                 FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
+            } detail: {
+                Text(verbatim: installer.version)
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.Colors.secondary)
             }
         }
     }

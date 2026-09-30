@@ -1,6 +1,28 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ will be erased" : {
+      "comment" : "Status chip under a drive that has data. The value is the space in use, e.g. 9.8 GB.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se borrarán %@"
+          }
+        }
+      }
+    },
+    "Choose a USB Drive" : {
+      "comment" : "Title of the USB drive screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige una memoria USB"
+          }
+        }
+      }
+    },
     "Choose an Installer" : {
       "comment" : "Title of the Installer screen.",
       "localizations" : {
@@ -8,6 +30,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elige un instalador"
+          }
+        }
+      }
+    },
+    "Connect a USB Drive" : {
+      "comment" : "Title of the empty state when no USB drive or SD card is connected.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conecta una memoria USB"
           }
         }
       }
@@ -34,6 +67,28 @@
         }
       }
     },
+    "Empty" : {
+      "comment" : "Status chip under a drive with nothing on it.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vacía"
+          }
+        }
+      }
+    },
+    "Everything on the drive you choose will be erased." : {
+      "comment" : "Subtitle of the USB drive screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se borrará todo lo que haya en la memoria que elijas."
+          }
+        }
+      }
+    },
     "Installer" : {
       "comment" : "Name of the first assistant step, where the macOS installer is chosen.",
       "localizations" : {
@@ -41,6 +96,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instalador"
+          }
+        }
+      }
+    },
+    "Needs %@" : {
+      "comment" : "Under a drive that's too small. The value is the minimum size, e.g. 17.8 GB.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Necesita %@"
           }
         }
       }
@@ -74,6 +140,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paso %1$lld de %2$lld · %3$@"
+          }
+        }
+      }
+    },
+    "Too small" : {
+      "comment" : "Status chip under a drive smaller than the installer needs.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muy pequeña"
+          }
+        }
+      }
+    },
+    "Use a USB drive or SD card with at least %@. %@ or more works for any version of macOS." : {
+      "comment" : "Empty state when no drive is connected. First value: minimum size for the chosen installer (e.g. 17.8 GB); second: size that works for any installer (32 GB).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa una memoria USB o una tarjeta SD de al menos %1$@. Con %2$@ o más sirve para cualquier versión de macOS."
+          }
+        }
+      }
+    },
+    "Waiting for a drive…" : {
+      "comment" : "Shown while no USB drive or SD card is connected.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando una memoria…"
           }
         }
       }

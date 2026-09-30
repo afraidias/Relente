@@ -8,7 +8,7 @@
 import Foundation
 import UniformTypeIdentifiers
 
-struct InstallerSource: Identifiable, Hashable {
+nonisolated struct InstallerSource: Identifiable, Hashable, Sendable {
 
     /// The three kinds of source files the app accepts.
     enum Kind: Hashable {
@@ -50,7 +50,7 @@ struct InstallerSource: Identifiable, Hashable {
 
 // MARK: - Sample data
 
-extension InstallerSource {
+nonisolated extension InstallerSource {
     /// Fake installers for building the screens before real detection exists.
     static let samples: [InstallerSource] = [
         InstallerSource(

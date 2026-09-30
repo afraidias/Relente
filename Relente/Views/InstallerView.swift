@@ -24,12 +24,15 @@ struct InstallerView: View {
                 ForEach(installers) { installer in
                     PickItem(
                         title: installer.name,
-                        subtitle: "\(installer.version) · \(installer.formattedSize)",
                         isSelected: installer.id == selectedID
                     ) {
                         selectedID = installer.id
                     } icon: {
                         FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
+                    } detail: {
+                        Text(verbatim: "\(installer.version) · \(installer.formattedSize)")
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.Colors.secondary)
                     }
                     .help(installer.url.path(percentEncoded: false))
                 }
