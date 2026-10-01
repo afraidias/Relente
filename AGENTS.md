@@ -26,13 +26,22 @@ These project conventions replace the skills' defaults:
   style, testing strategy and boundaries. A feature's `spec.md` only adds what is specific to it.
 - **Status:** each `spec.md` starts with `Status: Draft | Approved | Done`. It becomes **Done in
   the last commit of its own pull request**, before merging, and the index is updated with it.
-- **Open items:** work deferred to a later feature goes in the spec's "Open Items", naming where it
-  will be done. Before specifying a feature, search earlier specs' Open Items for work deferred to
-  it. Nothing deferred lives only in local notes.
+- **Open items:** what a feature doesn't do that someone could expect from it, and the work it
+  defers, go in the spec's "Open items", each with the roadmap step that will do it (roadmap
+  steps, not specs). Before specifying a feature, search earlier specs' Open items for work
+  deferred to its step. Nothing deferred lives only in local notes.
 - **Ideas:** ideas that no spec has deferred yet (for example, from a design canvas) go in a GitHub
   issue labelled `idea` that names its roadmap step. Before specifying a feature, also check the
   open `idea` issues for its step; the pull request that builds one closes it.
-- **Changing behavior:** update the spec first, then the code.
+- **Changing behavior:** update the spec first, then the code: the spec in progress, never a
+  Done one.
+- **Done specs are history:** a finished spec records what was decided and built in its pull
+  request, and it isn't edited afterwards. A later change to what it built goes in the spec in
+  progress, if the owner adds it to its scope, or in an `idea` issue for a later spec. The spec
+  that makes the change names the earlier spec in its "Changes to earlier features" section, so
+  `grep -rn "spec NNN" specs/` finds every later change; an older spec never points at a newer
+  one. [`docs/product.md`](docs/product.md) always describes the app as it is now, and every
+  feature that changes it updates it.
 - **Requirements interviews** (`interview-me`) end up in the spec's Objective, not in
   `docs/intent/`. **Architecture decisions** (`documentation-and-adrs`) go in
   `docs/decisions/NNNN-short-title.md` when they outlive a single feature; otherwise in the spec's
@@ -203,4 +212,5 @@ macOS installers only, from Big Sur (11) onwards; destinations are USB drives an
 7. Follows Apple's Human Interface Guidelines for macOS, or the spec's Decisions record the
    exception and why.
 8. Follows the helper security rules and `SECURITY.md`.
-9. The spec (status Done), `specs/README.md`, README and BUILDING are updated if needed.
+9. The spec (status Done), `specs/README.md`, `docs/product.md`, README and BUILDING are updated
+   if needed.

@@ -22,7 +22,7 @@ one that can destroy data.
 
 ### Three figures
 Side by side, centered (`BigStat` component: small uppercase label, large number, optional
-caption), in the content column (560 pt when built; 640 pt since spec 005):
+caption):
 
 | Label | Value | Caption | Color |
 | --- | --- | --- | --- |

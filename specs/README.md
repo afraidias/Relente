@@ -48,6 +48,11 @@ What we're building, for whom and why, in two or three sentences.
 ## Behavior
 What the user sees and can do, state by state.
 
+## Changes to earlier features
+For each screen or behavior built by an earlier spec that this feature changes: the spec that
+built it (e.g. "spec 003"), what changes and why. Earlier specs aren't edited; `docs/product.md`
+is updated. Omit if nothing.
+
 ## Acceptance criteria
 - [ ] Specific, testable condition. The ones about logic become tests.
 
@@ -57,9 +62,6 @@ Only what this feature adds to AGENTS.md (Always / Ask first / Never). Omit if n
 ## Edge cases
 What happens in unusual situations.
 
-## Out of scope
-What this spec deliberately doesn't cover, and which roadmap step or spec will.
-
 ## Decisions
 Choices made while writing or approving the spec, with the reason.
 
@@ -67,7 +69,9 @@ Choices made while writing or approving the spec, with the reason.
 Unresolved points that need the owner's input before approval. Empty when Approved.
 
 ## Open items
-Work deferred to a later feature, naming where it will be done.
+What this feature doesn't do that someone could expect from it (e.g. a button that's shown but
+does nothing yet), and work it defers, each with the roadmap step that will do it. Name roadmap
+steps, not specs.
 ```
 
 ### plan.md
