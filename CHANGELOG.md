@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.0](https://github.com/afraidias/Relente/compare/v0.4.0...v0.5.0) (2026-10-01)
+
+
+### Features
+
+* add Done screen ([#23](https://github.com/afraidias/Relente/issues/23)) ([3a602b4](https://github.com/afraidias/Relente/commit/3a602b454e64a1319e4eb7bdae2bcda5608d0705))
+
+
+### Documentation
+
+* require Apple's Human Interface Guidelines on every screen ([#24](https://github.com/afraidias/Relente/issues/24)) ([2de2fa9](https://github.com/afraidias/Relente/commit/2de2fa9daad101290f2b8716a3058ad1a1575c3a))
+* track ideas from design canvases as GitHub issues ([#21](https://github.com/afraidias/Relente/issues/21)) ([6528e7c](https://github.com/afraidias/Relente/commit/6528e7c969b4bfb108555de95bceb21153a04214))
+
 ## [0.4.0](https://github.com/afraidias/Relente/compare/v0.3.1...v0.4.0) (2026-09-30)
 
 
