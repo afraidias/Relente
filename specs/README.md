@@ -48,6 +48,11 @@ What we're building, for whom and why, in two or three sentences.
 ## Behavior
 What the user sees and can do, state by state.
 
+## Changes to earlier features
+For each screen or behavior built by an earlier spec that this feature changes: the spec that
+built it (e.g. "spec 003"), what changes and why. Earlier specs aren't edited; `docs/product.md`
+is updated. Omit if nothing.
+
 ## Acceptance criteria
 - [ ] Specific, testable condition. The ones about logic become tests.
 
