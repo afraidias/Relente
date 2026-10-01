@@ -62,10 +62,6 @@ Only what this feature adds to AGENTS.md (Always / Ask first / Never). Omit if n
 ## Edge cases
 What happens in unusual situations.
 
-## Out of scope
-What this spec deliberately doesn't cover, and which roadmap step will. Name roadmap steps, not
-specs.
-
 ## Decisions
 Choices made while writing or approving the spec, with the reason.
 
@@ -73,7 +69,9 @@ Choices made while writing or approving the spec, with the reason.
 Unresolved points that need the owner's input before approval. Empty when Approved.
 
 ## Open items
-Work deferred to a later feature, naming the roadmap step where it will be done.
+What this feature doesn't do that someone could expect from it (e.g. a button that's shown but
+does nothing yet), and work it defers, each with the roadmap step that will do it. Name roadmap
+steps, not specs.
 ```
 
 ### plan.md

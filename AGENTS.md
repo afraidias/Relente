@@ -26,9 +26,10 @@ These project conventions replace the skills' defaults:
   style, testing strategy and boundaries. A feature's `spec.md` only adds what is specific to it.
 - **Status:** each `spec.md` starts with `Status: Draft | Approved | Done`. It becomes **Done in
   the last commit of its own pull request**, before merging, and the index is updated with it.
-- **Open items:** work deferred to a later feature goes in the spec's "Open Items", naming the
-  roadmap step where it will be done. Before specifying a feature, search earlier specs' Open Items for work deferred to
-  it. Nothing deferred lives only in local notes.
+- **Open items:** what a feature doesn't do that someone could expect from it, and the work it
+  defers, go in the spec's "Open items", each with the roadmap step that will do it (roadmap
+  steps, not specs). Before specifying a feature, search earlier specs' Open items for work
+  deferred to its step. Nothing deferred lives only in local notes.
 - **Ideas:** ideas that no spec has deferred yet (for example, from a design canvas) go in a GitHub
   issue labelled `idea` that names its roadmap step. Before specifying a feature, also check the
   open `idea` issues for its step; the pull request that builds one closes it.
@@ -38,8 +39,8 @@ These project conventions replace the skills' defaults:
   request, and it isn't edited afterwards. A later change to what it built goes in the spec in
   progress, if the owner adds it to its scope, or in an `idea` issue for a later spec. The spec
   that makes the change names the earlier spec in its "Changes to earlier features" section, so
-  `grep -rn "spec NNN" specs/` finds every later change. An older spec never points at a newer
-  one: its Out of scope and Open items name roadmap steps, not specs. [`docs/product.md`](docs/product.md) always describes the app as it is now, and every
+  `grep -rn "spec NNN" specs/` finds every later change; an older spec never points at a newer
+  one. [`docs/product.md`](docs/product.md) always describes the app as it is now, and every
   feature that changes it updates it.
 - **Requirements interviews** (`interview-me`) end up in the spec's Objective, not in
   `docs/intent/`. **Architecture decisions** (`documentation-and-adrs`) go in
