@@ -57,11 +57,11 @@ assistant container), at the same time as the screens slide:
   Done, and back along the same path with "Back". On Eject and Start Over it returns to its tile.
 
 ### New: installer label on the USB Drive screen
-Under the screen's subtitle, a small gray capsule with the chosen installer's real icon (16 pt),
-its name in semibold and its version and size in secondary text, e.g. "macOS Tahoe  26.0 ·
-16.8 GB". It reminds the user what will go on the drive and is the stop the installer's icon makes
-on its way to Review. It is not a control (clicking it does nothing). VoiceOver reads it as one
-element: "Installer: macOS Tahoe 26.0, 16.8 GB".
+Changes the USB Drive screen built in spec 002. Under the screen's subtitle, a small gray capsule
+with the chosen installer's real icon (16 pt), its name in semibold and its version and size in
+secondary text, e.g. "macOS Tahoe 26.0 · 16.8 GB". It reminds the user what will go on the drive
+and is the stop the installer's icon makes on its way to Review. It is not a control (clicking it
+does nothing). VoiceOver reads it as one element: "Installer: macOS Tahoe 26.0, 16.8 GB".
 
 ### Selections
 - The Installer screen starts with the first installer selected (as now).
@@ -99,7 +99,8 @@ element: "Installer: macOS Tahoe 26.0, 16.8 GB".
   to Done.
 - A **simulation label** makes it impossible to mistake for the real thing: an orange capsule
   "SIMULATION · Nothing is erased" (Spanish: "SIMULACIÓN · No se borra nada") under the header of
-  Creating, Error and Done while they show a simulated creation. VoiceOver reads it.
+  Creating, Error and Done while they show a simulated creation (screens built in specs 004 and
+  005). VoiceOver reads it.
 - Launch arguments (Debug only), for checking and for the UI tests:
   - `-simulateFailure driveDisconnected` makes the simulation fail partway through Copy with that
     reason, to see Error without cancelling.
@@ -114,12 +115,14 @@ Error and Done can't be reached. Roadmap step 7 replaces both with the real crea
 - **Step indicator:** one indicator stays in the footer across screens instead of being redrawn
   with each footer. When the step changes, the blue pill stretches to the new step, the dots fill
   in, and the step number rolls like a counter. The footer's buttons still swap at once.
-- **Selection:** on Installer and USB Drive, the gray plate and the blue name capsule slide from
+- **Selection:** on Installer and USB Drive (specs 001 and 002), the gray plate and the blue name
+  capsule slide from
   the previous item to the new one, with the mouse and with the arrows. Names are white exactly
   where the capsule is under them, as in a segmented control, so no name turns white late.
 
 ### Review's usage bar
-Chosen by the owner on the canvas (page "Usage bar", option **C**) while building this feature:
+Changes the usage bar built in spec 003. Chosen by the owner on the canvas (page "Usage bar",
+option **C**) while building this feature:
 
 - Above the bar, the drive's name as a section label on the leading side and its capacity on the
   trailing side ("SANDISK ULTRA … 32 GB").
@@ -247,7 +250,8 @@ Checked by hand in the running app (Debug build):
    flow, its animations and its UI tests be built and checked now.
 6. **Back answers Esc and ⌘[.** USB Drive and Review have no Cancel button, so Esc (which always
    cancels, `docs/product.md`) takes the user back; ⌘[ is the standard Mac shortcut for Back.
-   Apple's guidelines and its assistants place Back beside Continue, so USB Drive gets one too.
+   Apple's guidelines and its assistants place Back beside Continue, so USB Drive gets one too
+   (spec 002's footer only had Continue).
    ⌘[ lives in a Go menu rather than on the button: a button takes only one shortcut, an invisible
    second button didn't receive it, and Apple's guidelines want shortcuts findable in the menu bar
    (Finder has the same Go › Back ⌘[).
@@ -262,8 +266,9 @@ Checked by hand in the running app (Debug build):
     redrawn; the selection slides because the plate and capsule are one shape that moves, like
     the drive between screens.
 11. **Review's usage bar, option C** (asked by the owner while building): separating the two
-    parts and giving their sizes in the legend makes the split readable at a glance.
-    `docs/product.md` describes the screen as it is now; earlier specs aren't edited.
+    parts and giving their sizes in the legend makes the split readable at a glance. It changes
+    Review's usage bar from spec 003; `docs/product.md` describes it as it is now, and spec 003
+    isn't edited.
 
 ## Open questions
 None.
