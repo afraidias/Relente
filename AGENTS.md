@@ -26,8 +26,8 @@ These project conventions replace the skills' defaults:
   style, testing strategy and boundaries. A feature's `spec.md` only adds what is specific to it.
 - **Status:** each `spec.md` starts with `Status: Draft | Approved | Done`. It becomes **Done in
   the last commit of its own pull request**, before merging, and the index is updated with it.
-- **Open items:** work deferred to a later feature goes in the spec's "Open Items", naming where it
-  will be done. Before specifying a feature, search earlier specs' Open Items for work deferred to
+- **Open items:** work deferred to a later feature goes in the spec's "Open Items", naming the
+  roadmap step where it will be done. Before specifying a feature, search earlier specs' Open Items for work deferred to
   it. Nothing deferred lives only in local notes.
 - **Ideas:** ideas that no spec has deferred yet (for example, from a design canvas) go in a GitHub
   issue labelled `idea` that names its roadmap step. Before specifying a feature, also check the
@@ -38,9 +38,8 @@ These project conventions replace the skills' defaults:
   request, and it isn't edited afterwards. A later change to what it built goes in the spec in
   progress, if the owner adds it to its scope, or in an `idea` issue for a later spec. The spec
   that makes the change names the earlier spec in its "Changes to earlier features" section, so
-  `grep -rn "spec NNN" specs/` finds every later change. An older spec is never edited to point
-  at a newer one; when it's written, its Out of scope and Open items may name where work will
-  go. [`docs/product.md`](docs/product.md) always describes the app as it is now, and every
+  `grep -rn "spec NNN" specs/` finds every later change. An older spec never points at a newer
+  one: its Out of scope and Open items name roadmap steps, not specs. [`docs/product.md`](docs/product.md) always describes the app as it is now, and every
   feature that changes it updates it.
 - **Requirements interviews** (`interview-me`) end up in the spec's Objective, not in
   `docs/intent/`. **Architecture decisions** (`documentation-and-adrs`) go in

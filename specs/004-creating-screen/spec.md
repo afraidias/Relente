@@ -161,7 +161,6 @@ Same layout as Creating, so the screen doesn't jump:
 - The real `createinstallmedia` process, parsing its output, measuring speed, the real Verify
   check, and keeping the Mac awake while creating (roadmap step 7).
 - The helper and authorization (roadmap step 6).
-- The Done screen (spec 005).
 
 ## Decisions
 1. **Cancel with confirmation.** The user can stop, but only after being told the drive will be
