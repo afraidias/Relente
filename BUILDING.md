@@ -29,6 +29,13 @@ On macOS 26 and later the app uses Liquid Glass; on macOS 14 and 15 it falls bac
 
 For real testing, use a macOS 14 or 15 virtual machine, and Rosetta or an Intel Mac for the Intel build.
 
+## Simulated creation (Debug builds)
+
+Until `createinstallmedia` is wired up (roadmap step 7), Debug builds simulate creating the installer so the whole assistant can be walked: nothing is erased, and Creating, Error and Done show a "SIMULATION · Nothing is erased" label. Release builds have no simulation and keep "Erase and Create" disabled. Two Debug-only launch arguments (**Product → Scheme → Edit Scheme… → Run → Arguments**):
+
+- `-simulationSpeed fast`: the simulation lasts about 2 seconds instead of 15 (the UI tests use it).
+- `-simulateFailure driveDisconnected`: the simulation fails partway through Copy, to see the Error screen.
+
 ## Git hooks
 
 The repository has two git hooks in `.githooks/`: one checks formatting with swift-format before each commit, and the other checks that the commit message follows [Conventional Commits](https://www.conventionalcommits.org/). Turn them on once after cloning:
@@ -69,7 +76,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Rele
 
 | Folder | Contents |
 | --- | --- |
-| `Relente/App` | App entry point. |
+| `Relente/App` | App entry point, the assistant's shared state (`Assistant`) and its menu commands. |
 | `Relente/Views` | Assistant screens. |
 | `Relente/Components` | Reusable views and the design system (`Theme.swift`). |
 | `Relente/Models` | Data types (installers, drives…). |

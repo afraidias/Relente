@@ -14,6 +14,8 @@ struct StepIndicator: View {
     let total: Int
     let name: LocalizedStringResource
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         HStack(spacing: 10) {
             HStack(spacing: 5) {
@@ -24,6 +26,10 @@ struct StepIndicator: View {
                         .frame(width: step == current ? 16 : 6, height: 6)
                 }
             }
+            // The pill stretches to the new step (spec 006). With Reduce Motion, a new set of dots
+            // for each step, so it crossfades instead.
+            .id(reduceMotion ? current : 0)
+            .transition(.opacity)
 
             Text(
                 "Step \(current) of \(total) · \(Text(name))",
@@ -31,7 +37,10 @@ struct StepIndicator: View {
             )
             .font(Theme.Fonts.footnote)
             .foregroundStyle(Theme.Colors.secondary)
+            // The step number rolls like a counter.
+            .contentTransition(reduceMotion ? .opacity : .numericText(value: Double(current)))
         }
+        .animation(reduceMotion ? .easeInOut(duration: 0.2) : .snappy, value: current)
         // VoiceOver reads the label only; the dots are decorative.
         .accessibilityElement(children: .combine)
     }

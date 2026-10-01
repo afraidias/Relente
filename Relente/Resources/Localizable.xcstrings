@@ -40,13 +40,13 @@
         }
       }
     },
-    "%@ will use %@ of %@" : {
-      "comment" : "VoiceOver label of the usage bar. Values: installer name (e.g. macOS Tahoe), its size (16.8 GB) and the drive's capacity (32 GB).",
+    "%@ will use %@ of %@, %@ free" : {
+      "comment" : "VoiceOver label of the usage bar. Values: installer name (e.g. macOS Tahoe), its size (16.8 GB), the drive's capacity (32 GB) and the space left (15.2 GB).",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ocupará %2$@ de %3$@"
+            "value" : "%1$@ ocupará %2$@ de %3$@; quedarán %4$@ libres"
           }
         }
       }
@@ -153,6 +153,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple silicon"
+          }
+        }
+      }
+    },
+    "Available in a later version." : {
+      "comment" : "Help tag of the disabled Erase and Create button, before creating installers is built.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disponible en una versión posterior."
           }
         }
       }
@@ -323,6 +334,7 @@
       }
     },
     "Done" : {
+      "comment" : "Name of the assistant's last screen, once the installer is ready.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -464,6 +476,17 @@
         }
       }
     },
+    "Go" : {
+      "comment" : "Menu bar menu with commands to move through the assistant.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ir"
+          }
+        }
+      }
+    },
     "HOLD" : {
       "comment" : "Done screen card capsule, uppercase: keep the power button pressed.",
       "localizations" : {
@@ -525,6 +548,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instalador listo"
+          }
+        }
+      }
+    },
+    "Installer: %@ %@, %@" : {
+      "comment" : "VoiceOver label of the installer reminder on the USB Drive screen. Values: name, version and size, e.g. macOS Tahoe, 26.0, 16.8 GB.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalador: %1$@ %2$@, %3$@"
           }
         }
       }
@@ -712,6 +746,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Revisar y crear"
+          }
+        }
+      }
+    },
+    "SIMULATION · Nothing is erased" : {
+      "comment" : "Label shown while the creation is only simulated (Debug builds).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIMULACIÓN · No se borra nada"
           }
         }
       }
@@ -932,6 +977,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inténtalo de nuevo. Si sigue pasando, usa otra memoria."
+          }
+        }
+      }
+    },
+    "USB Drive" : {
+      "comment" : "Name of the second assistant step, where the USB drive or SD card is chosen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memoria USB"
           }
         }
       }

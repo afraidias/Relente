@@ -13,6 +13,8 @@ struct DoneView: View {
     let result: CreationResult
     /// The kind of Mac in use, whose start-up card is marked "This Mac".
     let thisMac: MacArchitecture
+    /// Whether the creation was only simulated (Debug builds): a label then says so.
+    var isSimulated = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,6 +25,11 @@ struct DoneView: View {
                     comment: "Done screen subtitle. The value is how long it took, e.g. 12 minutes."
                 )
             )
+
+            if isSimulated {
+                SimulationLabel()
+                    .padding(.top, 8)
+            }
 
             Spacer(minLength: 8)
 
@@ -50,15 +57,10 @@ struct DoneHero: View {
         VStack(spacing: 12) {
             HeroArtwork(size: 104, haloColor: Theme.Colors.success) {
                 DriveArtwork(kind: result.drive.kind)
+                    .sharedArtwork(.drive)
             } badge: {
-                FileIcon(url: result.installer.url, fallbackType: result.installer.kind.contentType)
-                    .overlay(alignment: .topTrailing) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .resizable()
-                            .foregroundStyle(.white, Theme.Colors.success)
-                            .frame(width: 18, height: 18)
-                            .offset(x: 6, y: -6)
-                    }
+                InstallerBadge(installer: result.installer, isChecked: true)
+                    .sharedArtwork(.installer)
             }
 
             Text(
@@ -193,7 +195,7 @@ struct DoneFooter: View {
     }
 
     var body: some View {
-        AssistantFooter(step: 4, totalSteps: 4, stepName: "Done") {
+        AssistantFooter(for: .done) {
             HelpLink {
                 isShowingHelp = true
             }
@@ -216,16 +218,16 @@ struct DoneFooter: View {
 
 // MARK: - Whole screen
 
-/// The whole screen as it appears in the window: content and footer. Used by the previews and,
-/// in Debug builds, by the `-startScreen done` launch argument (see `RelenteApp`).
+/// The whole screen as it appears in the window: content and footer, for the previews.
 struct DoneScreen: View {
     var result = CreationResult.sample
     var thisMac = MacArchitecture.appleSilicon
     var isShowingHelp = false
+    var isSimulated = false
 
     var body: some View {
         VStack(spacing: 0) {
-            DoneView(result: result, thisMac: thisMac)
+            DoneView(result: result, thisMac: thisMac, isSimulated: isSimulated)
                 .padding(.horizontal, 32)
                 .padding(.bottom, 24)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -266,6 +268,10 @@ struct DoneScreen: View {
     DoneScreen(
         result: CreationResult(installer: InstallerSource.samples[0], drive: Drive.samples[0], duration: .seconds(45))
     )
+}
+
+#Preview("Simulated") {
+    DoneScreen(isSimulated: true)
 }
 
 #Preview("Help open") {

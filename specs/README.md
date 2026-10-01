@@ -31,6 +31,7 @@ once in [AGENTS.md](../AGENTS.md), and the screen flow and design system in
 | [003 · Review screen](003-review-screen/spec.md) | 3 | Done |
 | [004 · Creating screen (+ Error)](004-creating-screen/spec.md) | 3 | Done |
 | [005 · Done screen](005-done-screen/spec.md) | 3 | Done |
+| [006 · Assistant navigation](006-assistant-navigation/spec.md) | 4 | Done |
 
 ## Templates
 

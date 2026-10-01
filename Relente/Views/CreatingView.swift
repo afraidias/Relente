@@ -16,6 +16,8 @@ struct CreatingView: View {
     let drive: Drive
     /// Running, or stopped with a reason. Both share this layout, so the screen doesn't jump.
     let state: CreationState
+    /// Whether the creation is only simulated (Debug builds): a label then says so.
+    var isSimulated = false
 
     var body: some View {
         let progress = state.progress
@@ -28,6 +30,11 @@ struct CreatingView: View {
                     title: "Creating Installer",
                     subtitle: "Keep the drive plugged in. This can take a while."
                 )
+            }
+
+            if isSimulated {
+                SimulationLabel()
+                    .padding(.top, 8)
             }
 
             Spacer(minLength: 8)
@@ -91,6 +98,7 @@ struct CreatingHero: View {
 
         let artwork = HeroArtwork(size: 90, haloColor: tint) {
             DriveArtwork(kind: drive.kind)
+                .sharedArtwork(.drive)
         } badge: {
             if isFailed {
                 Image(systemName: "xmark.circle.fill")
@@ -98,6 +106,7 @@ struct CreatingHero: View {
                     .foregroundStyle(.white, Theme.Colors.danger)
             } else {
                 FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
+                    .sharedArtwork(.installer)
             }
         }
 
@@ -137,6 +146,7 @@ struct CreatingHero: View {
     private var percentage: some View {
         Text(progress.percent, format: .percent)
             .font(Theme.Fonts.figure)
+            .rollingFigure(Double(progress.percent))
             // The ring already reads the percentage.
             .accessibilityHidden(true)
     }
@@ -166,24 +176,33 @@ struct CreatingStats: View {
                 caption: Text(
                     "of \(Self.bytes(progress.installerSize))",
                     comment: "Creating screen, under COPIED. The value is the installer's size, e.g. 16.8 GB."
-                )
+                ),
+                rollingValue: Double(progress.displayedCopiedBytes)
             )
             .frame(maxWidth: .infinity)
 
             BigStat(
                 label: LocalizedStringResource(
                     "SPEED", comment: "Creating screen figure: how fast the installer is being copied."),
-                value: speed
+                value: speed,
+                rollingValue: Double(progress.displayedBytesPerSecond ?? 0)
             )
             .frame(maxWidth: .infinity)
 
             BigStat(
                 label: LocalizedStringResource(
                     "REMAINING", comment: "Creating screen figure: estimated time left."),
-                value: Text(progress.remaining.text)
+                value: Text(progress.remaining.text),
+                rollingValue: remainingSeconds
             )
             .frame(maxWidth: .infinity)
         }
+    }
+
+    /// REMAINING in seconds, so it rolls downwards as it shrinks; 0 when there's no estimate.
+    private var remainingSeconds: Double {
+        guard case .estimate(let duration) = progress.remaining else { return 0 }
+        return Double(duration.components.seconds)
     }
 
     /// "48 MB/s", or a dash while there's no speed to show.
@@ -235,7 +254,7 @@ struct CreatingFooter: View {
     }
 
     var body: some View {
-        AssistantFooter(step: 4, totalSteps: 4, stepName: "Creation") {
+        AssistantFooter(for: .creating) {
             Button("Cancel") {
                 isConfirmingCancel = true
             }
@@ -317,7 +336,7 @@ struct CreationErrorFooter: View {
     let onTryAgain: () -> Void
 
     var body: some View {
-        AssistantFooter(step: 4, totalSteps: 4, stepName: "Creation") {
+        AssistantFooter(for: .creating) {
             Button(action: onStartOver) {
                 Label {
                     Text("Start Over", comment: "Error screen button: go back to the first step.")
@@ -344,18 +363,20 @@ struct CreationErrorFooter: View {
 
 // MARK: - Whole screen
 
-/// The whole screen as it appears in the window: content and footer. Used by the previews and,
-/// in Debug builds, by the `-startScreen creating` launch argument (see `RelenteApp`).
+/// The whole screen as it appears in the window: content and footer, for the previews.
 struct CreatingScreen: View {
     var state = CreationState.running(.sampleMidCopy)
     var isConfirmingCancel = false
+    var isSimulated = false
 
     var body: some View {
         VStack(spacing: 0) {
-            CreatingView(installer: InstallerSource.samples[0], drive: Drive.samples[0], state: state)
-                .padding(.horizontal, 32)
-                .padding(.bottom, 24)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            CreatingView(
+                installer: InstallerSource.samples[0], drive: Drive.samples[0], state: state, isSimulated: isSimulated
+            )
+            .padding(.horizontal, 32)
+            .padding(.bottom, 24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             if state.failure == nil {
                 CreatingFooter(driveName: Drive.samples[0].name, isConfirmingCancel: isConfirmingCancel, onStop: {})
@@ -395,6 +416,14 @@ struct CreatingScreen: View {
 
 #Preview("Error: cancelled") {
     CreatingScreen(state: .failed(.sampleCancelled))
+}
+
+#Preview("Simulated") {
+    CreatingScreen(isSimulated: true)
+}
+
+#Preview("Error, simulated") {
+    CreatingScreen(state: .failed(.sampleDriveDisconnected), isSimulated: true)
 }
 
 #Preview("Cancel confirmation") {
