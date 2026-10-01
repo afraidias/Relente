@@ -29,6 +29,9 @@ These project conventions replace the skills' defaults:
 - **Open items:** work deferred to a later feature goes in the spec's "Open Items", naming where it
   will be done. Before specifying a feature, search earlier specs' Open Items for work deferred to
   it. Nothing deferred lives only in local notes.
+- **Ideas:** ideas that no spec has deferred yet (for example, from a design canvas) go in a GitHub
+  issue labelled `idea` that names its roadmap step. Before specifying a feature, also check the
+  open `idea` issues for its step; the pull request that builds one closes it.
 - **Changing behavior:** update the spec first, then the code.
 - **Requirements interviews** (`interview-me`) end up in the spec's Objective, not in
   `docs/intent/`. **Architecture decisions** (`documentation-and-adrs`) go in
