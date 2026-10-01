@@ -102,20 +102,21 @@ USB") and two cards side by side, one per kind of Mac. Each card has:
 
 #### One content width: 640 pt
 - The column that holds the figures, bars, callouts and steps is **640 pt** on every screen
-  (Review, Creating, Error and Done), instead of 560 pt. It's one value in `Theme`
-  (`Theme.Sizes.contentWidth`), used by every screen and component preview instead of their own
-  constants.
+  (Review from spec 003, Creating and Error from spec 004, and Done), instead of 560 pt. It's
+  one value in `Theme` (`Theme.Sizes.contentWidth`), used by every screen and component preview
+  instead of their own constants.
 - Checked with renders of the real screens: Review, Creating and Error keep their balance at 640 pt.
 
 #### 4b · Error without the ring
-- The Error screen no longer draws the red progress ring: the red halo and the red badge already
-  say it stopped, and STOPPED AT says where. The ring's space is kept, so nothing moves when
-  Creating turns into Error. Spec 004 is updated to match.
+- Changes the Error screen built in spec 004. It no longer draws the red progress ring: the red
+  halo and the red badge already say it stopped, and STOPPED AT says where. The ring's space is
+  kept, so nothing moves when Creating turns into Error.
 
 #### Icons on buttons
-A button gets an SF Symbol before its title when its action has a well-known system symbol that
-adds meaning. Buttons that move through the assistant or dismiss (Continue, Back, Cancel) and the
-buttons of alerts stay text only, as in macOS dialogs.
+Changes buttons on the screens built in specs 001–004. A button gets an SF Symbol before its
+title when its action has a well-known system symbol that adds meaning. Buttons that move through
+the assistant or dismiss (Continue, Back, Cancel) and the buttons of alerts stay text only, as in
+macOS dialogs.
 
 | Screen | Button | Symbol |
 | --- | --- | --- |
@@ -139,8 +140,8 @@ already follows them (default button on the right and on Return, destructive but
 default, system colors and symbols, title-case buttons, "…" on buttons that ask for more input,
 a fixed-size window). These changes follow from the review:
 
-- **Esc presses "Cancel"** on the Creating screen (`.cancelAction`). It only opens the
-  confirmation, so it's safe.
+- **Esc presses "Cancel"** on the Creating screen (spec 004, where Esc did nothing). It only opens
+  the confirmation, so it's safe.
 - **The cancel confirmation is a sheet that looks like a macOS alert,** instead of the native
   alert, so that Return *and* Esc keep going (a native alert gives each button one key; spec 004,
   decision 8). It slides down from the window's title bar and blocks it until answered, laid out
@@ -152,9 +153,9 @@ a fixed-size window). These changes follow from the review:
   other choice in a macOS alert, `role: .destructive`, only a click) and **"Keep Going"** (primary, Return and Esc). For now
   "Stop" only closes the sheet.
 - **The help button goes in the bottom-leading corner** of the window (see Done's Help).
-- **Every step pill is blue,** on every screen. The current step's pill turned red on Error and
-  green on Done; the halo, the badge and the title already say that, and the odd color clashed
-  with the blue ones.
+- **Every step pill is blue,** on every screen. The current step's pill turned red on Error (spec
+  004) and green on Done; the halo, the badge and the title already say that, and the odd color
+  clashed with the blue ones.
 - Picking an installer or a drive with the arrow keys is part of navigation (roadmap step 4; see
   Open items).
 
@@ -166,7 +167,7 @@ Every step name in the footer is a noun, in English and Spanish:
 | 1 | Installer | Instalador |
 | 2 | USB Drive | Memoria USB |
 | 3 | Review | Revisión (was "Revisar") |
-| 4 | Creation (was "Creating") | Creación (was "Crear") |
+| 4 | Creation (was "Creating", spec 004) | Creación (was "Crear") |
 | 5 | Done | Listo |
 
 Step 2's footer arrives with navigation (roadmap step 4); it uses these names.
@@ -186,8 +187,8 @@ All Spanish text is Spanish from Spain (tuteo, Apple Spain's terms such as "tecl
 | Use a USB drive or SD card with at least %@. %@ or more works for any version of macOS. | …Con %2$@ o más sirve… | …Una de %2$@ o más sirve… |
 
 "Booteable" isn't in the dictionary, but it's the word people use for a USB drive that starts up
-a Mac; the owner chose it. Specs 002–004 describe English text, so only spec 004 notes a
-change (the step name).
+a Mac; the owner chose it. Specs 002–004 describe English text, so of these only the step name
+changes what spec 004 describes.
 
 ### Checking Done in the running app
 Navigation arrives in roadmap step 4, so the running app can't reach Done yet. To check
@@ -239,7 +240,7 @@ VoiceOver reads.
   fades in without moving (checked by the owner).
 - [x] `docs/product.md` updated: the Done screen as built, the Error screen without the ring, and
   in the design system the 640 pt content width, the rule for icons on buttons and the new
-  components. Spec 003 notes the new width; spec 004 the width and the ring change.
+  components.
 
 ## Edge cases
 - Very long installer names → the volume name under the hero is truncated in the middle on one

@@ -37,10 +37,11 @@ These project conventions replace the skills' defaults:
 - **Done specs are history:** a finished spec records what was decided and built in its pull
   request, and it isn't edited afterwards. A later change to what it built goes in the spec in
   progress, if the owner adds it to its scope, or in an `idea` issue for a later spec. The spec
-  that makes the change names the earlier spec in its "Changes to earlier features" section:
-  references go from the newer spec to the older one, never back, so
-  `grep -rn "spec NNN" specs/` finds every later change. [`docs/product.md`](docs/product.md)
-  always describes the app as it is now, and every feature that changes it updates it.
+  that makes the change names the earlier spec in its "Changes to earlier features" section, so
+  `grep -rn "spec NNN" specs/` finds every later change. An older spec is never edited to point
+  at a newer one; when it's written, its Out of scope and Open items may name where work will
+  go. [`docs/product.md`](docs/product.md) always describes the app as it is now, and every
+  feature that changes it updates it.
 - **Requirements interviews** (`interview-me`) end up in the spec's Objective, not in
   `docs/intent/`. **Architecture decisions** (`documentation-and-adrs`) go in
   `docs/decisions/NNNN-short-title.md` when they outlive a single feature; otherwise in the spec's
