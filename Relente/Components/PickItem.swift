@@ -112,7 +112,7 @@ struct PickItem<Icon: View, Detail: View>: View {
             ) {
                 FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
             } detail: {
-                Text(verbatim: installer.version)
+                Text(verbatim: installer.version.description)
                     .font(.subheadline)
                     .foregroundStyle(Theme.Colors.secondary)
             }

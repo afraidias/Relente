@@ -19,28 +19,35 @@ struct ReviewSummaryTests {
         size: 16_800_000_000
     )
 
-    private func drive(capacity: Int64 = 32_000_000_000, usedBytes: Int64 = 0) -> Drive {
+    private func drive(capacity: Int64 = 32_000_000_000, used: UsedSpace = .bytes(0)) -> Drive {
         Drive(
             id: "TEST",
             bsdName: "disk9",
             name: "Test Drive",
+            model: "Test Drive",
             kind: .usbDrive,
             capacity: capacity,
-            usedBytes: usedBytes
+            usedSpace: used
         )
     }
 
     // MARK: - Figures
 
     @Test func `erased is the space in use on the drive`() {
-        let summary = ReviewSummary(installer: installer, drive: drive(usedBytes: 9_800_000_000))
-        #expect(summary.erasedBytes == 9_800_000_000)
+        let summary = ReviewSummary(installer: installer, drive: drive(used: .bytes(9_800_000_000)))
+        #expect(summary.erased == .bytes(9_800_000_000))
+        #expect(!summary.erasesNothing)
+    }
+
+    @Test func `data that can't be measured is erased, size unknown`() {
+        let summary = ReviewSummary(installer: installer, drive: drive(used: .unknown))
+        #expect(summary.erased == .unknown)
         #expect(!summary.erasesNothing)
     }
 
     @Test func `an empty drive erases nothing`() {
-        let summary = ReviewSummary(installer: installer, drive: drive(usedBytes: 0))
-        #expect(summary.erasedBytes == 0)
+        // Under 100 MB, only the file system's own space is in use.
+        let summary = ReviewSummary(installer: installer, drive: drive(used: .bytes(2_000_000)))
         #expect(summary.erasesNothing)
     }
 

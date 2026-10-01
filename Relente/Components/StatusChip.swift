@@ -59,7 +59,8 @@ struct StatusChip: View {
 #Preview {
     VStack(alignment: .leading, spacing: 8) {
         StatusChip(text: Drive.Status.empty.label, tone: .ok)
-        StatusChip(text: Drive.Status.willErase(usedBytes: 9_800_000_000).label, tone: .warning)
+        StatusChip(text: Drive.Status.willErase(.bytes(9_800_000_000)).label, tone: .warning)
+        StatusChip(text: Drive.Status.willErase(.unknown).label, tone: .warning)
         StatusChip(text: Drive.Status.tooSmall.label, tone: .error)
         StatusChip(text: Drive.Status.empty.label, tone: .info)
         StatusChip(text: Drive.Status.empty.label, tone: .neutral)

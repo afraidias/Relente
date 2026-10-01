@@ -29,6 +29,17 @@
         }
       }
     },
+    "%@ Close any windows or apps using it and try again." : {
+      "comment" : "Eject alert. The value is macOS's reason, e.g. “The disk is in use by Finder.”",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Cierra las ventanas o apps que la estén usando y vuelve a intentarlo."
+          }
+        }
+      }
+    },
     "%@ will be erased" : {
       "comment" : "Status chip under a drive that has data. The value is the space in use, e.g. 9.8 GB.",
       "localizations" : {
@@ -113,6 +124,28 @@
         }
       }
     },
+    ".app, .dmg or .pkg" : {
+      "comment" : "Under “Other Installer…”: the kinds of files it accepts.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".app, .dmg o .pkg"
+          }
+        }
+      }
+    },
+    "A window or an app may be using it. Close them and try again." : {
+      "comment" : "Eject alert when macOS gives no reason.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede que una ventana o una app la esté usando. Ciérralas y vuelve a intentarlo."
+          }
+        }
+      }
+    },
     "AT START-UP" : {
       "comment" : "Done screen card capsule, uppercase: press the key while the Mac turns on.",
       "localizations" : {
@@ -142,6 +175,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Casi listo"
+          }
+        }
+      }
+    },
+    "Already have one? Choose Installer…" : {
+      "comment" : "Link under “Download from Apple…” in the Installer screen’s empty state.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Ya tienes uno? Elegir instalador…"
           }
         }
       }
@@ -234,6 +278,28 @@
         }
       }
     },
+    "Choose an installer app, a disk image that contains one, or InstallAssistant.pkg." : {
+      "comment" : "Alert message when the chosen file isn't an installer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige una app de instalación, una imagen de disco que la contenga o InstallAssistant.pkg."
+          }
+        }
+      }
+    },
+    "Choose or drop an installer app, disk image or InstallAssistant.pkg." : {
+      "comment" : "VoiceOver hint of “Other Installer…” on the Installer screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige o suelta una app de instalación, una imagen de disco o InstallAssistant.pkg."
+          }
+        }
+      }
+    },
     "Compatibility" : {
       "comment" : "Done screen help: cause title.",
       "localizations" : {
@@ -241,17 +307,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compatibilidad"
-          }
-        }
-      }
-    },
-    "Connect a USB Drive" : {
-      "comment" : "Title of the empty state when no USB drive or SD card is connected.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conecta una memoria USB"
           }
         }
       }
@@ -333,6 +388,17 @@
         }
       }
     },
+    "Data will be erased" : {
+      "comment" : "Status chip under a drive that has data Relente can't measure (e.g. formatted for Linux).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se borrarán datos"
+          }
+        }
+      }
+    },
     "Done" : {
       "comment" : "Name of the assistant's last screen, once the installer is ready.",
       "localizations" : {
@@ -351,6 +417,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descargar desde Apple…"
+          }
+        }
+      }
+    },
+    "Download one from Apple, or choose one you already have." : {
+      "comment" : "Empty state on the Installer screen when no installer is found.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descarga uno desde Apple o elige uno que ya tengas."
           }
         }
       }
@@ -450,6 +527,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "LIBRE DESPUÉS"
+          }
+        }
+      }
+    },
+    "Force Eject" : {
+      "comment" : "Eject alert: eject even if something is using the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forzar expulsión"
           }
         }
       }
@@ -662,6 +750,50 @@
         }
       }
     },
+    "Needs macOS Big Sur or later" : {
+      "comment" : "Under an installer older than macOS Big Sur, which Relente can't use.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requiere macOS Big Sur o posterior"
+          }
+        }
+      }
+    },
+    "No Installers Found" : {
+      "comment" : "Empty state title on the Installer screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han encontrado instaladores"
+          }
+        }
+      }
+    },
+    "No USB Drive Connected" : {
+      "comment" : "Empty state title on the USB Drive screen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ninguna memoria USB conectada"
+          }
+        }
+      }
+    },
+    "Not supported" : {
+      "comment" : "Status chip under an installer older than macOS Big Sur.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No compatible"
+          }
+        }
+      }
+    },
     "Nothing" : {
       "comment" : "Review screen: an empty drive has nothing to erase.",
       "localizations" : {
@@ -669,6 +801,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nada"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "comment" : "Button that closes an alert.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
+          }
+        }
+      }
+    },
+    "Other Installer…" : {
+      "comment" : "Last item on the Installer screen: choose or drop a file.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otro instalador…"
           }
         }
       }
@@ -746,6 +900,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Revisar y crear"
+          }
+        }
+      }
+    },
+    "SD Card" : {
+      "comment" : "Model shown for an SD card: macOS reports the reader, not the card.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarjeta SD"
           }
         }
       }
@@ -882,6 +1047,17 @@
         }
       }
     },
+    "The drive is no longer connected." : {
+      "comment" : "Eject alert: the drive is gone.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La memoria ya no está conectada."
+          }
+        }
+      }
+    },
     "The drive was disconnected." : {
       "comment" : "Error screen: the drive was unplugged while creating.",
       "localizations" : {
@@ -992,6 +1168,17 @@
         }
       }
     },
+    "Unknown size" : {
+      "comment" : "Review screen, WILL BE ERASED: the drive has data Relente can't measure (e.g. formatted for Linux).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño desconocido"
+          }
+        }
+      }
+    },
     "Use a USB drive or SD card with at least %@. %@ or more works for any version of macOS." : {
       "comment" : "Empty state when no drive is connected. First value: minimum size for the chosen installer (e.g. 17.8 GB); second: size that works for any installer (32 GB).",
       "localizations" : {
@@ -1047,6 +1234,17 @@
         }
       }
     },
+    "Waiting for an installer…" : {
+      "comment" : "Shown while no macOS installer has been found.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando un instalador…"
+          }
+        }
+      }
+    },
     "You stopped the process." : {
       "comment" : "Error screen: the user cancelled the creation.",
       "localizations" : {
@@ -1087,6 +1285,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "«%@»"
+          }
+        }
+      }
+    },
+    "“%@” Couldn’t Be Ejected" : {
+      "comment" : "Alert title when macOS refuses to eject the drive. The value is the drive's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido expulsar «%@»"
+          }
+        }
+      }
+    },
+    "“%@” Isn't a macOS Installer" : {
+      "comment" : "Alert title when the chosen file isn't an installer. The value is the file's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%@» no es un instalador de macOS"
+          }
+        }
+      }
+    },
+    "“%@” was disconnected." : {
+      "comment" : "VoiceOver, when the chosen drive is unplugged on Review. The value is the drive's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha desconectado «%@»."
           }
         }
       }

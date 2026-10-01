@@ -18,22 +18,19 @@ struct DriveView: View {
     var onMoveSelection: (Int) -> Void = { _ in }
 
     var body: some View {
-        if drives.isEmpty {
-            VStack(spacing: 0) {
-                DriveInstallerLabel(installer: installer)
+        VStack(spacing: 0) {
+            ScreenHeader(
+                title: "Choose a USB Drive",
+                subtitle: "Everything on the drive you choose will be erased."
+            )
+
+            DriveInstallerLabel(installer: installer)
+                .padding(.top, 12)
+
+            if drives.isEmpty {
                 NoDriveView(requiredCapacity: Drive.requiredCapacity(forInstallerSize: installer.size))
-            }
-            .padding(.top, Theme.Sizes.headerTopPadding)
-        } else {
-            VStack(spacing: 0) {
-                ScreenHeader(
-                    title: "Choose a USB Drive",
-                    subtitle: "Everything on the drive you choose will be erased."
-                )
-
-                DriveInstallerLabel(installer: installer)
-                    .padding(.top, 12)
-
+                    .frame(maxHeight: .infinity)
+            } else {
                 Spacer()
 
                 HStack(spacing: 24) {
@@ -41,7 +38,7 @@ struct DriveView: View {
                         DriveItem(
                             name: drive.name,
                             kind: drive.kind,
-                            formattedCapacity: drive.formattedCapacity,
+                            detail: drive.detail,
                             status: drive.status(forInstallerSize: installer.size),
                             requiredCapacity: Drive.requiredCapacity(forInstallerSize: installer.size),
                             isSelected: drive.id == selectedID
@@ -55,8 +52,8 @@ struct DriveView: View {
 
                 Spacer()
             }
-            .padding(.top, Theme.Sizes.headerTopPadding)
         }
+        .padding(.top, Theme.Sizes.headerTopPadding)
     }
 }
 
@@ -85,7 +82,7 @@ struct DriveInstallerLabel: View {
         .accessibilityAddTraits(.isStaticText)
         .accessibilityLabel(
             Text(
-                "Installer: \(installer.name) \(installer.version), \(installer.formattedSize)",
+                "Installer: \(installer.name) \(installer.version.description), \(installer.formattedSize)",
                 comment:
                     "VoiceOver label of the installer reminder on the USB Drive screen. Values: name, version and size, e.g. macOS Tahoe, 26.0, 16.8 GB."
             )
@@ -93,12 +90,13 @@ struct DriveInstallerLabel: View {
     }
 }
 
-/// One drive: illustration, name, capacity and status chip.
+/// One drive: illustration, name, model and capacity, and status chip.
 /// Drives that can't be used are disabled (dimmed, not selectable).
 struct DriveItem: View {
     let name: String
     let kind: Drive.Kind
-    let formattedCapacity: String
+    /// "SanDisk Ultra · 32 GB", or only the capacity when the name is the model.
+    let detail: String
     let status: Drive.Status
     let requiredCapacity: Int64
     let isSelected: Bool
@@ -110,7 +108,7 @@ struct DriveItem: View {
                 .sharedArtwork(.drive, isActive: isSelected)
         } detail: {
             VStack(spacing: 6) {
-                Text(verbatim: formattedCapacity)
+                Text(verbatim: detail)
                     .font(.subheadline)
                     .foregroundStyle(Theme.Colors.secondary)
 
@@ -136,10 +134,15 @@ extension Drive.Status {
     /// Text of the status chip.
     var label: LocalizedStringResource {
         switch self {
-        case .willErase(let usedBytes):
+        case .willErase(.bytes(let usedBytes)):
             LocalizedStringResource(
                 "\(usedBytes.formatted(.byteCount(style: .file))) will be erased",
                 comment: "Status chip under a drive that has data. The value is the space in use, e.g. 9.8 GB."
+            )
+        case .willErase(.unknown):
+            LocalizedStringResource(
+                "Data will be erased",
+                comment: "Status chip under a drive that has data Relente can't measure (e.g. formatted for Linux)."
             )
         case .empty:
             LocalizedStringResource("Empty", comment: "Status chip under a drive with nothing on it.")
@@ -214,6 +217,17 @@ struct DriveFooter: View {
         .padding(32)
         .frame(width: 800, height: 480)
         .preferredColorScheme(.dark)
+}
+
+#Preview("Data of unknown size") {
+    @Previewable @State var selectedID: Drive.ID?
+
+    DriveView(
+        drives: [Drive.samples[1], Drive.unknownDataSample], installer: InstallerSource.samples[0],
+        selectedID: $selectedID
+    )
+    .padding(32)
+    .frame(width: 800, height: 480)
 }
 
 #Preview("No drive") {

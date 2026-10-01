@@ -24,6 +24,8 @@ struct AssistantView: View {
     @State private var footerStep: AssistantStep
     /// How the change to `shownStep` moves.
     @State private var change = ScreenChange(direction: .forward, style: .crossfade)
+    /// The last disconnection VoiceOver announced, so each is said once.
+    @State private var announcedDisconnection: UUID?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -73,9 +75,24 @@ struct AssistantView: View {
                     assistant.screenChangeDidEnd()
                     // VoiceOver reads the new screen from its title (see `ScreenHeader`).
                     AccessibilityNotification.ScreenChanged().post()
+                    announceDisconnection()
                 }
             }
         }
+    }
+
+    // MARK: - Announcements
+
+    /// After the chosen drive was unplugged on Review and the assistant went back to USB Drive,
+    /// VoiceOver says why, once the new screen is in place.
+    private func announceDisconnection() {
+        guard let disconnection = assistant.disconnection, disconnection.id != announcedDisconnection else { return }
+        announcedDisconnection = disconnection.id
+        AccessibilityNotification.Announcement(
+            String(
+                localized: "“\(disconnection.driveName)” was disconnected.",
+                comment: "VoiceOver, when the chosen drive is unplugged on Review. The value is the drive's name.")
+        ).post()
     }
 
     // MARK: - Motion
@@ -174,7 +191,9 @@ struct AssistantView: View {
         case .installer:
             InstallerView(
                 installers: assistant.installers, selectedID: installerSelection,
-                onMoveSelection: assistant.moveSelection)
+                onMoveSelection: assistant.moveSelection,
+                onChooseFile: { url in Task { await assistant.chooseInstaller(at: url) } },
+                error: assistant.installerError, onDismissError: assistant.dismissInstallerError)
         case .drive:
             if let installer = assistant.selectedInstaller {
                 DriveView(
@@ -226,7 +245,12 @@ struct AssistantView: View {
                 CreationErrorFooter(onStartOver: assistant.startOver, onTryAgain: assistant.tryAgain)
             }
         case .done:
-            DoneFooter(installerName: assistant.result?.installer.name ?? "", onEject: assistant.eject)
+            DoneFooter(
+                installerName: assistant.result?.installer.name ?? "", driveName: assistant.result?.drive.name ?? "",
+                isEjecting: assistant.isEjecting, ejectFailure: assistant.ejectFailure,
+                onEject: { Task { await assistant.eject() } },
+                onForceEject: { Task { await assistant.forceEject() } },
+                onDismissFailure: assistant.dismissEjectFailure)
         }
     }
 

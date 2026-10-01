@@ -30,11 +30,14 @@ struct AssistantTests {
 
     private static func installer(_ name: String, size: Int64) -> InstallerSource {
         InstallerSource(
-            url: URL(filePath: "/Applications/Install \(name).app"), name: name, version: "1.0", kind: .app, size: size)
+            url: URL(filePath: "/Applications/Install \(name).app"), name: name, version: "26.0", kind: .app, size: size
+        )
     }
 
     private static func drive(_ name: String, capacity: Int64) -> Drive {
-        Drive(id: name, bsdName: "disk9", name: name, kind: .usbDrive, capacity: capacity, usedBytes: 0)
+        Drive(
+            id: name, bsdName: "disk9", name: name, model: name, kind: .usbDrive, capacity: capacity,
+            usedSpace: .bytes(0))
     }
 
     /// An assistant whose screen changes end at once, as if every animation had finished.
@@ -429,7 +432,7 @@ struct AssistantTests {
         await waitUntil { assistant.step == .done }
         settle(assistant)
 
-        assistant.eject()
+        await assistant.eject()
         #expect(assistant.step == .installer)
         #expect(assistant.lastChange.style == .crossfade)
         #expect(assistant.selectedInstallerID == tahoe.id)

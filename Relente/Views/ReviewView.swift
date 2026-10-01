@@ -68,11 +68,12 @@ struct ReviewHero: View {
                     .sharedArtwork(.installer)
             }
 
-            Text(verbatim: "\(drive.name) · \(drive.formattedCapacity)")
+            Text(verbatim: "\(drive.name) · \(drive.detail)")
                 .font(.body.weight(.medium))
                 .lineLimit(1)
                 .truncationMode(.middle)
-                .accessibilityLabel(Text(verbatim: "\(drive.name), \(drive.formattedCapacity)"))
+                .accessibilityLabel(
+                    Text(verbatim: "\(drive.name), \(drive.detail.replacingOccurrences(of: " · ", with: ", "))"))
         }
     }
 }
@@ -84,14 +85,27 @@ struct ReviewStats: View {
     let installerName: String
     let summary: ReviewSummary
 
+    private var erasedValue: Text {
+        if summary.erasesNothing {
+            return Text("Nothing", comment: "Review screen: an empty drive has nothing to erase.")
+        }
+        return switch summary.erased {
+        case .bytes(let bytes): Text(verbatim: bytes.formatted(.byteCount(style: .file)))
+        case .unknown:
+            Text(
+                "Unknown size",
+                comment:
+                    "Review screen, WILL BE ERASED: the drive has data Relente can't measure (e.g. formatted for Linux)."
+            )
+        }
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             BigStat(
                 label: LocalizedStringResource(
                     "WILL BE ERASED", comment: "Review screen figure: space in use on the drive, which will be lost."),
-                value: summary.erasesNothing
-                    ? Text("Nothing", comment: "Review screen: an empty drive has nothing to erase.")
-                    : Text(verbatim: summary.erasedBytes.formatted(.byteCount(style: .file))),
+                value: erasedValue,
                 tint: summary.erasesNothing ? Theme.Colors.secondary : Theme.Colors.warning
             )
             .frame(maxWidth: .infinity)
@@ -289,6 +303,10 @@ private struct ReviewScreenPreview: View {
 
 #Preview("Empty drive") {
     ReviewScreenPreview(drive: Drive.samples[1])
+}
+
+#Preview("Data of unknown size") {
+    ReviewScreenPreview(drive: Drive.unknownDataSample)
 }
 
 #Preview("Can't create yet (Release)") {

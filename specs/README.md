@@ -32,6 +32,7 @@ once in [AGENTS.md](../AGENTS.md), and the screen flow and design system in
 | [004 · Creating screen (+ Error)](004-creating-screen/spec.md) | 3 | Done |
 | [005 · Done screen](005-done-screen/spec.md) | 3 | Done |
 | [006 · Assistant navigation](006-assistant-navigation/spec.md) | 4 | Done |
+| [007 · Real disk and installer detection](007-real-detection/spec.md) | 5 | Approved |
 
 ## Templates
 

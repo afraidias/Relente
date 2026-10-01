@@ -183,14 +183,31 @@ private struct HelpCause: View {
 struct DoneFooter: View {
     /// E.g. "macOS Tahoe", for the help entry about which Macs support it.
     let installerName: String
+    /// The drive's name, for the alert when it can't be ejected.
+    let driveName: String
+    /// While ejecting, "Eject" shows a spinner and can't be clicked again.
+    let isEjecting: Bool
+    /// Why macOS didn't eject the drive, shown as an alert like the Finder's.
+    let ejectFailure: EjectError?
     let onEject: () -> Void
+    let onForceEject: () -> Void
+    let onDismissFailure: () -> Void
 
     @State private var isShowingHelp: Bool
 
     /// `isShowingHelp` opens the help popover from the start, for previews.
-    init(installerName: String, isShowingHelp: Bool = false, onEject: @escaping () -> Void) {
+    init(
+        installerName: String, driveName: String = "", isShowingHelp: Bool = false, isEjecting: Bool = false,
+        ejectFailure: EjectError? = nil, onEject: @escaping () -> Void, onForceEject: @escaping () -> Void = {},
+        onDismissFailure: @escaping () -> Void = {}
+    ) {
         self.installerName = installerName
+        self.driveName = driveName
+        self.isEjecting = isEjecting
+        self.ejectFailure = ejectFailure
         self.onEject = onEject
+        self.onForceEject = onForceEject
+        self.onDismissFailure = onDismissFailure
         _isShowingHelp = State(initialValue: isShowingHelp)
     }
 
@@ -207,11 +224,38 @@ struct DoneFooter: View {
                 Label {
                     Text("Eject", comment: "Done screen button: eject the drive and go back to the first step.")
                 } icon: {
-                    Image(systemName: "eject")
+                    if isEjecting {
+                        ProgressView()
+                            .controlSize(.small)
+                    } else {
+                        Image(systemName: "eject")
+                    }
                 }
             }
             .buttonStyle(.primary)
             .keyboardShortcut(.defaultAction)
+            .disabled(isEjecting)
+        }
+        .alert(
+            Text(
+                "“\(driveName)” Couldn’t Be Ejected",
+                comment: "Alert title when macOS refuses to eject the drive. The value is the drive's name."),
+            isPresented: Binding(get: { ejectFailure != nil }, set: { if !$0 { onDismissFailure() } }),
+            presenting: ejectFailure
+        ) { _ in
+            // Return tries again; only a click forces the eject; Esc cancels.
+            Button(
+                String(localized: "Try Again", comment: "Eject alert: try to eject the drive again."), action: onEject
+            )
+            .keyboardShortcut(.defaultAction)
+            Button(
+                String(localized: "Force Eject", comment: "Eject alert: eject even if something is using the drive."),
+                role: .destructive, action: onForceEject)
+            Button(
+                String(localized: "Cancel", comment: "Eject alert: close it and stay on the Done screen."),
+                role: .cancel, action: onDismissFailure)
+        } message: { failure in
+            Text(failure.message)
         }
     }
 }
@@ -224,6 +268,8 @@ struct DoneScreen: View {
     var thisMac = MacArchitecture.appleSilicon
     var isShowingHelp = false
     var isSimulated = false
+    var isEjecting = false
+    var ejectFailure: EjectError?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -232,7 +278,9 @@ struct DoneScreen: View {
                 .padding(.bottom, 24)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            DoneFooter(installerName: result.installer.name, isShowingHelp: isShowingHelp, onEject: {})
+            DoneFooter(
+                installerName: result.installer.name, driveName: result.drive.name, isShowingHelp: isShowingHelp,
+                isEjecting: isEjecting, ejectFailure: ejectFailure, onEject: {})
         }
         .frame(width: Theme.Sizes.window.width, height: Theme.Sizes.window.height)
     }
@@ -242,6 +290,14 @@ struct DoneScreen: View {
 
 #Preview("Apple silicon") {
     DoneScreen()
+}
+
+#Preview("Ejecting") {
+    DoneScreen(isEjecting: true)
+}
+
+#Preview("Couldn't eject") {
+    DoneScreen(ejectFailure: .refused(reason: "The disk is in use by Finder."))
 }
 
 #Preview("Intel") {

@@ -11,7 +11,7 @@ import UniformTypeIdentifiers
 nonisolated struct InstallerSource: Identifiable, Hashable, Sendable {
 
     /// The three kinds of source files the app accepts.
-    enum Kind: Hashable {
+    enum Kind: Hashable, Sendable {
         /// `Install macOS *.app`
         case app
         /// `.dmg` that contains the installer app.
@@ -34,17 +34,41 @@ nonisolated struct InstallerSource: Identifiable, Hashable, Sendable {
     let url: URL
     /// Marketing name, e.g. "macOS Tahoe".
     let name: String
-    /// Version number, e.g. "26.0".
-    let version: String
+    /// macOS version, e.g. 26.0.
+    let version: MacOSVersion
     let kind: Kind
     /// Size in bytes.
     let size: Int64
 
     var id: URL { url }
 
+    /// Whether Relente can make a bootable drive from it: macOS Big Sur (11) or later.
+    var isSupported: Bool {
+        version >= .bigSur
+    }
+
     /// Size formatted for people, e.g. "16.8 GB".
     var formattedSize: String {
         size.formatted(.byteCount(style: .file))
+    }
+}
+
+// MARK: - Order and default selection
+
+nonisolated extension InstallerSource {
+    /// Newest macOS first. Installers of the same version keep their order.
+    static func sorted(_ installers: [InstallerSource]) -> [InstallerSource] {
+        installers.enumerated()
+            .sorted { lhs, rhs in
+                lhs.element.version != rhs.element.version
+                    ? lhs.element.version > rhs.element.version : lhs.offset < rhs.offset
+            }
+            .map(\.element)
+    }
+
+    /// The installer selected when the list first fills: the newest supported one.
+    static func defaultSelection(in installers: [InstallerSource]) -> InstallerSource? {
+        sorted(installers).first(where: \.isSupported)
     }
 }
 
@@ -75,4 +99,13 @@ nonisolated extension InstallerSource {
             size: 13_400_000_000
         ),
     ]
+
+    /// An installer older than Big Sur, which Relente shows but can't use.
+    static let unsupportedSample = InstallerSource(
+        url: URL(filePath: "/Applications/Install macOS Catalina.app"),
+        name: "macOS Catalina",
+        version: "10.15.7",
+        kind: .app,
+        size: 8_100_000_000
+    )
 }
