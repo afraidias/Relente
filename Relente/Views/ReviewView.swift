@@ -15,9 +15,6 @@ struct ReviewView: View {
     /// Whether the user ticked "I understand…". It's cleared every time the screen appears.
     @Binding var hasConfirmed: Bool
 
-    /// Width shared by the figures, the usage bar and the warning, so they line up.
-    private let contentWidth: CGFloat = 560
-
     var body: some View {
         let summary = ReviewSummary(installer: installer, drive: drive)
 
@@ -45,7 +42,7 @@ struct ReviewView: View {
 
                 EraseWarning(driveName: drive.name, hasConfirmed: $hasConfirmed)
             }
-            .frame(width: contentWidth)
+            .frame(width: Theme.Sizes.contentWidth)
         }
         .padding(.top, Theme.Sizes.headerTopPadding)
         .onAppear { hasConfirmed = false }
@@ -208,7 +205,12 @@ struct ReviewFooter: View {
                 .buttonStyle(.secondary)
 
             Button(role: .destructive, action: onErase) {
-                Text("Erase and Create", comment: "Button that erases the drive and creates the installer.")
+                Label {
+                    Text("Erase and Create", comment: "Button that erases the drive and creates the installer.")
+                } icon: {
+                    // It asks for Touch ID (or the password; see spec 005, open items).
+                    Image(systemName: "touchid")
+                }
             }
             .buttonStyle(.primary)
             .tint(Theme.Colors.danger)

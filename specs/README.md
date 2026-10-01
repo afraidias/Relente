@@ -30,6 +30,7 @@ once in [AGENTS.md](../AGENTS.md), and the screen flow and design system in
 | [002 · USB drive screen](002-drive-screen/spec.md) | 3 | Done |
 | [003 · Review screen](003-review-screen/spec.md) | 3 | Done |
 | [004 · Creating screen (+ Error)](004-creating-screen/spec.md) | 3 | Done |
+| [005 · Done screen](005-done-screen/spec.md) | 3 | Done |
 
 ## Templates
 

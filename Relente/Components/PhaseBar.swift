@@ -125,6 +125,6 @@ struct PhaseBar: View {
         PhaseBar(current: .verify, currentFraction: 0.5)
         PhaseBar(current: .copy, currentFraction: 0.43, isFailed: true)
     }
-    .frame(width: 560)
+    .frame(width: Theme.Sizes.contentWidth)
     .padding(32)
 }

@@ -1,6 +1,17 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@" : {
+      "comment" : "Done screen subtitle, how long it took. The value is a duration, e.g. 12 minutes or 1 hour, 5 minutes.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
     "%@ %@" : {
       "comment" : "Error screen subtitle. First value: why it stopped; second: what to do. Both are full sentences.",
       "localizations" : {
@@ -40,6 +51,40 @@
         }
       }
     },
+    "%@, on %@" : {
+      "comment" : "VoiceOver, Done screen drive. First value: its new name; second: the drive, e.g. SanDisk Ultra.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, on %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, en %2$@"
+          }
+        }
+      }
+    },
+    "%@, this Mac: %@" : {
+      "comment" : "VoiceOver, Done screen card of the Mac in use. First value: Apple silicon or Intel; second: what to do.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, this Mac: %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, este Mac: %2$@"
+          }
+        }
+      }
+    },
     "%@/s" : {
       "comment" : "Creating screen, SPEED. The value is an amount of data, e.g. 48 MB; the figure is per second.",
       "localizations" : {
@@ -47,6 +92,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@/s"
+          }
+        }
+      }
+    },
+    "%@: %@" : {
+      "comment" : "VoiceOver, Done screen card. First value: Apple silicon or Intel; second: what to do.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "AT START-UP" : {
+      "comment" : "Done screen card capsule, uppercase: press the key while the Mac turns on.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AL ENCENDER"
           }
         }
       }
@@ -69,6 +142,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Casi listo"
+          }
+        }
+      }
+    },
+    "Apple silicon" : {
+      "comment" : "Done screen card heading: Macs with Apple silicon.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple silicon"
           }
         }
       }
@@ -139,6 +223,17 @@
         }
       }
     },
+    "Compatibility" : {
+      "comment" : "Done screen help: cause title.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compatibilidad"
+          }
+        }
+      }
+    },
     "Connect a USB Drive" : {
       "comment" : "Title of the empty state when no USB drive or SD card is connected.",
       "localizations" : {
@@ -146,6 +241,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Conecta una memoria USB"
+          }
+        }
+      }
+    },
+    "Connection" : {
+      "comment" : "Done screen help: cause title.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conexión"
           }
         }
       }
@@ -178,18 +284,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo crear el instalador"
-          }
-        }
-      }
-    },
-    "Creating" : {
-      "comment" : "Name of the fourth assistant step, where the installer is being made.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Crear"
+            "value" : "No se ha podido crear el instalador"
           }
         }
       }
@@ -216,6 +311,27 @@
         }
       }
     },
+    "Creation" : {
+      "comment" : "Name of the fourth assistant step, where the installer is being made.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creación"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo"
+          }
+        }
+      }
+    },
     "Download from Apple…" : {
       "comment" : "Button on the Installer screen that opens the installer download screen.",
       "localizations" : {
@@ -234,6 +350,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vuelve a descargar el instalador e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "Drive not showing up at start-up?" : {
+      "comment" : "Title of the Done screen's help popover.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿No aparece la memoria al arrancar?"
+          }
+        }
+      }
+    },
+    "Eject" : {
+      "comment" : "Done screen button: eject the drive and go back to the first step.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expulsar"
+          }
+        }
+      }
+    },
+    "Eject it and plug it into the Mac where you want to install macOS. It took %@." : {
+      "comment" : "Done screen subtitle. The value is how long it took, e.g. 12 minutes.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expúlsala y conéctala al Mac en el que quieras instalar macOS. Ha tardado %@."
           }
         }
       }
@@ -315,6 +464,39 @@
         }
       }
     },
+    "HOLD" : {
+      "comment" : "Done screen card capsule, uppercase: keep the power button pressed.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MANTÉN"
+          }
+        }
+      }
+    },
+    "Hold Option (⌥) right after turning on the Mac, then choose “%@”." : {
+      "comment" : "Done screen card for Intel Macs. The value is the drive's name, e.g. Install macOS Tahoe.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén pulsada la tecla Opción (⌥) nada más encender el Mac y elige «%@»."
+          }
+        }
+      }
+    },
+    "Hold the power button until you see the start-up options, then choose “%@”." : {
+      "comment" : "Done screen card for Apple silicon Macs. The value is the drive's name, e.g. Install macOS Tahoe.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén pulsado el botón de encendido hasta ver las opciones de arranque y elige «%@»."
+          }
+        }
+      }
+    },
     "I understand that all data on this drive will be lost." : {
       "comment" : "Required checkbox before erasing the drive.",
       "localizations" : {
@@ -337,13 +519,56 @@
         }
       }
     },
+    "Installer Ready" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalador listo"
+          }
+        }
+      }
+    },
+    "Intel" : {
+      "comment" : "Done screen card heading: Macs with an Intel processor.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intel"
+          }
+        }
+      }
+    },
+    "Intel Mac with the T2 chip (2018–2020)" : {
+      "comment" : "Done screen help: cause title.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac Intel con chip T2 (2018–2020)"
+          }
+        }
+      }
+    },
+    "It only shows up on Macs that support %@." : {
+      "comment" : "Done screen help. The value is the macOS version, e.g. macOS Tahoe.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo aparece en los Mac compatibles con %@."
+          }
+        }
+      }
+    },
     "Keep Going" : {
       "comment" : "Alert button: don't stop, keep creating the installer.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continuar"
+            "value" : "Seguir"
           }
         }
       }
@@ -376,7 +601,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hacer arrancable"
+            "value" : "Hacer booteable"
           }
         }
       }
@@ -447,6 +672,17 @@
         }
       }
     },
+    "Plug it straight into the Mac, not into a hub, and try another port." : {
+      "comment" : "Done screen help: what to do about the connection.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conéctala directamente al Mac, sin hub, y prueba otro puerto."
+          }
+        }
+      }
+    },
     "REMAINING" : {
       "comment" : "Creating screen figure: estimated time left.",
       "localizations" : {
@@ -464,7 +700,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisar"
+            "value" : "Revisión"
           }
         }
       }
@@ -487,6 +723,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VELOCIDAD"
+          }
+        }
+      }
+    },
+    "START UP FROM THE DRIVE" : {
+      "comment" : "Done screen section label above the start-up cards.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ARRANCAR DESDE EL USB"
           }
         }
       }
@@ -524,6 +771,17 @@
         }
       }
     },
+    "Start up in Recovery (⌘R) and, in Startup Security Utility, allow booting from external media." : {
+      "comment" : "Done screen help. Use the macOS names of Recovery, the utility and the option.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arranca en Recuperación (⌘R) y, en Utilidad Seguridad de Arranque, permite arrancar desde soportes externos."
+          }
+        }
+      }
+    },
     "Step %lld of %lld · %@" : {
       "comment" : "Assistant footer. First value: current step number; second: total steps; third: step name.",
       "localizations" : {
@@ -553,17 +811,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "¿Detener la creación del instalador?"
-          }
-        }
-      }
-    },
-    "Stopped" : {
-      "comment" : "VoiceOver label of the progress ring after a failure.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Detenido"
           }
         }
       }
@@ -612,13 +859,24 @@
         }
       }
     },
+    "This Mac" : {
+      "comment" : "Done screen: marks the start-up card that matches the Mac in use.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac"
+          }
+        }
+      }
+    },
     "This can't be undone. Other disks won't be touched." : {
       "comment" : "Review screen warning, second line.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se puede deshacer. Los demás discos no se tocarán."
+            "value" : "No se puede deshacer. No se tocará ningún otro disco."
           }
         }
       }
@@ -629,7 +887,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Muy pequeña"
+            "value" : "Demasiado pequeña"
           }
         }
       }
@@ -651,7 +909,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reinténtalo para borrar la memoria y empezar de nuevo."
+            "value" : "Inténtalo de nuevo para borrar la memoria y empezar de cero."
           }
         }
       }
@@ -684,7 +942,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Usa una memoria USB o una tarjeta SD de al menos %1$@. Con %2$@ o más sirve para cualquier versión de macOS."
+            "value" : "Usa una memoria USB o una tarjeta SD de al menos %1$@. Una de %2$@ o más sirve para cualquier versión de macOS."
           }
         }
       }
@@ -744,6 +1002,17 @@
         }
       }
     },
+    "less than a minute" : {
+      "comment" : "Done screen subtitle, how long it took: under 60 seconds.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "menos de un minuto"
+          }
+        }
+      }
+    },
     "of %@" : {
       "comment" : "Creating screen, under COPIED. The value is the installer's size, e.g. 16.8 GB.",
       "localizations" : {
@@ -751,6 +1020,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "de %@"
+          }
+        }
+      }
+    },
+    "“%@”" : {
+      "comment" : "Done screen, under the drive: the name it has now, in quotes, e.g. “Install macOS Tahoe”.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%@»"
           }
         }
       }

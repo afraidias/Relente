@@ -6,6 +6,7 @@
 //  and the classic bordered styles on earlier versions, so screens never
 //  need their own availability checks. Liquid Glass buttons are always
 //  capsules; at the regular control size macOS would draw rounded rectangles.
+//  A button whose label has a symbol always shows the symbol and the title.
 //
 
 import SwiftUI
@@ -24,8 +25,10 @@ struct PrimaryButtonStyle: PrimitiveButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         if #available(macOS 26, *), !usesClassicControls {
             Button(configuration).buttonStyle(.glassProminent).buttonBorderShape(.capsule)
+                .labelStyle(.titleAndIcon)
         } else {
             Button(configuration).buttonStyle(.borderedProminent)
+                .labelStyle(.titleAndIcon)
         }
     }
 }
@@ -37,8 +40,10 @@ struct SecondaryButtonStyle: PrimitiveButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         if #available(macOS 26, *), !usesClassicControls {
             Button(configuration).buttonStyle(.glass).buttonBorderShape(.capsule)
+                .labelStyle(.titleAndIcon)
         } else {
             Button(configuration).buttonStyle(.bordered)
+                .labelStyle(.titleAndIcon)
         }
     }
 }
