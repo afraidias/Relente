@@ -30,7 +30,7 @@ struct InstallerView: View {
             )
 
             if installers.isEmpty {
-                NoInstallerView(onDownload: downloadFromApple, onChoose: { isChoosingFile = true })
+                NoInstallerView(onDownload: downloadFromApple, onChoose: { isChoosingFile = true }, onDrop: drop)
                     .frame(maxHeight: .infinity)
                     .contentShape(.rect)
                     .dropDestination(for: URL.self) { urls, _ in
@@ -39,14 +39,15 @@ struct InstallerView: View {
             } else {
                 Spacer()
 
-                HStack(spacing: 24) {
+                // Top-aligned, so the dashed square lines up with the installers' icons.
+                HStack(alignment: .top, spacing: 24) {
                     ForEach(installers) { installer in
                         InstallerItem(installer: installer, isSelected: installer.id == selectedID) {
                             selectedID = installer.id
                         }
                     }
 
-                    OtherInstallerItem(onChoose: { isChoosingFile = true }, onDrop: drop)
+                    AddInstallerButton(onChoose: { isChoosingFile = true }, onDrop: drop)
                 }
                 .selectsWithArrowKeys(onMoveSelection)
                 .slidingSelection(selectedID)
@@ -90,51 +91,6 @@ struct InstallerView: View {
 
     private func downloadFromApple() {
         // TODO: open the download screen (1b), roadmap step 9.
-    }
-}
-
-// MARK: - Other installer
-
-/// The last item of the row: choose an installer saved anywhere, by clicking or by dropping it
-/// from the Finder. It's a button, never selected.
-struct OtherInstallerItem: View {
-    let onChoose: () -> Void
-    let onDrop: ([URL]) -> Bool
-
-    @State private var isTargeted = false
-
-    var body: some View {
-        PickItem(
-            title: String(
-                localized: "Other Installer…", comment: "Last item on the Installer screen: choose or drop a file."),
-            isSelected: false, action: onChoose
-        ) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(isTargeted ? Theme.Colors.accent.opacity(0.12) : .clear)
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
-                    .foregroundStyle(isTargeted ? AnyShapeStyle(Theme.Colors.accent) : AnyShapeStyle(.tertiary))
-                Image(systemName: "plus")
-                    .font(.system(size: 28, weight: .medium))
-                    .foregroundStyle(isTargeted ? AnyShapeStyle(Theme.Colors.accent) : AnyShapeStyle(.secondary))
-            }
-            .padding(6)
-        } detail: {
-            Text(".app, .dmg or .pkg", comment: "Under “Other Installer…”: the kinds of files it accepts.")
-                .font(.subheadline)
-                .foregroundStyle(Theme.Colors.secondary)
-        }
-        .accessibilityHint(
-            Text(
-                "Choose or drop an installer app, disk image or InstallAssistant.pkg.",
-                comment: "VoiceOver hint of “Other Installer…” on the Installer screen.")
-        )
-        .dropDestination(for: URL.self) { urls, _ in
-            onDrop(urls)
-        } isTargeted: { targeted in
-            isTargeted = targeted
-        }
     }
 }
 

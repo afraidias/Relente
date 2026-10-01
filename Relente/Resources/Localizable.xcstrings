@@ -1,6 +1,64 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
+    "“%@”" : {
+      "comment" : "Done screen, under the drive: the name it has now, in quotes, e.g. “Install macOS Tahoe”.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%@»"
+          }
+        }
+      }
+    },
+    "“%@” Couldn’t Be Ejected" : {
+      "comment" : "Alert title when macOS refuses to eject the drive. The value is the drive's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido expulsar «%@»"
+          }
+        }
+      }
+    },
+    "“%@” Isn't a macOS Installer" : {
+      "comment" : "Alert title when the chosen file isn't an installer. The value is the file's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%@» no es un instalador de macOS"
+          }
+        }
+      }
+    },
+    "“%@” was disconnected." : {
+      "comment" : "VoiceOver, when the chosen drive is unplugged on Review. The value is the drive's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha desconectado «%@»."
+          }
+        }
+      }
+    },
+    "“%@” will be left unusable until it's erased again." : {
+      "comment" : "Message of the cancel alert. The value is the drive's name, e.g. SanDisk Ultra.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«%@» quedará inutilizable hasta que se vuelva a borrar."
+          }
+        }
+      }
+    },
     "%@" : {
       "comment" : "Done screen subtitle, how long it took. The value is a duration, e.g. 12 minutes or 1 hour, 5 minutes.",
       "localizations" : {
@@ -96,17 +154,6 @@
         }
       }
     },
-    "%@/s" : {
-      "comment" : "Creating screen, SPEED. The value is an amount of data, e.g. 48 MB; the figure is per second.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@/s"
-          }
-        }
-      }
-    },
     "%@: %@" : {
       "comment" : "VoiceOver, Done screen card. First value: Apple silicon or Intel; second: what to do.",
       "localizations" : {
@@ -124,13 +171,13 @@
         }
       }
     },
-    ".app, .dmg or .pkg" : {
-      "comment" : "Under “Other Installer…”: the kinds of files it accepts.",
+    "%@/s" : {
+      "comment" : "Creating screen, SPEED. The value is an amount of data, e.g. 48 MB; the figure is per second.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : ".app, .dmg o .pkg"
+            "value" : "%@/s"
           }
         }
       }
@@ -146,17 +193,6 @@
         }
       }
     },
-    "AT START-UP" : {
-      "comment" : "Done screen card capsule, uppercase: press the key while the Mac turns on.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AL ENCENDER"
-          }
-        }
-      }
-    },
     "About %@" : {
       "comment" : "Creating screen, REMAINING: estimated time left. The value is a duration, e.g. 4 min or 1 hr, 20 min.",
       "localizations" : {
@@ -164,6 +200,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unos %@"
+          }
+        }
+      }
+    },
+    "Add Installer…" : {
+      "comment" : "VoiceOver name of the dashed square with a plus.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir instalador…"
           }
         }
       }
@@ -179,17 +226,6 @@
         }
       }
     },
-    "Already have one? Choose Installer…" : {
-      "comment" : "Link under “Download from Apple…” in the Installer screen’s empty state.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Ya tienes uno? Elegir instalador…"
-          }
-        }
-      }
-    },
     "Apple silicon" : {
       "comment" : "Done screen card heading: Macs with Apple silicon.",
       "localizations" : {
@@ -197,6 +233,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple silicon"
+          }
+        }
+      }
+    },
+    "AT START-UP" : {
+      "comment" : "Done screen card capsule, uppercase: press the key while the Mac turns on.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AL ENCENDER"
           }
         }
       }
@@ -223,17 +270,6 @@
         }
       }
     },
-    "COPIED" : {
-      "comment" : "Creating screen figure: bytes of the installer copied to the drive so far.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "COPIADO"
-          }
-        }
-      }
-    },
     "Calculating…" : {
       "comment" : "Creating screen, REMAINING: not enough data yet to estimate the time left.",
       "localizations" : {
@@ -246,7 +282,7 @@
       }
     },
     "Cancel" : {
-      "comment" : "Secondary button in the Creating screen's footer; asks before stopping.",
+      "comment" : "Eject alert: close it and stay on the Done screen.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -290,7 +326,7 @@
       }
     },
     "Choose or drop an installer app, disk image or InstallAssistant.pkg." : {
-      "comment" : "VoiceOver hint of “Other Installer…” on the Installer screen.",
+      "comment" : "Help tag and VoiceOver hint of the dashed square with a plus on the Installer screen.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -333,6 +369,17 @@
         }
       }
     },
+    "COPIED" : {
+      "comment" : "Creating screen figure: bytes of the installer copied to the drive so far.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "COPIADO"
+          }
+        }
+      }
+    },
     "Copy" : {
       "comment" : "Creation phase: copying the installer to the drive.",
       "localizations" : {
@@ -355,8 +402,8 @@
         }
       }
     },
-    "Creating Installer" : {
-      "comment" : "Title of the Creating screen.",
+    "Creating installer" : {
+      "comment" : "VoiceOver label of the progress ring.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -366,8 +413,8 @@
         }
       }
     },
-    "Creating installer" : {
-      "comment" : "VoiceOver label of the progress ring.",
+    "Creating Installer" : {
+      "comment" : "Title of the Creating screen.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -421,13 +468,13 @@
         }
       }
     },
-    "Download one from Apple, or choose one you already have." : {
+    "Download one from Apple, or add one you already have." : {
       "comment" : "Empty state on the Installer screen when no installer is found.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Descarga uno desde Apple o elige uno que ya tengas."
+            "value" : "Descarga uno desde Apple o añade uno que ya tengas."
           }
         }
       }
@@ -498,17 +545,6 @@
         }
       }
     },
-    "Everything on the drive you choose will be erased." : {
-      "comment" : "Subtitle of the USB drive screen.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se borrará todo lo que haya en la memoria que elijas."
-          }
-        }
-      }
-    },
     "Everything on “%@” will be permanently erased." : {
       "comment" : "Review screen warning. The value is the drive's name, e.g. SanDisk Ultra.",
       "localizations" : {
@@ -520,13 +556,13 @@
         }
       }
     },
-    "FREE AFTERWARDS" : {
-      "comment" : "Review screen figure: space left on the drive after creating it.",
+    "Everything on the drive you choose will be erased." : {
+      "comment" : "Subtitle of the USB drive screen.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "LIBRE DESPUÉS"
+            "value" : "Se borrará todo lo que haya en la memoria que elijas."
           }
         }
       }
@@ -560,6 +596,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Libre"
+          }
+        }
+      }
+    },
+    "FREE AFTERWARDS" : {
+      "comment" : "Review screen figure: space left on the drive after creating it.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LIBRE DESPUÉS"
           }
         }
       }
@@ -706,6 +753,17 @@
         }
       }
     },
+    "less than a minute" : {
+      "comment" : "Done screen subtitle, how long it took: under 60 seconds.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "menos de un minuto"
+          }
+        }
+      }
+    },
     "Less than a minute" : {
       "comment" : "Creating screen, REMAINING: under 60 seconds left.",
       "localizations" : {
@@ -805,6 +863,17 @@
         }
       }
     },
+    "of %@" : {
+      "comment" : "Creating screen, under COPIED. The value is the installer's size, e.g. 16.8 GB.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "de %@"
+          }
+        }
+      }
+    },
     "OK" : {
       "comment" : "Button that closes an alert.",
       "localizations" : {
@@ -812,17 +881,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aceptar"
-          }
-        }
-      }
-    },
-    "Other Installer…" : {
-      "comment" : "Last item on the Installer screen: choose or drop a file.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Otro instalador…"
           }
         }
       }
@@ -926,39 +984,6 @@
         }
       }
     },
-    "SPEED" : {
-      "comment" : "Creating screen figure: how fast the installer is being copied.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "VELOCIDAD"
-          }
-        }
-      }
-    },
-    "START UP FROM THE DRIVE" : {
-      "comment" : "Done screen section label above the start-up cards.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ARRANCAR DESDE EL USB"
-          }
-        }
-      }
-    },
-    "STOPPED AT" : {
-      "comment" : "Error screen figure: overall progress when creating stopped.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DETENIDO EN"
-          }
-        }
-      }
-    },
     "Something went wrong while creating the installer." : {
       "comment" : "Error screen: a failure with no known cause.",
       "localizations" : {
@@ -970,6 +995,17 @@
         }
       }
     },
+    "SPEED" : {
+      "comment" : "Creating screen figure: how fast the installer is being copied.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VELOCIDAD"
+          }
+        }
+      }
+    },
     "Start Over" : {
       "comment" : "Error screen button: go back to the first step.",
       "localizations" : {
@@ -977,6 +1013,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Empezar de nuevo"
+          }
+        }
+      }
+    },
+    "START UP FROM THE DRIVE" : {
+      "comment" : "Done screen section label above the start-up cards.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ARRANCAR DESDE EL USB"
           }
         }
       }
@@ -1021,6 +1068,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "¿Detener la creación del instalador?"
+          }
+        }
+      }
+    },
+    "STOPPED AT" : {
+      "comment" : "Error screen figure: overall progress when creating stopped.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DETENIDO EN"
           }
         }
       }
@@ -1080,17 +1138,6 @@
         }
       }
     },
-    "This Mac" : {
-      "comment" : "Done screen: marks the start-up card that matches the Mac in use.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Este Mac"
-          }
-        }
-      }
-    },
     "This can't be undone. Other disks won't be touched." : {
       "comment" : "Review screen warning, second line.",
       "localizations" : {
@@ -1098,6 +1145,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se puede deshacer. No se tocará ningún otro disco."
+          }
+        }
+      }
+    },
+    "This Mac" : {
+      "comment" : "Done screen: marks the start-up card that matches the Mac in use.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este Mac"
           }
         }
       }
@@ -1114,7 +1172,7 @@
       }
     },
     "Try Again" : {
-      "comment" : "Error screen button: go back to Review with the same drive and installer.",
+      "comment" : "Eject alert: try to eject the drive again.\nError screen button: go back to Review with the same drive and installer.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1157,17 +1215,6 @@
         }
       }
     },
-    "USB Drive" : {
-      "comment" : "Name of the second assistant step, where the USB drive or SD card is chosen.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Memoria USB"
-          }
-        }
-      }
-    },
     "Unknown size" : {
       "comment" : "Review screen, WILL BE ERASED: the drive has data Relente can't measure (e.g. formatted for Linux).",
       "localizations" : {
@@ -1175,6 +1222,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tamaño desconocido"
+          }
+        }
+      }
+    },
+    "USB Drive" : {
+      "comment" : "Model shown for a USB drive that reports no vendor or product name.\nName of the second assistant step, where the USB drive or SD card is chosen.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memoria USB"
           }
         }
       }
@@ -1201,28 +1259,6 @@
         }
       }
     },
-    "WILL BE ERASED" : {
-      "comment" : "Review screen figure: space in use on the drive, which will be lost.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SE BORRARÁ"
-          }
-        }
-      }
-    },
-    "WILL BE INSTALLED" : {
-      "comment" : "Review screen figure: size of the installer copied to the drive.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SE INSTALARÁ"
-          }
-        }
-      }
-    },
     "Waiting for a drive…" : {
       "comment" : "Shown while no USB drive or SD card is connected.",
       "localizations" : {
@@ -1245,6 +1281,28 @@
         }
       }
     },
+    "WILL BE ERASED" : {
+      "comment" : "Review screen figure: space in use on the drive, which will be lost.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SE BORRARÁ"
+          }
+        }
+      }
+    },
+    "WILL BE INSTALLED" : {
+      "comment" : "Review screen figure: size of the installer copied to the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SE INSTALARÁ"
+          }
+        }
+      }
+    },
     "You stopped the process." : {
       "comment" : "Error screen: the user cancelled the creation.",
       "localizations" : {
@@ -1252,83 +1310,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Has detenido el proceso."
-          }
-        }
-      }
-    },
-    "less than a minute" : {
-      "comment" : "Done screen subtitle, how long it took: under 60 seconds.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "menos de un minuto"
-          }
-        }
-      }
-    },
-    "of %@" : {
-      "comment" : "Creating screen, under COPIED. The value is the installer's size, e.g. 16.8 GB.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "de %@"
-          }
-        }
-      }
-    },
-    "“%@”" : {
-      "comment" : "Done screen, under the drive: the name it has now, in quotes, e.g. “Install macOS Tahoe”.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "«%@»"
-          }
-        }
-      }
-    },
-    "“%@” Couldn’t Be Ejected" : {
-      "comment" : "Alert title when macOS refuses to eject the drive. The value is the drive's name.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se ha podido expulsar «%@»"
-          }
-        }
-      }
-    },
-    "“%@” Isn't a macOS Installer" : {
-      "comment" : "Alert title when the chosen file isn't an installer. The value is the file's name.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "«%@» no es un instalador de macOS"
-          }
-        }
-      }
-    },
-    "“%@” was disconnected." : {
-      "comment" : "VoiceOver, when the chosen drive is unplugged on Review. The value is the drive's name.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se ha desconectado «%@»."
-          }
-        }
-      }
-    },
-    "“%@” will be left unusable until it's erased again." : {
-      "comment" : "Message of the cancel alert. The value is the drive's name, e.g. SanDisk Ultra.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "«%@» quedará inutilizable hasta que se vuelva a borrar."
           }
         }
       }

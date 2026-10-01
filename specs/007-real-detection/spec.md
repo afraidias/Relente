@@ -27,12 +27,11 @@ with C3").
 - **Found automatically:** every `Install macOS *.app` at the top level of `/Applications`. The
   folder is watched while the app runs: an installer that appears (a download from the App Store
   finishing, a copy dragged in) or disappears updates the screen by itself.
-- **Chosen by the user:** clicking **"Other Installer…"** (or the empty state's "Choose
-  Installer…" link) opens the standard open panel, which accepts an installer app, a `.dmg` that
-  contains one, or an `InstallAssistant.pkg`. The same files can be **dragged from the Finder**
-  onto "Other Installer…", or anywhere on the empty state. A valid file is added to the list and
-  selected. Choosing a file that's already listed just selects
-  it. Chosen files are remembered until the app quits.
+- **Chosen by the user:** clicking the **add square** (a dashed square with a plus, below) opens
+  the standard open panel, which accepts an installer app, a `.dmg` that contains one, or an
+  `InstallAssistant.pkg`. The same files can be **dragged from the Finder** onto the square, or
+  anywhere on the empty state. A valid file is added to the list and selected. Choosing a file
+  that's already listed just selects it. Chosen files are remembered until the app quits.
 - Nothing else is searched (no Downloads folder, no Spotlight), so macOS never asks the user for
   permission to read their folders.
 
@@ -59,22 +58,21 @@ with C3").
 
 **With installers (option B of the canvas)**
 - As built in spec 001, plus the unsupported state above.
-- The last item of the row is **"Other Installer…"**: a dashed rounded square with a `plus`
-  symbol where the icon goes, the name below it and ".app, .dmg or .pkg" as its detail. It's a
-  button, never selected: clicking it opens the open panel. While a file is dragged over it, its
-  border and symbol turn the accent color. VoiceOver reads it as a button, "Other Installer…",
-  with the hint "Choose or drop an installer app, disk image or InstallAssistant.pkg."
+- The last item of the row is the **add square**: a dashed rounded square with a `plus` symbol,
+  the size and place of an installer's icon, with **no text** under it (the row is top-aligned so
+  it lines up with the icons). It's a button, never selected: clicking it opens the open panel.
+  While a file is dragged over it, its border and plus turn the accent color. Its help tag (on
+  hover) and VoiceOver hint say "Choose or drop an installer app, disk image or
+  InstallAssistant.pkg."; VoiceOver names it "Add Installer…".
 - At the bottom, only "Download from Apple…", as in spec 001.
 
-**No installers (option C3 of the canvas)**
+**No installers (option C3 of the canvas, revised)**
 - The screen keeps its header ("Choose an Installer" and its subtitle). Below it, centered, a
-  native empty state like USB Drive's 2b: a gray installer symbol, **"No Installers Found"** and
-  "Download one from Apple, or choose one you already have." (one sentence: the waiting indicator
-  below already says it will appear by itself; shortened at Checkpoint D, the first version was
-  too long).
+  native empty state like USB Drive's 2b, with the **add square** in the symbol's place,
+  **"No Installers Found"** and "Download one from Apple, or add one you already have." (one
+  sentence: the waiting indicator below already says it will appear by itself).
 - **"Download from Apple…"** as the primary button (it still does nothing until roadmap step 9,
-  like on the screen with installers) and **"Already have one? Choose Installer…"** as a link
-  below it.
+  like on the screen with installers).
 - Below them, a small spinner and **"Waiting for an installer…"**. When an installer appears in
   `/Applications`, or one is chosen, the screen switches to the list by itself.
 - "Continue" is disabled.
@@ -85,14 +83,14 @@ with C3").
 Installer's empty state (C3) and USB Drive's (2b) are the same component, `EmptyStateView`, so
 they look and behave alike:
 
-| Part | Installer (C3) | USB Drive (2b) |
+| Part | Installer (C3, revised) | USB Drive (2b) |
 | --- | --- | --- |
 | Screen header | "Choose an Installer" and its subtitle | "Choose a USB Drive" and its subtitle (2b had none) |
 | Under the header | — | The installer label (spec 006), as on the screen with drives |
-| Symbol (gray) | Installer symbol | `externaldrive.badge.plus` |
+| Symbol | The add square | `externaldrive.badge.plus`, gray |
 | Title (`.headline`-sized, bold) | "No Installers Found" | **"No USB Drive Connected"** (was "Connect a USB Drive") |
 | Description | As above | "Use a USB drive or SD card with at least *N*. 32 GB or more works for any version of macOS." (as in spec 002) |
-| Actions | "Download from Apple…" and the "Choose Installer…" link | none |
+| Actions | "Download from Apple…" | none |
 | Waiting indicator | "Waiting for an installer…" | "Waiting for a drive…" |
 
 - The block is centered in the space left under the header, at the same place on both screens.
@@ -167,8 +165,8 @@ supported installer is selected.
   Release.
 
 ## Changes to earlier features
-- **Spec 001 (Installer screen):** real installers instead of samples; the "Other Installer…"
-  item, by click or drag and drop; the unsupported state; the empty state (C3); order and default
+- **Spec 001 (Installer screen):** real installers instead of samples; the add square, by click
+  or drag and drop; the unsupported state; the empty state (C3); order and default
   selection.
 - **Spec 002 (USB Drive screen):** 2b gets the screen header and the installer label above an
   empty state shared with Installer's, and its title becomes "No USB Drive Connected"; real drives, only USB drives and SD cards; the drive's title is
@@ -187,8 +185,8 @@ supported installer is selected.
 - [ ] An `Install macOS *.app` in `/Applications` appears on the Installer screen with its real
   name, version, size and icon; one added or removed while the app runs appears or disappears
   without relaunching.
-- [ ] "Other Installer…" (click or drop) and the empty state (link or drop) accept an installer app, a `.dmg` containing one and an
-  `InstallAssistant.pkg`, adds it and selects it; any other file shows the "Isn't a macOS
+- [ ] The add square (click or drop) and the empty state (drop) accept an installer app, a `.dmg`
+  containing one and an `InstallAssistant.pkg`, add it and select it; any other file shows the "Isn't a macOS
   Installer" alert and adds nothing.
 - [ ] A `.dmg` is mounted read-only and hidden to be read, and is always detached afterwards, also
   when reading fails.
@@ -286,9 +284,13 @@ supported installer is selected.
    that wait for something look and behave the same. 2b gains the screen header, which it didn't
    have, so the title stays where it is on every other screen; its own title becomes "No USB
    Drive Connected" to pair with "No Installers Found", while the header already says what to do.
-10. **"Other Installer…" as the last item, not a button beside Download (option B).** Chosen by
-   the owner at the first screen review: two buttons side by side competed with each other; an
-   item in the row says "another one of these", and it can take a dropped file, as in the Finder.
+10. **An add square as the last item, not a button beside Download (option B).** Chosen by the
+   owner at the first screen review: two buttons side by side competed with each other; an item
+   in the row says "another one of these", and it can take a dropped file, as in the Finder. Then,
+   at Checkpoint D, the owner removed its texts ("Other Installer…", ".app, .dmg or .pkg") and
+   put it in the empty state in place of the symbol, replacing the "Already have one? Choose
+   Installer…" link: the plus says "add" on its own, and the help tag explains it on hover. The
+   texts of both empty states were shortened at the same time.
 11. **Chosen installers aren't remembered after quitting.** Keeps this step small; remembering
    them needs security-scoped bookmarks (Open items).
 

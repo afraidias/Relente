@@ -106,9 +106,10 @@ what macOS reports into plain values. The views change where the spec says: the 
   waiting indicator, centered under a `ScreenHeader`. `NoDriveView` uses it (with the header and
   installer label now above it); a new `NoInstallerView` does too.
 - **`InstallerView`:** unsupported items (disabled `PickItem` with the "Not supported" chip and
-  caption, like `DriveItem`), the "Other Installer…" item (`PickItem` never selected, with
-  `dropDestination(for: URL.self)` and a highlight while targeted; the empty state takes drops
-  too) *(changed at Checkpoint C: it was a button beside "Download from Apple…")*, `fileImporter`
+  caption, like `DriveItem`), the add square (`Components/AddInstallerButton.swift`: a button with
+  `dropDestination(for: URL.self)` and a highlight while targeted, no text; also the empty
+  state's symbol, and the empty state takes drops too) *(changed at Checkpoints C and D: it was a
+  button beside "Download from Apple…", then a titled item)*, `fileImporter`
   for `.app`, `.dmg` and `.pkg`, and the alert for a file that isn't an installer. Arrow keys skip
   unsupported items (in `Assistant.moveSelection`).
 - **`DriveView` / `DriveItem`:** title plus "model · capacity"; the "Data will be erased" chip.

@@ -3,19 +3,20 @@
 //  Relente
 //
 //  What a screen shows while it waits for something that isn't there yet: an installer on the
-//  Installer screen, a drive on the USB Drive screen. Both look and behave the same: a gray
-//  symbol, a title, a description, optional actions and a "Waiting for…" indicator.
+//  Installer screen, a drive on the USB Drive screen. Both look and behave the same: a symbol
+//  (or, on Installer, the square to add one), a title, a description, optional actions and a
+//  "Waiting for…" indicator.
 //  Spec: specs/007-real-detection/spec.md
 //
 
 import SwiftUI
 
-struct EmptyStateView<Actions: View>: View {
+struct EmptyStateView<Icon: View, Actions: View>: View {
     let title: LocalizedStringResource
-    let systemImage: String
     let description: Text
     /// e.g. "Waiting for a drive…".
     let waitingText: LocalizedStringResource
+    @ViewBuilder let icon: Icon
     @ViewBuilder let actions: Actions
 
     var body: some View {
@@ -23,7 +24,7 @@ struct EmptyStateView<Actions: View>: View {
             Label {
                 Text(title)
             } icon: {
-                Image(systemName: systemImage)
+                icon
             }
         } description: {
             description
@@ -36,11 +37,12 @@ struct EmptyStateView<Actions: View>: View {
     }
 }
 
-extension EmptyStateView where Actions == EmptyView {
+extension EmptyStateView where Icon == Image, Actions == EmptyView {
+    /// A gray system symbol and no actions, as on the USB Drive screen.
     init(title: LocalizedStringResource, systemImage: String, description: Text, waitingText: LocalizedStringResource) {
         self.init(
-            title: title, systemImage: systemImage, description: description, waitingText: waitingText,
-            actions: { EmptyView() })
+            title: title, description: description, waitingText: waitingText,
+            icon: { Image(systemName: systemImage) }, actions: { EmptyView() })
     }
 }
 

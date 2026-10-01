@@ -7,9 +7,7 @@ Spec: [spec.md](spec.md) · Plan: [plan.md](plan.md)
 - Phases 1–4 done; Checkpoint D (real hardware) not done yet: no installer in `/Applications`
   and no USB drive at hand. To get an installer:
   `softwareupdate --fetch-full-installer --full-installer-version 15.8.1` (about 15.7 GB).
-- **Pending decision:** the Installer empty state's symbol. The owner doesn't like
-  `arrow.down.app` and is choosing between `laptopcomputer.and.arrow.down` and
-  `arrow.down.app.dashed` (`Views/NoInstallerView.swift`).
+- The Installer empty state's symbol was settled: the add square takes its place (no symbol).
 - The owner keeps the roadmap order: downloading installers stays roadmap step 9.
 
 ## Phase 1: Models and rules (test-driven)
@@ -120,6 +118,14 @@ Spec: [spec.md](spec.md) · Plan: [plan.md](plan.md)
     "Force Eject", "Cancel" (Esc); VoiceOver announces "“Name” was disconnected."
   - Verify: previews; Debug build; manual check with `-sampleData YES`.
   - Files: `Views/DoneView.swift`, `Views/AssistantView.swift`, `Resources/Localizable.xcstrings`
+
+- [x] Task 9c: The add square (asked at Checkpoint D)
+  - Acceptance: `Components/AddInstallerButton.swift`, a dashed square with a plus and no text,
+    help tag and VoiceOver name and hint; last item of the row (top-aligned) and the empty
+    state's symbol; the "Already have one?" link removed; shorter empty-state texts; strings.
+  - Verify: previews; Debug build; snapshots.
+  - Files: `Components/AddInstallerButton.swift`, `Components/EmptyStateView.swift`,
+    `Views/InstallerView.swift`, `Views/NoInstallerView.swift`, `Resources/Localizable.xcstrings`
 
 ### Checkpoint C
 - [ ] Owner reviews the screens in the app with `-sampleData YES` (light, dark, classic).
