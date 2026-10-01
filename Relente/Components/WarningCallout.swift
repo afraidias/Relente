@@ -62,6 +62,6 @@ struct WarningCallout<Content: View>: View {
         Toggle("I understand that all data on this drive will be lost.", isOn: $isOn)
             .toggleStyle(.checkbox)
     }
-    .frame(width: 560)
+    .frame(width: Theme.Sizes.contentWidth)
     .padding()
 }

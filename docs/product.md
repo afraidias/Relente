@@ -41,15 +41,24 @@ buttons on the right.
 2. **USB drive:** drives as large Finder-style illustrations with status labels.
    2b. **No drive:** empty state that waits for one to be plugged in.
 3. **Review:** the drive as the hero; WILL BE ERASED / WILL BE INSTALLED / FREE AFTERWARDS; usage
-   bar; orange warning with a required checkbox; red "Erase and Create" with Touch ID.
+   bar; orange warning with a required checkbox; red "Erase and Create" with the Touch ID symbol.
 4. **Creating:** progress ring around the drive; COPIED / SPEED / REMAINING; a 4-phase bar
-   (Format, Copy, Make bootable, Verify). "Cancel" asks for confirmation ("Keep Going" is the
-   default; "Stop" leaves the drive unusable until it's erased again).
-   4b. **Error:** same layout, nothing moves, in red: a red badge, the reason and what to do as
-   the subtitle, "STOPPED AT X %", and the current step's pill in red. "Try Again" (default) returns to Review; "Start Over"
-   returns to the Installer screen.
-5. **Done:** green badge, "Verified" and "Took X min", how to boot (Apple silicon / Intel).
-   "Eject" returns to the Installer screen, never to Permissions.
+   (Format, Copy, Make bootable, Verify). "Cancel" (also Esc) asks for confirmation in a sheet that
+   looks like a macOS alert: "Keep Going" answers Return and Esc; "Stop", which leaves the drive
+   unusable until it's erased again, only a click.
+   4b. **Error:** same layout, nothing moves, in red: no ring (its space is kept), a red halo and
+   badge, the reason and what to do as the subtitle, and "STOPPED AT X %". "Try Again" (default)
+   returns to Review; "Start Over" returns to the Installer screen.
+5. **Done:** the drive with a green halo and the installer's icon, checked, as its badge; under
+   it the name the drive has now ("Install macOS Tahoe"); the subtitle says to eject it and plug
+   it into the Mac and how long it took. "Start up from the drive": one card per kind of Mac
+   (Apple silicon, Intel) with a strip of its keyboard and the key to hold highlighted, "This Mac"
+   on the matching one. A help "?" in the footer's bottom-leading corner opens a popover with the
+   causes when the drive doesn't show up. "Eject" (default) returns to the Installer screen, never
+   to Permissions.
+
+Step pills are always blue, whatever the screen's state. Step names in the footer are nouns: Installer, USB Drive, Review, Creation, Done (Spanish:
+Instalador, Memoria USB, Revisión, Creación, Listo). Spanish text is Spanish from Spain.
 
 The chosen drive's illustration travels between screens with `matchedGeometryEffect` (one
 `@Namespace` in the assistant container); the installer tile from step 1 flies to the Review
@@ -63,10 +72,19 @@ badge. With Reduce Motion, a crossfade is used instead.
   subtitle `.body` (13 pt), section labels `.subheadline.weight(.semibold)` (11 pt), small text
   `.callout` (12 pt).
 - Reusable components, one `View` each (e.g. `StatusChip`, `HeroArtwork`, `PickItem`, `BigStat`,
-  `PhaseBar`, `StepIndicator`, `WarningCallout`).
+  `PhaseBar`, `StepIndicator`, `WarningCallout`, `KeyCap`, `StartUpCard`).
+- One content width for the column under the hero (figures, bars, callouts, cards):
+  `Theme.Sizes.contentWidth` (640 pt), the same on every screen.
 - Buttons: `.buttonStyle(.primary)` for the main action, `.buttonStyle(.secondary)` for others,
   `role: .destructive` for erasing. On macOS 26+ they are Liquid Glass capsules at the regular
   control size; on macOS 14–15, the classic bordered styles.
+- Icons on buttons only when the action has a well-known system symbol that adds meaning
+  (download, Touch ID, start over, try again, eject), shown before the title; "Continue", "Back",
+  "Cancel" and alert buttons stay text only. Help is the standard round "?" button.
+- Every screen follows Apple's Human Interface Guidelines for macOS; an exception is recorded in
+  its spec's Decisions. Help buttons go in the bottom-leading corner; Esc always cancels.
+- Progress rings only while something is in progress: a finished or stopped screen uses the halo
+  and badge colors instead.
 - Window: fixed 800×560 content under a hidden title bar. Every screen's header sits
   `Theme.Sizes.headerTopPadding` (28 pt) below it, clear of the window buttons.
 - Cards only for grouping (Download, error details, "How to boot"); never for picking options or

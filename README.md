@@ -68,7 +68,7 @@ Early development. The roadmap (specs refer to these as "roadmap step N"):
 
 1. [x] Project setup
 2. [x] Folder structure and design system
-3. [ ] Static screens with sample data: 001 Installer ✓, 002 USB drive ✓, 003 Review ✓, 004 Creating (+ Error) ✓, 005 Done
+3. [x] Static screens with sample data: 001 Installer ✓, 002 USB drive ✓, 003 Review ✓, 004 Creating (+ Error) ✓, 005 Done ✓
 4. [ ] Assistant navigation and animations (includes the VoiceOver check deferred from 003)
 5. [ ] Real disk and installer detection
 6. [ ] System helper, XPC and security checks (includes the Permissions screen)

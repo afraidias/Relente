@@ -13,9 +13,6 @@ struct StepIndicator: View {
     let current: Int
     let total: Int
     let name: LocalizedStringResource
-    /// Color of the current step's pill, e.g. danger when that step failed.
-    /// Earlier steps always use the accent color: they did finish.
-    var currentTint: Color = Theme.Colors.accent
 
     var body: some View {
         HStack(spacing: 10) {
@@ -40,8 +37,9 @@ struct StepIndicator: View {
     }
 
     private func color(of step: Int) -> Color {
-        if step == current { return currentTint }
-        return step < current ? Theme.Colors.accent : Color.secondary.opacity(0.3)
+        // Always the accent color, also when a step fails or the assistant is done: the screen
+        // already says so, and another color would clash with the other pills (spec 005).
+        step <= current ? Theme.Colors.accent : Color.secondary.opacity(0.3)
     }
 }
 
@@ -49,7 +47,7 @@ struct StepIndicator: View {
     VStack(alignment: .leading, spacing: 12) {
         StepIndicator(current: 1, total: 4, name: "Installer")
         StepIndicator(current: 3, total: 4, name: "Review")
-        StepIndicator(current: 4, total: 4, name: "Creating", currentTint: Theme.Colors.danger)
+        StepIndicator(current: 4, total: 4, name: "Creation")
     }
     .padding()
 }

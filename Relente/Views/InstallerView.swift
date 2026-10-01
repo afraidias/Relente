@@ -40,8 +40,10 @@ struct InstallerView: View {
 
             Spacer()
 
-            Button("Download from Apple…") {
+            Button {
                 // TODO: open the download screen (1b).
+            } label: {
+                Label("Download from Apple…", systemImage: "arrow.down.circle")
             }
             .buttonStyle(.secondary)
         }

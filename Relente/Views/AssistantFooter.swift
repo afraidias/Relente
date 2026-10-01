@@ -2,37 +2,41 @@
 //  AssistantFooter.swift
 //  Relente
 //
-//  Bottom bar of the assistant: step indicator on the left,
+//  Bottom bar of the assistant: an optional help button and the step indicator on the left,
 //  the screen's buttons on the right.
 //
 
 import SwiftUI
 
-struct AssistantFooter<Actions: View>: View {
+struct AssistantFooter<Leading: View, Actions: View>: View {
     let step: Int
     let totalSteps: Int
     let stepName: LocalizedStringResource
-    /// Color of the current step's pill; danger when the step failed.
-    let stepTint: Color
+    /// Before the step indicator, e.g. the help button: Apple's guidelines put help in the
+    /// bottom-leading corner, apart from the action buttons.
+    let leading: Leading
     let actions: Actions
 
     init(
         step: Int,
         totalSteps: Int,
         stepName: LocalizedStringResource,
-        stepTint: Color = Theme.Colors.accent,
+        @ViewBuilder leading: () -> Leading,
         @ViewBuilder actions: () -> Actions
     ) {
         self.step = step
         self.totalSteps = totalSteps
         self.stepName = stepName
-        self.stepTint = stepTint
+        self.leading = leading()
         self.actions = actions()
     }
 
     var body: some View {
         HStack {
-            StepIndicator(current: step, total: totalSteps, name: stepName, currentTint: stepTint)
+            HStack(spacing: 12) {
+                leading
+                StepIndicator(current: step, total: totalSteps, name: stepName)
+            }
 
             Spacer()
 
@@ -42,6 +46,18 @@ struct AssistantFooter<Actions: View>: View {
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
+    }
+}
+
+extension AssistantFooter where Leading == EmptyView {
+    /// A footer with nothing before the step indicator.
+    init(
+        step: Int,
+        totalSteps: Int,
+        stepName: LocalizedStringResource,
+        @ViewBuilder actions: () -> Actions
+    ) {
+        self.init(step: step, totalSteps: totalSteps, stepName: stepName, leading: { EmptyView() }, actions: actions)
     }
 }
 

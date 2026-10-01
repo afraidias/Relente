@@ -27,7 +27,8 @@ step 7.
   capacity, e.g. "SanDisk Ultra · 32 GB".
 
 #### Three figures
-Side by side, centered (`BigStat`), in the same 560 pt column as the Review screen:
+Side by side, centered (`BigStat`), in the same content column as the Review screen (560 pt when
+built; 640 pt since spec 005):
 
 | Label | Value | Caption |
 | --- | --- | --- |
@@ -73,13 +74,16 @@ failure, STOPPED AT. Each phase has a fixed weight:
 - The percentage shown is rounded **down**, so it only reads "100 %" once everything is done.
 
 #### Footer
-- Left: "Step 4 of 4 · Creating".
-- Right: a **"Cancel"** button (secondary style). No button is the default action.
-- "Cancel" asks for confirmation in an alert:
+- Left: "Step 4 of 4 · Creating" ("Step 4 of 4 · Creation" since spec 005: step names are nouns).
+- Right: a **"Cancel"** button (secondary style). No button is the default action; Esc presses
+  "Cancel" (since spec 005, as Apple's guidelines ask), which only opens the confirmation.
+- "Cancel" asks for confirmation in an alert (since spec 005, a sheet that looks like a macOS
+  alert; see spec 005):
   - Title "Stop creating the installer?"
   - Message "“SanDisk Ultra” will be left unusable until it's erased again."
   - Buttons **"Keep Going"** (the default action: Return keeps going) and **"Stop"**
-    (`role: .destructive`). Esc does nothing (the alert stays open); see decision 8.
+    (`role: .destructive`). Esc does nothing (the alert stays open); see decision 8. Since spec
+    005, Return and Esc both keep going, and only a click on "Stop" stops.
 - For now "Stop" only closes the alert; going to the Error screen comes with navigation (roadmap
   step 4) and actually stopping the process with roadmap step 7.
 
@@ -99,8 +103,9 @@ Same layout as Creating, so the screen doesn't jump:
 | Verification failed | "The drive didn't pass the final check." | "Try again, or use a different drive." |
 | Unknown | "Something went wrong while creating the installer." | "Try again. If it keeps happening, use a different drive." |
 
-- Hero: the halo turns red (danger) and the ring stays where it stopped, in red; the badge is a
-  red `xmark.circle.fill` instead of the installer icon.
+- Hero: the halo turns red (danger) and the ring is no longer drawn (its space is kept, so nothing
+  moves; changed by spec 005, it was a red ring frozen where it stopped); the badge is a red
+  `xmark.circle.fill` instead of the installer icon.
 - Below it: the drive's name and capacity. The percentage moves to the figures; its space stays
   empty so nothing moves (decision 7).
 - One figure, centered, instead of three: **STOPPED AT**, the overall percentage when it stopped
@@ -109,8 +114,8 @@ Same layout as Creating, so the screen doesn't jump:
 
 - The phase bar stays, frozen: finished phases filled, the failed phase in red up to where it
   stopped, the rest gray.
-- Footer: "Step 4 of 4 · Creating", with the current step's pill in red (earlier steps stay
-  blue: they did finish); **"Start Over"** (secondary) and **"Try Again"** (primary,
+- Footer: "Step 4 of 4 · Creating" (now "Creation", spec 005), with the current step's pill in red
+  (earlier steps stay blue: they did finish; since spec 005 every pill stays blue); **"Start Over"** (secondary) and **"Try Again"** (primary,
   default action: Return is safe because it only goes back to Review, where the checkbox has to be
   ticked again). For now both buttons do nothing.
 
@@ -151,7 +156,7 @@ Same layout as Creating, so the screen doesn't jump:
 - Estimates over an hour → "About 1 h 20 min" (system duration formatting).
 - Failure during Format → STOPPED AT is at most 5 % and the Format segment turns red; the drive may
   still have its old data, but the message stays the same ("wasn't finished").
-- Failure at 0 % → STOPPED AT "0 %", ring empty.
+- Failure at 0 % → STOPPED AT "0 %".
 - Very long drive names → truncated in the middle on one line, in the hero and in the alert;
   VoiceOver reads the full name.
 
@@ -189,7 +194,8 @@ Same layout as Creating, so the screen doesn't jump:
    each button a single key, so "Keep Going" can answer Return or Esc, not both (checked with a UI
    test while building). Return was chosen: it's the key people press by reflex, and Apple
    recommends making the safe button the default in destructive alerts. A custom sheet could take
-   both keys but would look less native.
+   both keys but would look less native. *Changed by spec 005:* following Apple's guidelines
+   (Esc always cancels), it's now a custom sheet where Return and Esc both keep going.
 9. **The reason goes in the subtitle, not in a card or an alert, and there's no OTHER DISKS
    figure.** Chosen by the owner after seeing the screen: a card needed its space reserved while
    running (pushing the title against the ring), an alert on top of an error screen interrupts
@@ -203,7 +209,8 @@ None.
 - **Roadmap step 4:** make "Stop" go to the Error screen (reason "Cancelled"), "Try Again" go to
   Review and "Start Over" go to Installer; check VoiceOver and Reduce Motion in the running app.
   Add a UI test for the Cancel alert: Return keeps going, Esc leaves the alert open, and only a
-  click on "Stop" stops (checked by hand with a temporary UI test while building 004).
+  click on "Stop" stops (checked by hand with a temporary UI test while building 004). *Done in
+  spec 005, for the sheet that replaced the alert (Return and Esc both keep going).*
 - **Roadmap step 7:** run `createinstallmedia` for real (at least Big Sur, Sonoma and Tahoe) and
   record its exact output: whether Make bootable reports a percentage and the order of the phases;
   reorder the phase bar if needed. Measure how long Make bootable and Verify usually take, and if

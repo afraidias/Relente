@@ -8,6 +8,7 @@
 //  Spec: specs/004-creating-screen/spec.md
 //
 
+import AppKit
 import SwiftUI
 
 struct CreatingView: View {
@@ -15,9 +16,6 @@ struct CreatingView: View {
     let drive: Drive
     /// Running, or stopped with a reason. Both share this layout, so the screen doesn't jump.
     let state: CreationState
-
-    /// Width shared by the figures and the phase bar, as on the Review screen.
-    private let contentWidth: CGFloat = 560
 
     var body: some View {
         let progress = state.progress
@@ -56,7 +54,7 @@ struct CreatingView: View {
                     isFailed: state.failure != nil
                 )
             }
-            .frame(width: contentWidth)
+            .frame(width: Theme.Sizes.contentWidth)
 
             // Free space is shared evenly above and below the hero and at the bottom. Both
             // states are the same height, so it's shared the same way and nothing jumps.
@@ -77,37 +75,47 @@ struct CreatingView: View {
 // MARK: - Hero
 
 /// The drive inside the progress ring, the overall percentage, and the drive's name and capacity.
-/// When it stopped, everything turns red, the ring stays where it was and the percentage moves
-/// to STOPPED AT.
+/// When it stopped, the halo and badge turn red, the ring goes away (keeping its space) and the
+/// percentage moves to STOPPED AT.
 struct CreatingHero: View {
     let installer: InstallerSource
     let drive: Drive
     let progress: CreationProgress
     let isFailed: Bool
 
+    /// Size of the ring, and of the space it leaves when it's gone.
+    private static let ringDiameter: CGFloat = 140
+
     var body: some View {
         let tint = isFailed ? Theme.Colors.danger : Theme.Colors.accent
 
+        let artwork = HeroArtwork(size: 90, haloColor: tint) {
+            DriveArtwork(kind: drive.kind)
+        } badge: {
+            if isFailed {
+                Image(systemName: "xmark.circle.fill")
+                    .resizable()
+                    .foregroundStyle(.white, Theme.Colors.danger)
+            } else {
+                FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
+            }
+        }
+
         VStack(spacing: 10) {
-            ProgressRing(
-                fraction: progress.overallFraction,
-                label: isFailed
-                    ? Text("Stopped", comment: "VoiceOver label of the progress ring after a failure.")
-                    : Text("Creating installer", comment: "VoiceOver label of the progress ring."),
-                value: Text(progress.percent, format: .percent),
-                diameter: 140,
-                tint: tint
-            ) {
-                HeroArtwork(size: 90, haloColor: tint) {
-                    DriveArtwork(kind: drive.kind)
-                } badge: {
-                    if isFailed {
-                        Image(systemName: "xmark.circle.fill")
-                            .resizable()
-                            .foregroundStyle(.white, Theme.Colors.danger)
-                    } else {
-                        FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
-                    }
+            if isFailed {
+                // No ring once it stopped: the red halo and badge say it, and STOPPED AT says
+                // where. The ring's space is kept, so nothing moves (spec 005).
+                artwork
+                    .frame(width: Self.ringDiameter, height: Self.ringDiameter)
+            } else {
+                ProgressRing(
+                    fraction: progress.overallFraction,
+                    label: Text("Creating installer", comment: "VoiceOver label of the progress ring."),
+                    value: Text(progress.percent, format: .percent),
+                    diameter: Self.ringDiameter,
+                    tint: tint
+                ) {
+                    artwork
                 }
             }
 
@@ -211,61 +219,122 @@ struct FailureStats: View {
 
 // MARK: - Footer
 
-/// "Cancel", which asks before stopping. "Keep Going" is the default (Return);
-/// "Stop" is never the default.
+/// "Cancel", which asks before stopping. Esc presses it, as Apple's guidelines ask; it only opens
+/// the confirmation.
 struct CreatingFooter: View {
     let driveName: String
     let onStop: () -> Void
 
-    @State private var isConfirmingCancel = false
+    @State private var isConfirmingCancel: Bool
+
+    /// `isConfirmingCancel` opens the confirmation from the start, for previews.
+    init(driveName: String, isConfirmingCancel: Bool = false, onStop: @escaping () -> Void) {
+        self.driveName = driveName
+        self.onStop = onStop
+        _isConfirmingCancel = State(initialValue: isConfirmingCancel)
+    }
 
     var body: some View {
-        AssistantFooter(step: 4, totalSteps: 4, stepName: "Creating") {
+        AssistantFooter(step: 4, totalSteps: 4, stepName: "Creation") {
             Button("Cancel") {
                 isConfirmingCancel = true
             }
             .buttonStyle(.secondary)
+            .keyboardShortcut(.cancelAction)
         }
-        .alert(
-            Text("Stop creating the installer?", comment: "Title of the alert shown when cancelling the creation."),
-            isPresented: $isConfirmingCancel
-        ) {
-            Button(role: .cancel) {
-            } label: {
-                Text("Keep Going", comment: "Alert button: don't stop, keep creating the installer.")
-            }
-            // Return keeps going. A native alert gives each button one key, so Esc then does
-            // nothing (spec decision 8).
-            .keyboardShortcut(.defaultAction)
-
-            Button(role: .destructive, action: onStop) {
-                Text("Stop", comment: "Alert button: stop creating the installer.")
-            }
-        } message: {
-            Text(
-                "“\(driveName)” will be left unusable until it's erased again.",
-                comment: "Message of the cancel alert. The value is the drive's name, e.g. SanDisk Ultra."
+        .sheet(isPresented: $isConfirmingCancel) {
+            StopCreationSheet(
+                driveName: driveName,
+                onKeepGoing: { isConfirmingCancel = false },
+                onStop: {
+                    isConfirmingCancel = false
+                    onStop()
+                }
             )
         }
     }
 }
 
+/// Asks before stopping, looking like a macOS alert. A sheet rather than a native alert so that
+/// Return *and* Esc keep going (a native alert gives each button one key); "Stop" is destructive
+/// and only answers a click. Spec 005, "Apple's Human Interface Guidelines".
+struct StopCreationSheet: View {
+    let driveName: String
+    let onKeepGoing: () -> Void
+    let onStop: () -> Void
+
+    var body: some View {
+        // Laid out like a macOS alert: the app's icon (centered), then the title and message.
+        VStack(alignment: .leading, spacing: 12) {
+            Image(nsImage: NSApplication.shared.applicationIconImage)
+                .resizable()
+                .frame(width: 64, height: 64)
+                .frame(maxWidth: .infinity)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Stop creating the installer?", comment: "Title of the alert shown when cancelling the creation.")
+                    .font(.headline)
+                Text(
+                    "“\(driveName)” will be left unusable until it's erased again.",
+                    comment: "Message of the cancel alert. The value is the drive's name, e.g. SanDisk Ultra."
+                )
+            }
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: 8) {
+                Button(role: .destructive, action: onStop) {
+                    Text("Stop", comment: "Alert button: stop creating the installer.")
+                        .frame(maxWidth: .infinity)
+                }
+                // Gray like the other choice in a macOS alert; still destructive for VoiceOver.
+                .buttonStyle(.secondary)
+
+                Button(action: onKeepGoing) {
+                    Text("Keep Going", comment: "Alert button: don't stop, keep creating the installer.")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.primary)
+                // Return keeps going…
+                .keyboardShortcut(.defaultAction)
+            }
+            // Large, as in macOS alerts; side by side because there are two (Apple's guidelines).
+            .controlSize(.large)
+            .padding(.top, 8)
+        }
+        .padding(20)
+        .frame(width: 300, alignment: .leading)
+        // …and so does Esc.
+        .onExitCommand(perform: onKeepGoing)
+    }
+}
+
 /// "Start Over" and "Try Again". "Try Again" is the default: it only goes back to Review,
 /// where erasing has to be confirmed again.
-/// The step's pill turns red, like the rest of the screen.
 struct CreationErrorFooter: View {
     let onStartOver: () -> Void
     let onTryAgain: () -> Void
 
     var body: some View {
-        AssistantFooter(step: 4, totalSteps: 4, stepName: "Creating", stepTint: Theme.Colors.danger) {
+        AssistantFooter(step: 4, totalSteps: 4, stepName: "Creation") {
             Button(action: onStartOver) {
-                Text("Start Over", comment: "Error screen button: go back to the first step.")
+                Label {
+                    Text("Start Over", comment: "Error screen button: go back to the first step.")
+                } icon: {
+                    Image(systemName: "arrow.uturn.backward")
+                }
             }
             .buttonStyle(.secondary)
 
             Button(action: onTryAgain) {
-                Text("Try Again", comment: "Error screen button: go back to Review with the same drive and installer.")
+                Label {
+                    Text(
+                        "Try Again",
+                        comment: "Error screen button: go back to Review with the same drive and installer.")
+                } icon: {
+                    Image(systemName: "arrow.clockwise")
+                }
             }
             .buttonStyle(.primary)
             .keyboardShortcut(.defaultAction)
@@ -273,11 +342,13 @@ struct CreationErrorFooter: View {
     }
 }
 
-// MARK: - Previews
+// MARK: - Whole screen
 
-/// The whole screen as it will appear in the window: content and footer.
-private struct CreatingScreenPreview: View {
-    let state: CreationState
+/// The whole screen as it appears in the window: content and footer. Used by the previews and,
+/// in Debug builds, by the `-startScreen creating` launch argument (see `RelenteApp`).
+struct CreatingScreen: View {
+    var state = CreationState.running(.sampleMidCopy)
+    var isConfirmingCancel = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -287,7 +358,7 @@ private struct CreatingScreenPreview: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             if state.failure == nil {
-                CreatingFooter(driveName: Drive.samples[0].name, onStop: {})
+                CreatingFooter(driveName: Drive.samples[0].name, isConfirmingCancel: isConfirmingCancel, onStop: {})
             } else {
                 CreationErrorFooter(onStartOver: {}, onTryAgain: {})
             }
@@ -296,50 +367,56 @@ private struct CreatingScreenPreview: View {
     }
 }
 
+// MARK: - Previews
+
 #Preview("Format") {
-    CreatingScreenPreview(state: .running(.sampleFormat))
+    CreatingScreen(state: .running(.sampleFormat))
 }
 
 #Preview("Copy, speed unknown") {
-    CreatingScreenPreview(state: .running(.sampleEarlyCopy))
+    CreatingScreen(state: .running(.sampleEarlyCopy))
 }
 
 #Preview("Copy") {
-    CreatingScreenPreview(state: .running(.sampleMidCopy))
+    CreatingScreen(state: .running(.sampleMidCopy))
 }
 
 #Preview("Make bootable") {
-    CreatingScreenPreview(state: .running(.sampleMakeBootable))
+    CreatingScreen(state: .running(.sampleMakeBootable))
 }
 
 #Preview("Verify") {
-    CreatingScreenPreview(state: .running(.sampleVerify))
+    CreatingScreen(state: .running(.sampleVerify))
 }
 
 #Preview("Error: drive disconnected") {
-    CreatingScreenPreview(state: .failed(.sampleDriveDisconnected))
+    CreatingScreen(state: .failed(.sampleDriveDisconnected))
 }
 
 #Preview("Error: cancelled") {
-    CreatingScreenPreview(state: .failed(.sampleCancelled))
+    CreatingScreen(state: .failed(.sampleCancelled))
+}
+
+#Preview("Cancel confirmation") {
+    CreatingScreen(isConfirmingCancel: true)
 }
 
 #Preview("Classic (macOS 14–15)") {
-    CreatingScreenPreview(state: .running(.sampleMidCopy))
+    CreatingScreen(state: .running(.sampleMidCopy))
         .environment(\.usesClassicControls, true)
 }
 
 #Preview("Error, classic (macOS 14–15)") {
-    CreatingScreenPreview(state: .failed(.sampleDriveDisconnected))
+    CreatingScreen(state: .failed(.sampleDriveDisconnected))
         .environment(\.usesClassicControls, true)
 }
 
 #Preview("Dark") {
-    CreatingScreenPreview(state: .running(.sampleMidCopy))
+    CreatingScreen(state: .running(.sampleMidCopy))
         .preferredColorScheme(.dark)
 }
 
 #Preview("Error, dark") {
-    CreatingScreenPreview(state: .failed(.sampleDriveDisconnected))
+    CreatingScreen(state: .failed(.sampleDriveDisconnected))
         .preferredColorScheme(.dark)
 }
