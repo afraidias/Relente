@@ -58,6 +58,9 @@ xcrun swift-format lint -r --strict Relente RelenteTests RelenteUITests
 - Follow the helper security rules below; each one is covered by tests.
 - Build, run the tests and lint before saying something works.
 - Keep `main` buildable; work on a branch.
+- Follow Apple's Human Interface Guidelines for macOS on every screen (layout, controls, keyboard,
+  SF Symbols, alerts, help). Check each design against them before it's approved; record any
+  deliberate exception, with its reason, in the spec's Decisions.
 
 **Ask first:**
 - Before every commit, push, pull request or merge. Skills that say "commit after each task" or
@@ -197,5 +200,7 @@ macOS installers only, from Big Sur (11) onwards; destinations are USB drives an
 5. New strings are in the String Catalog with Spanish.
 6. Works in light and dark mode, with VoiceOver and with Reduce Motion (or the spec's Open Items
    record where that check is deferred to).
-7. Follows the helper security rules and `SECURITY.md`.
-8. The spec (status Done), `specs/README.md`, README and BUILDING are updated if needed.
+7. Follows Apple's Human Interface Guidelines for macOS, or the spec's Decisions record the
+   exception and why.
+8. Follows the helper security rules and `SECURITY.md`.
+9. The spec (status Done), `specs/README.md`, README and BUILDING are updated if needed.
