@@ -17,15 +17,15 @@ struct BigStat: View {
     var caption: Text?
     /// Color of the figure.
     var tint: Color = .primary
+    /// For a figure that changes while shown: its value, so its digits roll up or down.
+    var rollingValue: Double?
 
     var body: some View {
         VStack(spacing: 4) {
             Text(label)
                 .sectionLabelStyle()
 
-            value
-                .font(Theme.Fonts.figure)
-                .foregroundStyle(tint)
+            figure
 
             if let caption {
                 caption
@@ -36,6 +36,16 @@ struct BigStat: View {
         }
         .lineLimit(1)
         .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
+    private var figure: some View {
+        let styled = value.font(Theme.Fonts.figure).foregroundStyle(tint)
+        if let rollingValue {
+            styled.rollingFigure(rollingValue)
+        } else {
+            styled
+        }
     }
 }
 

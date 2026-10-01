@@ -7,31 +7,39 @@ import SwiftUI
 
 @main
 struct RelenteApp: App {
+    @State private var assistant = Assistant(
+        installers: InstallerSource.samples,
+        drives: Drive.samples,
+        creationService: Self.creationService
+    )
+
     var body: some Scene {
         WindowGroup {
-            rootView
+            AssistantView(assistant: assistant, thisMac: .current)
                 .environment(\.usesClassicControls, Self.forcesClassicControls)
         }
         // Only the window buttons in the top bar, no title.
         .windowStyle(.hiddenTitleBar)
         // The window takes the content's fixed size and can't be resized.
         .windowResizability(.contentSize)
+        .commands {
+            AssistantCommands(assistant: assistant)
+        }
     }
 
-    /// The assistant. In Debug builds, launching with `-startScreen done` or `-startScreen creating`
-    /// opens that screen with sample data instead, to check it in the running app (VoiceOver,
-    /// Reduce Motion, keyboard) until navigation exists (roadmap step 4). Always the assistant in
-    /// Release.
-    @ViewBuilder
-    private var rootView: some View {
+    /// How the installer is made. Until roadmap step 7 only Debug builds have one: a simulation
+    /// that erases nothing and says so on screen. `-simulationSpeed fast` makes it last about 2 s
+    /// and `-simulateFailure driveDisconnected` makes it fail during Copy. Release builds have
+    /// none, so "Erase and Create" stays disabled (spec 006).
+    private static var creationService: (any CreationService)? {
         #if DEBUG
-            switch UserDefaults.standard.string(forKey: "startScreen") {
-            case "done": DoneScreen(thisMac: .current)
-            case "creating": CreatingScreen()
-            default: ContentView()
-            }
+            let defaults = UserDefaults.standard
+            return SimulatedCreationService(
+                speed: .init(launchArgument: defaults.string(forKey: "simulationSpeed")),
+                failure: SimulatedCreationService.failure(launchArgument: defaults.string(forKey: "simulateFailure"))
+            )
         #else
-            ContentView()
+            return nil
         #endif
     }
 

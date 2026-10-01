@@ -10,19 +10,29 @@ import SwiftUI
 
 struct DriveView: View {
     let drives: [Drive]
-    /// Size of the chosen installer, in bytes. It decides which drives are big enough.
-    let installerSize: Int64
+    /// The chosen installer: shown in the label under the header, and its size decides which
+    /// drives are big enough.
+    let installer: InstallerSource
     @Binding var selectedID: Drive.ID?
+    /// Left and right arrows: -1 for the previous usable drive, +1 for the next.
+    var onMoveSelection: (Int) -> Void = { _ in }
 
     var body: some View {
         if drives.isEmpty {
-            NoDriveView(requiredCapacity: Drive.requiredCapacity(forInstallerSize: installerSize))
+            VStack(spacing: 0) {
+                DriveInstallerLabel(installer: installer)
+                NoDriveView(requiredCapacity: Drive.requiredCapacity(forInstallerSize: installer.size))
+            }
+            .padding(.top, Theme.Sizes.headerTopPadding)
         } else {
             VStack(spacing: 0) {
                 ScreenHeader(
                     title: "Choose a USB Drive",
                     subtitle: "Everything on the drive you choose will be erased."
                 )
+
+                DriveInstallerLabel(installer: installer)
+                    .padding(.top, 12)
 
                 Spacer()
 
@@ -32,19 +42,54 @@ struct DriveView: View {
                             name: drive.name,
                             kind: drive.kind,
                             formattedCapacity: drive.formattedCapacity,
-                            status: drive.status(forInstallerSize: installerSize),
-                            requiredCapacity: Drive.requiredCapacity(forInstallerSize: installerSize),
+                            status: drive.status(forInstallerSize: installer.size),
+                            requiredCapacity: Drive.requiredCapacity(forInstallerSize: installer.size),
                             isSelected: drive.id == selectedID
                         ) {
                             selectedID = drive.id
                         }
                     }
                 }
+                .selectsWithArrowKeys(onMoveSelection)
+                .slidingSelection(selectedID)
 
                 Spacer()
             }
             .padding(.top, Theme.Sizes.headerTopPadding)
         }
+    }
+}
+
+// MARK: - Installer label
+
+/// A reminder of what will go on the drive: the chosen installer's icon, name, version and size.
+/// Not a control. The installer's icon travels through it on its way to Review (spec 006).
+struct DriveInstallerLabel: View {
+    let installer: InstallerSource
+
+    var body: some View {
+        HStack(spacing: 6) {
+            FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
+                .frame(width: 16, height: 16)
+                .sharedArtwork(.installer)
+            Text(verbatim: installer.name)
+                .fontWeight(.semibold)
+            Text(verbatim: "\(installer.version) · \(installer.formattedSize)")
+                .foregroundStyle(Theme.Colors.secondary)
+        }
+        .font(Theme.Fonts.footnote)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 4)
+        .background(.fill.tertiary, in: Capsule())
+        .accessibilityElement(children: .ignore)
+        .accessibilityAddTraits(.isStaticText)
+        .accessibilityLabel(
+            Text(
+                "Installer: \(installer.name) \(installer.version), \(installer.formattedSize)",
+                comment:
+                    "VoiceOver label of the installer reminder on the USB Drive screen. Values: name, version and size, e.g. macOS Tahoe, 26.0, 16.8 GB."
+            )
+        )
     }
 }
 
@@ -62,6 +107,7 @@ struct DriveItem: View {
     var body: some View {
         PickItem(title: name, isSelected: isSelected, action: action) {
             DriveArtwork(kind: kind)
+                .sharedArtwork(.drive, isActive: isSelected)
         } detail: {
             VStack(spacing: 6) {
                 Text(verbatim: formattedCapacity)
@@ -113,12 +159,32 @@ extension Drive.Status {
     }
 }
 
+// MARK: - Footer
+
+/// "Back" and "Continue"; Continue, the default action, needs a drive that can be used.
+struct DriveFooter: View {
+    let canContinue: Bool
+    let onBack: () -> Void
+    let onContinue: () -> Void
+
+    var body: some View {
+        AssistantFooter(for: .drive) {
+            BackButton(action: onBack)
+
+            Button("Continue", action: onContinue)
+                .buttonStyle(.primary)
+                .keyboardShortcut(.defaultAction)
+                .disabled(!canContinue)
+        }
+    }
+}
+
 // MARK: - Previews
 
 #Preview("Liquid Glass (macOS 26+)") {
     @Previewable @State var selectedID = Drive.samples.first?.id
 
-    DriveView(drives: Drive.samples, installerSize: 16_800_000_000, selectedID: $selectedID)
+    DriveView(drives: Drive.samples, installer: InstallerSource.samples[0], selectedID: $selectedID)
         .padding(32)
         .frame(width: 800, height: 480)
 }
@@ -126,16 +192,42 @@ extension Drive.Status {
 #Preview("Classic (macOS 14–15)") {
     @Previewable @State var selectedID = Drive.samples.first?.id
 
-    DriveView(drives: Drive.samples, installerSize: 16_800_000_000, selectedID: $selectedID)
+    DriveView(drives: Drive.samples, installer: InstallerSource.samples[0], selectedID: $selectedID)
         .padding(32)
         .frame(width: 800, height: 480)
         .environment(\.usesClassicControls, true)
 }
 
+#Preview("Spanish") {
+    @Previewable @State var selectedID = Drive.samples.first?.id
+
+    DriveView(drives: Drive.samples, installer: InstallerSource.samples[0], selectedID: $selectedID)
+        .padding(32)
+        .frame(width: 800, height: 480)
+        .environment(\.locale, Locale(identifier: "es"))
+}
+
+#Preview("Dark") {
+    @Previewable @State var selectedID = Drive.samples.first?.id
+
+    DriveView(drives: Drive.samples, installer: InstallerSource.samples[0], selectedID: $selectedID)
+        .padding(32)
+        .frame(width: 800, height: 480)
+        .preferredColorScheme(.dark)
+}
+
 #Preview("No drive") {
     @Previewable @State var selectedID: Drive.ID?
 
-    DriveView(drives: [], installerSize: 16_800_000_000, selectedID: $selectedID)
+    DriveView(drives: [], installer: InstallerSource.samples[0], selectedID: $selectedID)
         .padding(32)
         .frame(width: 800, height: 480)
+}
+
+#Preview("Footer") {
+    VStack(spacing: 0) {
+        DriveFooter(canContinue: true, onBack: {}, onContinue: {})
+        DriveFooter(canContinue: false, onBack: {}, onContinue: {})
+    }
+    .frame(width: 800)
 }

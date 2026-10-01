@@ -19,6 +19,23 @@ struct PickItem<Icon: View, Detail: View>: View {
     let detail: Detail
 
     @Environment(\.isEnabled) private var isEnabled
+    /// Inside `.slidingSelection`, the row draws the plate and capsule; the item only marks them.
+    @Environment(\.drawsSelectionInRow) private var drawsSelectionInRow
+
+    /// Font of the name, also used by the row's white copy of it (`SlidingSelection`).
+    static var nameFont: Font { .body.weight(.medium) }
+
+    /// Gray plate behind the selected icon.
+    static var plate: some View {
+        RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .fill(.quaternary)
+    }
+
+    /// Blue capsule behind the selected name.
+    static var capsule: some View {
+        Capsule()
+            .fill(Theme.Colors.accent)
+    }
 
     init(
         title: String,
@@ -40,24 +57,20 @@ struct PickItem<Icon: View, Detail: View>: View {
                 icon
                     .frame(width: 96, height: 96)
                     .padding(8)
-                    .background {
-                        // Gray plate behind the selected icon.
-                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(.quaternary)
-                            .opacity(isSelected ? 1 : 0)
-                    }
+                    .background { selectionShape(.plate) }
 
                 Text(title)
-                    .font(.body.weight(.medium))
+                    .font(Self.nameFont)
                     .lineLimit(1)
+                    // In a row, the name stays primary: the row draws it white where the capsule is.
+                    .foregroundStyle(isSelected && !drawsSelectionInRow ? .white : .primary)
+                    .anchorPreference(key: SelectionMarks.self, value: .bounds) { anchor in
+                        drawsSelectionInRow
+                            ? SelectionMarks.Value(names: [.init(title: title, anchor: anchor)]) : .init()
+                    }
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
-                    .foregroundStyle(isSelected ? .white : .primary)
-                    .background {
-                        Capsule()
-                            .fill(Theme.Colors.accent)
-                            .opacity(isSelected ? 1 : 0)
-                    }
+                    .background { selectionShape(.capsule) }
 
                 detail
             }
@@ -67,6 +80,25 @@ struct PickItem<Icon: View, Detail: View>: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    /// The plate or capsule, drawn here or only marked for the row to draw.
+    @ViewBuilder
+    private func selectionShape(_ shape: SelectionShape) -> some View {
+        if drawsSelectionInRow {
+            Color.clear
+                .anchorPreference(key: SelectionMarks.self, value: .bounds) {
+                    isSelected ? SelectionMarks.Value(shapes: [shape: $0]) : .init()
+                }
+        } else {
+            Group {
+                switch shape {
+                case .plate: Self.plate
+                case .capsule: Self.capsule
+                }
+            }
+            .opacity(isSelected ? 1 : 0)
+        }
     }
 }
 

@@ -2,9 +2,9 @@
 //  DoneScreenUITests.swift
 //  RelenteUITests
 //
-//  What VoiceOver reads on the Done screen, in the running app. The app is opened on Done with
-//  the Debug-only `-startScreen done` argument until navigation exists (roadmap step 4).
-//  Spec: specs/005-done-screen/spec.md
+//  What VoiceOver reads on the Done screen, in the running app. Done is reached by walking the
+//  assistant with the Debug-only fast simulation (Tahoe on the SanDisk Ultra).
+//  Specs: specs/005-done-screen/spec.md, specs/006-assistant-navigation/spec.md
 //
 
 import XCTest
@@ -17,16 +17,11 @@ final class DoneScreenUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    /// Opens the app on Done, in English whatever the language of the Mac running the tests.
+    /// Opens the app and walks to Done.
     @MainActor
     private func launch() {
-        app = XCUIApplication()
-        // A fresh window each time: ignore the windows macOS saved from the last run.
-        app.launchArguments = [
-            "-startScreen", "done", "-AppleLanguages", "(en)", "-AppleLocale", "en_US",
-            "-ApplePersistenceIgnoreState", "YES",
-        ]
-        app.launch()
+        app = .relente(simulationSpeed: "fast")
+        app.goToDone()
     }
 
     /// Elements whose accessibility label matches, anywhere in the window.
@@ -103,5 +98,11 @@ final class DoneScreenUITests: XCTestCase {
         }
         // The window's own close, minimize and zoom buttons are the only others.
         XCTAssertLessThanOrEqual(otherButtons.count, 3, otherButtons.map(\.label).description)
+    }
+
+    @MainActor
+    func testTheSimulationIsLabelled() {
+        launch()
+        XCTAssertTrue(app.element("SIMULATION · Nothing is erased").exists)
     }
 }

@@ -29,21 +29,29 @@ screens duplicated for it) or almost nobody uses it.
 
 An 800×560 pt window. The top bar only has the window buttons; titles are
 centered; the footer shows the step indicator on the left (dots plus "Step X of 4 · Name") and the
-buttons on the right.
+buttons on the right. The footer stays still when the screen changes: its buttons swap at once and
+the step indicator animates (the pill stretches to the new step and the number rolls).
 
 0. **Permissions** (first launch only): app icon; three permissions as Settings-style icons with a
    status badge (System helper, Signature verified, Full Disk Access + "Open Settings…"); a
    reassurance line about Touch ID.
 1. **Installer:** Finder-style options with the real file icon
    (`NSWorkspace.shared.icon(forFile:)`); the selected one has a gray plate behind it and its name
-   in a blue capsule. "Download from Apple…".
+   in a blue capsule, which slide to a newly selected item (names are white exactly where the
+   capsule is, as in a segmented control). "Download from Apple…".
    1b. **Download:** grid of 4 versions, with a progress ring on the one downloading.
-2. **USB drive:** drives as large Finder-style illustrations with status labels.
-   2b. **No drive:** empty state that waits for one to be plugged in.
+2. **USB drive:** under the header, a small gray label reminds which installer was chosen (its
+   icon, name, version and size); drives as large Finder-style illustrations with status labels,
+   selected like installers. "Back" and "Continue".
+   2b. **No drive:** empty state that waits for one to be plugged in, with the installer label
+   above it.
 3. **Review:** the drive as the hero; WILL BE ERASED / WILL BE INSTALLED / FREE AFTERWARDS; usage
-   bar; orange warning with a required checkbox; red "Erase and Create" with the Touch ID symbol.
+   bar (the drive's name and capacity above it; the installer and the free space as two segments
+   with a gap; a legend with each part's size); orange warning with a checkbox, unchecked every
+   time Review is shown; "Back" and the red "Erase and Create" with the Touch ID symbol.
 4. **Creating:** progress ring around the drive; COPIED / SPEED / REMAINING; a 4-phase bar
-   (Format, Copy, Make bootable, Verify). "Cancel" (also Esc) asks for confirmation in a sheet that
+   (Format, Copy, Make bootable, Verify). The percentage and the three figures roll like a counter
+   as they change. "Cancel" (also Esc) asks for confirmation in a sheet that
    looks like a macOS alert: "Keep Going" answers Return and Esc; "Stop", which leaves the drive
    unusable until it's erased again, only a click.
    4b. **Error:** same layout, nothing moves, in red: no ring (its space is kept), a red halo and
@@ -60,9 +68,22 @@ buttons on the right.
 Step pills are always blue, whatever the screen's state. Step names in the footer are nouns: Installer, USB Drive, Review, Creation, Done (Spanish:
 Instalador, Memoria USB, Revisión, Creación, Listo). Spanish text is Spanish from Spain.
 
-The chosen drive's illustration travels between screens with `matchedGeometryEffect` (one
-`@Namespace` in the assistant container); the installer tile from step 1 flies to the Review
-badge. With Reduce Motion, a crossfade is used instead.
+Moving between screens (chosen on a design canvas, spec 006): going forward, the new screen slides
+in from the trailing edge; going back, from the leading edge. Creating → Done, "Start Over" and
+"Eject" crossfade instead, since they're an ending or a restart. The chosen drive flies from its
+place in the USB drive list to the hero of Review, Creating and Done; the installer's icon flies
+from its tile to the installer label on step 2 and then to the badge on the drive. Both are drawn
+once by the assistant over the screens, at places the screens mark (`SharedArtwork`). With Reduce
+Motion, every change is a crossfade, nothing flies or rolls, and selections fade.
+
+Keyboard: Return is the screen's default action (Continue, Try Again, Eject; never "Erase and
+Create"). "Back" answers Esc and is in the menu bar as **Go › Back** (⌘[, which macOS moves to the
+same key position on other keyboard layouts). Left and right arrows move the selection on steps 1
+and 2, skipping drives that can't be used.
+
+Until roadmap step 7, Debug builds simulate the creation (about 15 s, nothing is erased) and say so
+with an orange "SIMULATION · Nothing is erased" label on Creating, Error and Done; Release builds
+keep "Erase and Create" disabled with the help tag "Available in a later version."
 
 ## Design system
 

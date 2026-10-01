@@ -35,7 +35,9 @@ struct ReviewView: View {
 
                 UsageBar(
                     installerName: installer.name,
+                    driveName: drive.name,
                     installedBytes: summary.installedBytes,
+                    freeBytes: summary.freeAfterwardsBytes,
                     capacity: drive.capacity,
                     installedFraction: summary.installedFraction
                 )
@@ -60,8 +62,10 @@ struct ReviewHero: View {
         VStack(spacing: 12) {
             HeroArtwork(size: 104) {
                 DriveArtwork(kind: drive.kind)
+                    .sharedArtwork(.drive)
             } badge: {
                 FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
+                    .sharedArtwork(.installer)
             }
 
             Text(verbatim: "\(drive.name) · \(drive.formattedCapacity)")
@@ -112,52 +116,83 @@ struct ReviewStats: View {
 
 // MARK: - Usage bar
 
-/// How the drive will look afterwards: the installer in the accent color, free space in gray.
+/// How the drive will look afterwards: the drive and its capacity, then two segments with a gap
+/// (the installer in the accent color, free space in gray) and a legend with each part's size.
 struct UsageBar: View {
     let installerName: String
+    let driveName: String
     let installedBytes: Int64
+    let freeBytes: Int64
     let capacity: Int64
     /// Share of the drive the installer takes, from 0 to 1.
     let installedFraction: Double
 
+    /// Space between the installer's segment and the free one.
+    private static let gap: CGFloat = 4
+    /// The free segment never gets thinner than this, so it shows on an almost full drive.
+    private static let minimumFreeWidth: CGFloat = 8
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(spacing: 6) {
+            HStack {
+                Text(verbatim: driveName)
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                Spacer(minLength: 16)
+                Text(verbatim: Self.bytes(capacity))
+            }
+            .sectionLabelStyle()
+
             GeometryReader { proxy in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(.quaternary)
+                let available = proxy.size.width - Self.gap
+                let installedWidth = min(
+                    available * installedFraction, available - Self.minimumFreeWidth)
+                HStack(spacing: Self.gap) {
                     Capsule()
                         .fill(Theme.Colors.accent)
-                        .frame(width: proxy.size.width * installedFraction)
+                        .frame(width: max(installedWidth, 0))
+                    Capsule()
+                        .fill(.quaternary)
                 }
             }
             .frame(height: 8)
 
-            HStack(spacing: 16) {
-                legendItem(Text(verbatim: installerName), color: Theme.Colors.accent)
-                legendItem(Text("Free", comment: "Usage bar legend: free space on the drive."), color: .gray)
+            HStack {
+                legendItem(Text(verbatim: installerName), size: installedBytes, color: Theme.Colors.accent)
+                Spacer(minLength: 16)
+                legendItem(
+                    Text("Free", comment: "Usage bar legend: free space on the drive."), size: freeBytes, color: .gray)
             }
             .font(Theme.Fonts.footnote)
-            .foregroundStyle(Theme.Colors.secondary)
         }
         .accessibilityElement(children: .ignore)
+        .accessibilityAddTraits(.isStaticText)
         .accessibilityLabel(
             Text(
-                "\(installerName) will use \(installedBytes.formatted(.byteCount(style: .file))) of \(capacity.formatted(.byteCount(style: .file)))",
+                "\(installerName) will use \(Self.bytes(installedBytes)) of \(Self.bytes(capacity)), \(Self.bytes(freeBytes)) free",
                 comment:
-                    "VoiceOver label of the usage bar. Values: installer name (e.g. macOS Tahoe), its size (16.8 GB) and the drive's capacity (32 GB)."
+                    "VoiceOver label of the usage bar. Values: installer name (e.g. macOS Tahoe), its size (16.8 GB), the drive's capacity (32 GB) and the space left (15.2 GB)."
             )
         )
     }
 
-    private func legendItem(_ text: Text, color: Color) -> some View {
+    /// "● macOS Tahoe 16.8 GB": the name in the primary color, the size in gray.
+    private func legendItem(_ name: Text, size: Int64, color: Color) -> some View {
         HStack(spacing: 5) {
             Circle()
                 .fill(color)
                 .frame(width: 7, height: 7)
-            text
-                .lineLimit(1)
+            name
+                .fontWeight(.medium)
+            Text(verbatim: Self.bytes(size))
+                .foregroundStyle(Theme.Colors.secondary)
         }
+        .lineLimit(1)
+    }
+
+    private static func bytes(_ count: Int64) -> String {
+        count.formatted(.byteCount(style: .file))
     }
 }
 
@@ -196,13 +231,14 @@ struct EraseWarning: View {
 /// "Erase and Create" is never the default action, so Return can't erase a drive.
 struct ReviewFooter: View {
     let hasConfirmed: Bool
+    /// False in Release builds until roadmap step 7: the button stays disabled, with a help tag.
+    var canCreate = true
     let onBack: () -> Void
     let onErase: () -> Void
 
     var body: some View {
-        AssistantFooter(step: 3, totalSteps: 4, stepName: "Review") {
-            Button("Back", action: onBack)
-                .buttonStyle(.secondary)
+        AssistantFooter(for: .review) {
+            BackButton(action: onBack)
 
             Button(role: .destructive, action: onErase) {
                 Label {
@@ -214,7 +250,14 @@ struct ReviewFooter: View {
             }
             .buttonStyle(.primary)
             .tint(Theme.Colors.danger)
-            .disabled(!hasConfirmed)
+            .disabled(!hasConfirmed || !canCreate)
+            .help(
+                canCreate
+                    ? Text(verbatim: "")
+                    : Text(
+                        "Available in a later version.",
+                        comment:
+                            "Help tag of the disabled Erase and Create button, before creating installers is built."))
         }
     }
 }
@@ -224,6 +267,7 @@ struct ReviewFooter: View {
 /// The whole screen as it will appear in the window: content and footer.
 private struct ReviewScreenPreview: View {
     let drive: Drive
+    var canCreate = true
     @State private var hasConfirmed = false
 
     var body: some View {
@@ -233,7 +277,7 @@ private struct ReviewScreenPreview: View {
                 .padding(.bottom, 24)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            ReviewFooter(hasConfirmed: hasConfirmed, onBack: {}, onErase: {})
+            ReviewFooter(hasConfirmed: hasConfirmed, canCreate: canCreate, onBack: {}, onErase: {})
         }
         .frame(width: Theme.Sizes.window.width, height: Theme.Sizes.window.height)
     }
@@ -245,6 +289,10 @@ private struct ReviewScreenPreview: View {
 
 #Preview("Empty drive") {
     ReviewScreenPreview(drive: Drive.samples[1])
+}
+
+#Preview("Can't create yet (Release)") {
+    ReviewScreenPreview(drive: Drive.samples[0], canCreate: false)
 }
 
 #Preview("Classic (macOS 14–15)") {
