@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://github.com/afraidias/Relente/compare/v0.5.0...v0.6.0) (2026-10-01)
+
+
+### Features
+
+* add assistant navigation and animations ([#26](https://github.com/afraidias/Relente/issues/26)) ([7b96e1f](https://github.com/afraidias/Relente/commit/7b96e1ffd326d3e1b602471252ab24dbfccb0681))
+
+
+### Documentation
+
+* keep Done specs as history ([#28](https://github.com/afraidias/Relente/issues/28)) ([9cb5e5c](https://github.com/afraidias/Relente/commit/9cb5e5cccef1c17a7d66e70422f620fe98cd0c69))
+
 ## [0.5.0](https://github.com/afraidias/Relente/compare/v0.4.0...v0.5.0) (2026-10-01)
 
 
