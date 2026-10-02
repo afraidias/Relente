@@ -56,7 +56,7 @@ git config core.hooksPath .githooks
 To format all the code:
 
 ```bash
-xcrun swift-format format -i -r Relente RelenteTests RelenteUITests
+xcrun swift-format format -i -r Relente RelenteHelper Shared RelenteTests RelenteUITests
 ```
 
 ## Versions
@@ -91,6 +91,9 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Rele
 | `Relente/Models` | Data types (installers, drives…). |
 | `Relente/Services` | Disk and installer detection, helper connection. |
 | `Relente/Resources` | App icon (`AppIcon.icon`, made with Icon Composer), asset catalog and String Catalog. |
+| `RelenteHelper` | The system helper: a command-line tool that runs as root, embedded in the app (`Contents/MacOS/RelenteHelper`) and registered with `SMAppService`. |
+| `Shared` | Code compiled into both the app and the helper: the XPC protocol and the security checks. |
+| `Config` | Build settings (`Version.xcconfig`) and the helper's launchd plist, copied to `Contents/Library/LaunchDaemons/`. |
 | `specs` | One folder per feature (`NNN-short-name/`) with its `spec.md`, and `plan.md` and `tasks.md` from feature 004 on. See [`specs/README.md`](specs/README.md). |
 | `docs` | Product and design overview ([`docs/product.md`](docs/product.md)): scope, supported Macs, screen flow and design system. |
 

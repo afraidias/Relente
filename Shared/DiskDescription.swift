@@ -4,6 +4,7 @@
 //
 //  What Relente reads about one disk, partition or volume from DiskArbitration, as plain values.
 //  The live drive service fills it in; tests build it by hand.
+//  Shared by the app and the helper, which reads disks on its own (spec 008).
 //  Spec: specs/007-real-detection/spec.md
 //
 

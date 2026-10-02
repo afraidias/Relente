@@ -2,8 +2,8 @@
 //  DriveCatalog.swift
 //  Relente
 //
-//  Turns what DiskArbitration reports into the drives Relente shows: which disks are USB drives
-//  or SD cards, their names, identity and the space in use. Pure rules, tested case by case.
+//  Turns what DiskArbitration reports into the drives Relente shows: the USB drives and SD cards
+//  (`DiskRules`), their names, identity and the space in use. Pure rules, tested case by case.
 //  Spec: specs/007-real-detection/spec.md
 //
 
@@ -11,29 +11,14 @@ import Foundation
 
 nonisolated enum DriveCatalog {
 
-    static let usbProtocol = "USB"
-    static let secureDigitalProtocol = "Secure Digital"
-
     // MARK: - Which disks
-
-    /// Whether a disk is a USB drive or SD card Relente can offer: a whole, removable disk over
-    /// USB (external) or an SD card (also in a built-in slot), never one the Mac started up from.
-    static func isCandidate(_ disk: DiskDescription, bootDisks: Set<String>) -> Bool {
-        guard disk.isWhole, disk.isRemovable, disk.physicalWholeDisk == nil, !bootDisks.contains(disk.bsdName)
-        else { return false }
-        switch disk.deviceProtocol {
-        case usbProtocol: return !disk.isInternal
-        case secureDigitalProtocol: return true
-        default: return false
-        }
-    }
 
     /// The drives among every disk, partition and volume DiskArbitration reports.
     /// - Parameter usedBytes: space in use of each mounted volume, by BSD name.
     static func drives(
         from disks: [DiskDescription], usedBytes: [String: Int64], bootDisks: Set<String>
     ) -> [Drive] {
-        disks.filter { isCandidate($0, bootDisks: bootDisks) }
+        disks.filter { DiskRules.isUSBDriveOrSDCard($0, bootDisks: bootDisks) }
             .sorted { $0.bsdName.localizedStandardCompare($1.bsdName) == .orderedAscending }
             .map { whole in
                 let partitions = disks.filter { !$0.isWhole && $0.wholeDiskName == whole.bsdName }
@@ -48,7 +33,7 @@ nonisolated enum DriveCatalog {
         whole: DiskDescription, partitions: [DiskDescription], apfsVolumes: [DiskDescription],
         usedBytes: [String: Int64]
     ) -> Drive {
-        let kind: Drive.Kind = whole.deviceProtocol == secureDigitalProtocol ? .sdCard : .usbDrive
+        let kind: Drive.Kind = whole.deviceProtocol == DiskRules.secureDigitalProtocol ? .sdCard : .usbDrive
         let model = modelName(of: whole, kind: kind)
         let dataPartitions = partitions.filter { !isSystemPartition($0) }
         let volumes = (whole.mountPoint != nil ? [whole] : []) + dataPartitions + apfsVolumes
@@ -60,6 +45,7 @@ nonisolated enum DriveCatalog {
             model: model,
             kind: kind,
             capacity: whole.size,
+            fingerprint: DiskFingerprint(whole),
             usedSpace: usedSpace(
                 whole: whole, partitions: dataPartitions, apfsVolumes: apfsVolumes, usedBytes: usedBytes)
         )
