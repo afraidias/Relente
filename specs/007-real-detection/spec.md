@@ -1,6 +1,6 @@
 # 007 · Real disk and installer detection
 
-**Status:** Approved · **Roadmap step:** 5 · **Branch:** `feature/007-real-detection`
+**Status:** Done · **Roadmap step:** 5 · **Branch:** `feature/007-real-detection`
 
 ## Objective
 Replace the sample installers and drives with what is really on the Mac, so the assistant shows
@@ -114,9 +114,24 @@ out (DiskArbitration), on every screen.
 - Its **model** is the vendor and product name the drive reports, e.g. "SanDisk Ultra"; "USB
   Drive" when it reports none. An SD card's model is always "SD Card": what macOS reports is the
   reader, not the card.
-- Below the title, the line that showed the capacity now shows **model · capacity**, e.g.
-  "SanDisk Ultra · 32 GB" (only the capacity when the title already is the model). The same line
-  is used under the hero on Review and Creating.
+- On Review and Creating, the line under the hero shows **model · capacity**, e.g.
+  "SanDisk Ultra · 32 GB" (only the capacity when the title already is the model).
+- On the USB Drive screen (option C of the canvas "Relente · USB drive data", chosen at
+  Checkpoint D, then aligned), every drive has the same three lines under its title, so they line
+  up across drives:
+
+  | Drive | Line 1 | Line 2 | Line 3 |
+  | --- | --- | --- | --- |
+  | Has data | The model | Gray usage bar, filled to the space in use | "10.89 GB of 15.52 GB in use" |
+  | Empty | The model | Gray usage bar, no fill | "Empty · 32 GB" |
+  | Data of unknown size | The model | Gray usage bar, no fill | "Contents unknown · 15.52 GB" |
+  | Too small | The model | The red "Too small" chip | "8 GB · needs 17.8 GB" |
+
+  Line 1 is one line, cut with "…" if it doesn't fit (the full model in the help tag). When the
+  title already is the model, line 1 says what kind of drive it is: "USB Drive" or "SD Card".
+  Nothing on this screen is orange or green any more: the subtitle already says the drive will be
+  erased, and Review is where the user confirms it. VoiceOver reads the name and the three lines
+  (the bar itself is hidden from it).
 
 **Space in use (changes spec 002)**
 - The sum of the space used on every mounted volume of the drive, including APFS volumes in a
@@ -127,11 +142,34 @@ out (DiskArbitration), on every screen.
   no partitions at all is also empty.
 - **Unknown amount:** if a partition holds data that can't be measured (not mounted: Linux
   formats, a locked encrypted volume, an unknown format), the drive **has data of unknown size**.
-  Its chip says **"Data will be erased"** (warning, orange) and Review's WILL BE ERASED shows
-  **"Unknown size"** in orange. System partitions that never hold user data (such as EFI) don't
+  The USB Drive screen says **"Contents unknown"** (see the table above) and Review's WILL BE
+  ERASED shows **"Unknown size"** in orange. System partitions that never hold user data (such as EFI) don't
   count.
 - The figures update live: if the drive is reformatted or files are added while Relente is open,
-  its chip and Review's figures change.
+  its usage bar and Review's figures change.
+
+### Many installers or drives (changes specs 001 and 002)
+Chosen by the owner at Checkpoint D on the canvas "Relente · Many installers and drives" (option
+1 + 3), after four installers and the add square overflowed the window. The same rule holds on
+the Installer and USB Drive screens; on Installer, the add square counts as an item.
+
+| Items | Layout |
+| --- | --- |
+| Up to 4 | One row of large items, as before (160 pt wide, 96 pt icons). |
+| 5 or more | A grid of 5 columns of smaller items (118 pt wide, 64 pt icons), centered in the space under the header. |
+| More than fit | The same grid scrolls vertically; the selected item is scrolled into view. Installers scroll from 11 items; drives, which show more lines each, from 6. |
+
+- In the grid, Up and Down move the selection a row (5 items) among the items that can be chosen;
+  Left and Right work as before.
+- Under a small item, chips have no icon ("Too small", "Not supported"), so they fit; their text
+  says what the icon would.
+- When the grid scrolls, the items fade out over 16 pt at its top and bottom edges instead of
+  being cut (the scroller doesn't fade), and the scrolling area keeps 24 pt from the header and
+  20 pt from what's below it. Both asked by the owner when checking the grid in the app.
+- The selection's plate and capsule slide as in a row (spec 006); the chosen item's artwork flies
+  to the next screen from where it is. At rest, an item in the grid draws its own artwork, so it
+  scrolls, fades and is clipped with the rest; it hands it to the assistant only while the screen
+  changes (changes spec 006, where the assistant always draws it).
 
 ### Unplugging and plugging (changes specs 002, 003 and 006)
 
@@ -140,7 +178,7 @@ out (DiskArbitration), on every screen.
 | USB Drive | The unplugged drive disappears. If it was selected, the selection is cleared and "Continue" is disabled. If it was the last one, the screen switches to 2b by itself. |
 | Review | Back to USB Drive (slide back, as with "Back") with no drive selected. VoiceOver announces "“Name” was disconnected." |
 | Creating (Debug simulation) | The run fails with the existing reason "The drive was disconnected." |
-| Error, Done | Nothing changes on screen. On Done, "Eject" then just returns to the Installer screen. |
+| Error, Done | Nothing changes on screen. On Done, "Eject" then just returns to the Installer screen. On Error, "Try Again" goes back to USB Drive (slide back) with no drive selected instead of Review, even if the drive was plugged in again: after a disconnection the user picks the drive again. |
 | A drive plugged in | Appears in the list wherever the user is; never selected by itself. |
 
 The chosen installer disappearing works the same way: on USB Drive or Review the assistant goes
@@ -162,80 +200,105 @@ supported installer is selected.
 - Previews, unit tests and the UI test use the sample installers and drives, never the Mac's.
 - In Debug builds, the launch argument **`-sampleData YES`** makes the app use them instead of
   real detection, so the whole flow can be shown without installers or drives. Always off in
-  Release.
+  Release. The sample installers include one older than Big Sur (Catalina), shown unsupported.
+- With `-sampleData YES`, **`-sampleEmpty installers`** or **`-sampleEmpty drives`** starts with
+  that list empty, so the UI test (and anyone checking the screens) can reach each empty state.
 
 ## Changes to earlier features
 - **Spec 001 (Installer screen):** real installers instead of samples; the add square, by click
   or drag and drop; the unsupported state; the empty state (C3); order and default
-  selection.
+  selection; with 5 or more items, a grid of smaller items that scrolls when needed.
 - **Spec 002 (USB Drive screen):** 2b gets the screen header and the installer label above an
   empty state shared with Installer's, and its title becomes "No USB Drive Connected"; real drives, only USB drives and SD cards; the drive's title is
-  its volume name and the capacity line becomes "model · capacity"; "Empty" means under 100 MB
-  used; the new "Data will be erased" chip for an unknown amount; unplugging updates the screen.
+  its volume name; the capacity line and the status chips (orange "*N* will be erased", green
+  "Empty") become three aligned lines: the model, a gray usage bar and its figures; only "Too
+  small" keeps its red chip, in the bar's place, with "*N* · needs *M*" below; "Empty" means under 100 MB used; "Contents unknown" for an unknown amount; unplugging
+  updates the screen; with 5 or more drives, the grid of smaller items (spec 002 said they'd
+  wrap into a grid).
 - **Spec 003 (Review screen):** "Unknown size" in WILL BE ERASED; the hero line is
   "model · capacity"; unplugging the drive goes back to USB Drive.
 - **Spec 005 (Done screen):** "Eject" ejects for real, with a spinner and the alert when it fails.
 - **Spec 006 (Assistant navigation):** the assistant's installers and drives change while it
-  runs; the flow table gains "drive or installer disappears" → back to USB Drive or Installer.
+  runs; in a scrolling grid the chosen item's artwork is drawn by the assistant only while the
+  screen changes; artwork that one of the two screens has no place for (the drive between
+  Installer and USB Drive) comes or goes with its screen instead of sliding in late on its own,
+  which showed when a drive stayed chosen after going back (found at Checkpoint D); and starting
+  over from Done or Error, nothing flies: the drive and the installer's icon fade with their
+  screens, as the restart crossfades; the flow table gains "drive or installer disappears" → back to USB Drive or Installer.
 - `docs/product.md` is updated (Installer screen, drive names, Eject).
 
 ## Acceptance criteria
 
 **Installers**
-- [ ] An `Install macOS *.app` in `/Applications` appears on the Installer screen with its real
+- [x] An `Install macOS *.app` in `/Applications` appears on the Installer screen with its real
   name, version, size and icon; one added or removed while the app runs appears or disappears
-  without relaunching.
-- [ ] The add square (click or drop) and the empty state (drop) accept an installer app, a `.dmg`
+  without relaunching. *(Checkpoint D: Sequoia 15.8.1 and Monterey 12.7.6 appeared while the app
+  ran; Monterey moved out and back disappeared and reappeared.)*
+- [x] The add square (click or drop) and the empty state (drop) accept an installer app, a `.dmg`
   containing one and an `InstallAssistant.pkg`, add it and select it; any other file shows the "Isn't a macOS
-  Installer" alert and adds nothing.
+  Installer" alert and adds nothing. *(In the app: choosing Sequoia selects it without listing it
+  twice; dropping another file shows the alert. The `.dmg` and the `.pkg` by hand: see Open
+  items.)*
 - [ ] A `.dmg` is mounted read-only and hidden to be read, and is always detached afterwards, also
-  when reading fails.
-- [ ] Reading an installer's name, version and size from its files is covered by tests with
+  when reading fails. *(In the code: `hdiutil attach -readonly -nobrowse`, detached in a `defer`.
+  Not checked by hand: the owner skipped the `.dmg` at Checkpoint D; see Open items.)*
+- [x] Reading an installer's name, version and size from its files is covered by tests with
   fixture files (an app's `Info.plist`, a package description), including versions older than Big
-  Sur being unsupported.
+  Sur being unsupported. *(`InstallerMetadataTests`, `MacOSVersionTests`.)*
 - [ ] Unsupported installers are dimmed, show "Not supported" and "Needs macOS Big Sur or later",
-  can't be selected by mouse or arrow keys, and VoiceOver reads them as dimmed.
-- [ ] Installers are sorted newest first, and the newest supported one is selected when the list
-  first fills (tested).
-- [ ] With no installers, the C3 empty state is shown with "Continue" disabled, and it switches to
-  the list by itself when one appears.
-- [ ] Installer's and USB Drive's empty states use the same `EmptyStateView` and match the table
+  can't be selected by mouse or arrow keys, and VoiceOver reads them as dimmed. *(Catalina in the
+  sample data: "macOS Catalina, 10.15.7 · 8,1 GB, No compatible, Requiere macOS Big Sur o
+  posterior", not enabled, in the accessibility tree; arrows skip it in
+  `AssistantDetectionTests`. Listening with VoiceOver: see Open items.)*
+- [x] Installers are sorted newest first, and the newest supported one is selected when the list
+  first fills (tested). *(`InstallerSourceTests`; Sequoia before Monterey in the app.)*
+- [x] With no installers, the C3 empty state is shown with "Continue" disabled, and it switches to
+  the list by itself when one appears. *(UI test with `-sampleEmpty installers`; in the app when
+  Sequoia finished downloading.)*
+- [x] Installer's and USB Drive's empty states use the same `EmptyStateView` and match the table
   in "One empty state for both screens" (header, symbol, title, text, waiting indicator).
+  *(Compared in screenshots; VoiceOver reaches the add square since Task 16.)*
 
 **Drives**
-- [ ] Only whole, external, removable disks over USB or SD appear; the boot disk, internal disks,
+- [x] Only whole, external, removable disks over USB or SD appear; the boot disk, internal disks,
   disk images and fixed external drives never do. The filtering is a pure function of the disk's
-  description, covered by tests for each case.
-- [ ] Plugging in a USB drive or SD card adds it within a couple of seconds; unplugging removes
-  it.
-- [ ] The drive's title, model line, kind and identity (media UUID) come from the disk's
+  description, covered by tests for each case. *(`DriveCatalogTests`; in the app, an APFS
+  drive shows once, not its synthesized container disk. No SD card or external SSD at hand.)*
+- [x] Plugging in a USB drive or SD card adds it within a couple of seconds; unplugging removes
+  it. *(A USB drive, at Checkpoint D; no SD card at hand.)*
+- [x] The drive's title, model line, kind and identity (media UUID) come from the disk's
   description; naming rules are tested (volume name, first of several, model fallback, generic
-  fallback).
-- [ ] Space in use: the sum over mounted volumes; under 100 MB is "Empty" (tested at 99 and
-  100 MB); an unmeasurable partition gives "Data will be erased" and "Unknown size" on Review
-  (tested); too small still beats having data.
-- [ ] Unplugging the selected drive on USB Drive clears the selection; on Review it goes back to
+  fallback). *(`DriveCatalogTests`; "USB", "TOSHIBA USB FLASH DRIVE" in the app.)*
+- [x] Space in use: the sum over mounted volumes; under 100 MB is "Empty" (tested at 99 and
+  100 MB); an unmeasurable partition gives "Contents unknown" and "Unknown size" on Review
+  (tested); too small still beats having data. *(`DriveCatalogTests`, `DriveTests`,
+  `ReviewSummaryTests`; 10.89 GB of 15.52 GB, then "Empty" after erasing as APFS, in the app.)*
+- [x] Unplugging the selected drive on USB Drive clears the selection; on Review it goes back to
   USB Drive and VoiceOver announces it; during the simulation it fails with "The drive was
-  disconnected." (tested on the assistant with a sample drive service).
-- [ ] The chosen installer disappearing on USB Drive or Review goes back to the Installer screen
+  disconnected." (tested on the assistant with a sample drive service). *(Also each case by hand,
+  with VoiceOver and Reduce Motion on; "Try Again" afterwards goes to USB Drive, Decision 13.)*
+- [x] The chosen installer disappearing on USB Drive or Review goes back to the Installer screen
   (tested).
 
 **Eject**
-- [ ] "Eject" ejects the drive (it disappears from the Finder) and returns to the Installer
-  screen.
-- [ ] When the drive is in use, the alert appears with the reason; "Try Again", "Force Eject" and
-  "Cancel" behave as described; Return never force-ejects.
-- [ ] A drive already unplugged just returns to the Installer screen (tested).
+- [x] "Eject" ejects the drive (it disappears from the Finder) and returns to the Installer
+  screen. *(Checkpoint D, also with a Finder window open on the drive.)*
+- [x] When the drive is in use, the alert appears with the reason; "Try Again", "Force Eject" and
+  "Cancel" behave as described; Return never force-ejects. *(Checkpoint D, with a process holding
+  the volume; macOS named no app, so the generic reason showed.)*
+- [x] A drive already unplugged just returns to the Installer screen (tested).
 
 **General**
-- [ ] Services are protocols with a live and a sample implementation, injected through `init`;
+- [x] Services are protocols with a live and a sample implementation, injected through `init`;
   tests and previews never touch real disks or `/Applications`.
-- [ ] `-sampleData YES` shows the sample data in Debug; the UI test walks the whole flow with it.
-- [ ] New strings are in English and Spanish; new views have previews (including the empty state,
-  the unsupported installer, "Data will be erased", and the classic look).
-- [ ] Works in light and dark mode, with VoiceOver and with Reduce Motion.
-- [ ] Follows Apple's Human Interface Guidelines for macOS (checked on the empty state, the new
-  button, the alerts).
+- [x] `-sampleData YES` shows the sample data in Debug; the UI test walks the whole flow with it.
+- [x] New strings are in English and Spanish; new views have previews (including the empty state,
+  the unsupported installer, "Contents unknown", and the classic look).
+- [x] Works in light and dark mode, with VoiceOver and with Reduce Motion. *(Checkpoint C for the
+  screens; the usage bar in dark mode, Liquid Glass and classic, in screenshots; VoiceOver and
+  Reduce Motion by the owner on USB Drive, Review and the Installer empty state.)*
+- [x] Follows Apple's Human Interface Guidelines for macOS (checked on the empty state, the new
+  button, the alerts). *(Decisions 8, 10 and 12.)*
 
 ## Boundaries
 - **Always:** detection runs in the app, unprivileged; it only reads. Disk images are mounted
@@ -258,7 +321,7 @@ supported installer is selected.
   read, it's not listed yet; it appears when complete.
 - **A `.dmg` or `.pkg` chosen and then moved or deleted:** it disappears from the list like an
   installer removed from `/Applications`.
-- **Many drives:** the list wraps into a grid (spec 002).
+- **Many installers or drives:** the grid in "Many installers or drives".
 
 ## Decisions
 1. **Search only `/Applications`, plus choosing or dropping a file.** Chosen by the owner: macOS asks for
@@ -293,6 +356,23 @@ supported installer is selected.
    texts of both empty states were shortened at the same time.
 11. **Chosen installers aren't remembered after quitting.** Keeps this step small; remembering
    them needs security-scoped bookmarks (Open items).
+12. **A gray usage bar instead of colored chips (option C).** Chosen by the owner at Checkpoint
+   D, after seeing a real drive: the orange chip shouted on a screen where nothing is erased yet,
+   and the long model wrapped the capacity onto a second line. Apple's guidelines keep color for
+   what needs attention; here only "Too small" does, because it blocks the drive. The warning
+   stays where the user confirms the erase (Review). Options A (gray text) and B (gray chip) are
+   on the canvas. Then, seeing drives at different heights, the owner asked for three lines on
+   every drive, always in the same place ("C · alineada" on the canvas): the kind of drive fills
+   line 1 when the title is the model, and a too-small drive's chip takes the bar's place.
+13. **After a disconnection, "Try Again" goes to USB Drive.** Chosen by the owner at Checkpoint
+   D, where "Try Again" after unplugging during the simulation showed an empty Review: the drive
+   is picked again rather than reselected by itself, the safe side for an app that erases disks.
+   The other failures keep going back to Review (spec 004).
+14. **Up to 4 large items in a row; from 5, a grid of smaller ones that scrolls if needed.**
+   Chosen by the owner on the canvas (option 1 + 3): the large items fit 4 to a row in the
+   800 pt window, and a second row of them wouldn't fit, so the grid shrinks the items (like
+   the Finder's icon sizes) and scrolls only when even those don't fit. A horizontally scrolling row
+   (option 2) was set aside: horizontal scrolling is hard to discover with a mouse.
 
 ## Open questions
 None.
@@ -301,7 +381,12 @@ None.
 - **Roadmap step 6:** the helper re-validates the drive (helper rule 3) and the Permissions
   screen; detection here is only what the app shows.
 - **Roadmap step 7:** create from a `.dmg` (mounted read-only) and from an `InstallAssistant.pkg`;
-  check the installer's Apple signature right before creating (helper rule 4).
+  check the installer's Apple signature right before creating (helper rule 4). Check by hand that
+  a real `.dmg` and `InstallAssistant.pkg` are read, and the `.dmg` detached afterwards (skipped
+  at Checkpoint D of this spec).
+- **Roadmap step 8:** listen with VoiceOver to an installer older than Big Sur (dimmed, "Not
+  supported"); only its accessibility tree was checked, with the sample Catalina. Part of the
+  accessibility pass before the first release (issue #25).
 - **Roadmap step 9:** "Download from Apple…" (on both Installer states).
 - **No roadmap step yet:** a "show all external drives" option for external SSDs, hard drives
   and USB sticks that report fixed media; remembering chosen installers across launches. Each

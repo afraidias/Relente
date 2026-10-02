@@ -42,12 +42,26 @@ struct RelenteApp: App {
         #endif
     }
 
+    /// With sample data, `-sampleEmpty installers` or `-sampleEmpty drives` starts with that list
+    /// empty, to show its empty state. Unit tests make their own services.
+    private static var sampleEmpty: String? {
+        #if DEBUG
+            UserDefaults.standard.string(forKey: "sampleEmpty")
+        #else
+            nil
+        #endif
+    }
+
     private static var installerService: any InstallerService {
-        usesSampleData ? SampleInstallerService() : LiveInstallerService()
+        guard usesSampleData else { return LiveInstallerService() }
+        // Catalina too, so the sample data shows an unsupported installer as well.
+        let installers = InstallerSource.samples + [InstallerSource.unsupportedSample]
+        return SampleInstallerService(installers: sampleEmpty == "installers" ? [] : installers)
     }
 
     private static var driveService: any DriveService {
-        usesSampleData ? SampleDriveService() : LiveDriveService()
+        guard usesSampleData else { return LiveDriveService() }
+        return SampleDriveService(drives: sampleEmpty == "drives" ? [] : Drive.samples)
     }
 
     /// How the installer is made. Until roadmap step 7 only Debug builds have one: a simulation

@@ -53,6 +53,16 @@ nonisolated struct Drive: Identifiable, Hashable, Sendable {
         capacity.formatted(.byteCount(style: .file))
     }
 
+    /// The first line under the name on the USB Drive screen: the model, or what kind of drive it
+    /// is ("USB Drive", "SD Card") when the name already is the model, so every drive has the line.
+    var subtitle: String {
+        guard name == model else { return model }
+        return switch kind {
+        case .usbDrive: DriveCatalog.genericUSBDriveName
+        case .sdCard: DriveCatalog.genericSDCardName
+        }
+    }
+
     /// The line under the name: "SanDisk Ultra · 32 GB", or only "32 GB" when the name is the model.
     var detail: String {
         name == model ? formattedCapacity : "\(model) · \(formattedCapacity)"
@@ -64,6 +74,13 @@ nonisolated struct Drive: Identifiable, Hashable, Sendable {
         case .bytes(let bytes): bytes < Self.emptyThreshold
         case .unknown: false
         }
+    }
+
+    /// How full the usage bar under the drive is, from 0 to 1. No fill when the drive counts as
+    /// empty or its data can't be measured.
+    var usageFraction: Double {
+        guard !isEmpty, case .bytes(let bytes) = usedSpace, capacity > 0 else { return 0 }
+        return min(Double(bytes) / Double(capacity), 1)
     }
 
     /// The drive's status for an installer of the given size.

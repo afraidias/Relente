@@ -2,13 +2,41 @@
 
 Spec: [spec.md](spec.md) · Plan: [plan.md](plan.md)
 
-## Where this was left (2026-10-01)
+## Where this was left (2026-10-02)
 
-- Phases 1–4 done; Checkpoint D (real hardware) not done yet: no installer in `/Applications`
-  and no USB drive at hand. To get an installer:
-  `softwareupdate --fetch-full-installer --full-installer-version 15.8.1` (about 15.7 GB).
+- Phases 1–4 done; Checkpoint C approved by the owner (2026-10-02).
+- Checkpoint D done (2026-10-02), with macOS Sequoia 15.8.1 (15.69 GB) and a "16 GB" USB
+  drive (15.5 GB, NTFS):
+  - [x] Sequoia appeared on the Installer screen by itself while the app was running.
+  - [x] Monterey 12.7.6 (12.43 GB) appeared the same way; the drive shows as "USB", "TOSHIBA USB
+    FLASH DRIVE", 10.89 GB of 15.52 GB in use (option C, Task 10b).
+  - [x] Unplugged on USB Drive: it disappeared and the empty state showed; plugged back in, it
+    reappeared unselected within seconds.
+  - [x] Unplugged on Review: back to USB Drive with no drive selected (VoiceOver not checked).
+  - [x] Unplugged during the simulation: the Error screen with "The drive was disconnected.",
+    stopped at 10 % in Copy.
+  - [x] Found: "Try Again" after that showed an empty Review (the selection had been cleared).
+    Fixed (spec Decision 13): it goes to USB Drive with no drive selected; test in
+    `AssistantDetectionTests`. Checked again in the app by the owner.
+  - [x] Eject on Done with a Finder window open on the drive: macOS ejected it (the Finder
+    closes its windows itself) and the app went back to the Installer screen.
+  - [x] Eject with a process holding the volume (a shell whose working folder was on it): the
+    alert "“USB” Couldn't Be Ejected" with the generic reason (macOS named no app); "Cancel"
+    stayed on Done, "Try Again" failed again, "Force Eject" ejected it and went back.
+  - [x] Moving Monterey out of `/Applications` and back: it disappeared and reappeared by itself.
+  - [x] The drive erased as APFS (GPT, EFI + an APFS container on a synthesized `disk7`): one
+    drive, "USB", "Empty · 15.52 GB"; the container's disk isn't listed on its own.
+  - Not checked (no hardware): an SD card, an external SSD or hard drive. `DriveCatalogTests`
+    cover their rules.
+  - Raised by the owner: watching `/Applications` costs 0.0 % CPU idle; making it event-driven
+    (FSEvents) is issue #29 (needs a `DispatchQueue` exception).
+  - The drive is "Too small" for Sequoia, which is right: the installer alone doesn't fit, so the
+    limit stays. Monterey 12.7.6 (about 12 GB) is being downloaded to reach Review with it.
+  - The owner skipped the `.dmg` check (it would need another 16 GB); the reader is covered by
+    its tests.
 - The Installer empty state's symbol was settled: the add square takes its place (no symbol).
 - The owner keeps the roadmap order: downloading installers stays roadmap step 9.
+- Task 16 and Checkpoint E done (2026-10-02): spec Done, index and README roadmap updated.
 
 ## Phase 1: Models and rules (test-driven)
 
@@ -128,7 +156,7 @@ Spec: [spec.md](spec.md) · Plan: [plan.md](plan.md)
     `Views/InstallerView.swift`, `Views/NoInstallerView.swift`, `Resources/Localizable.xcstrings`
 
 ### Checkpoint C
-- [ ] Owner reviews the screens in the app with `-sampleData YES` (light, dark, classic).
+- [x] Owner reviews the screens in the app with `-sampleData YES` (light, dark, classic).
 
 ## Phase 4: Live services
 
@@ -158,17 +186,65 @@ Spec: [spec.md](spec.md) · Plan: [plan.md](plan.md)
   - Verify: manual with a `.dmg` and an `InstallAssistant.pkg`.
   - Files: `Services/InstallerReader.swift`, `Services/LiveInstallerService.swift`
 
+- [x] Task 10b: The drive's usage bar, option C (asked at Checkpoint D)
+  - Acceptance: on USB Drive, the model on one line (cut with "…", full in the help tag, none when
+    it's the name), a gray usage bar and "*N* of *M* in use" / "Empty · *M*" / "Contents unknown ·
+    *M*"; too small keeps "model · capacity", the red chip and "Needs"; no orange or green chips;
+    the row is top-aligned; strings in Spanish; the unused chip strings removed.
+  - Verify: `DriveTests` (usage fraction: in use, empty under 100 MB, unknown, never over 1);
+    screenshots in English and Spanish; the real drive in the app.
+  - Files: `Models/Drive.swift`, `Views/DriveView.swift`, `Components/StatusChip.swift`,
+    `Resources/Localizable.xcstrings`, `RelenteTests/DriveTests.swift`
+
+- [x] Task 10d: Three aligned lines under every drive (asked at Checkpoint D, "C · alineada")
+  - Acceptance: line 1 the model, or "USB Drive" / "SD Card" when the name is the model; line 2
+    the bar, or the red "Too small" chip, always 20 pt tall; line 3 the usage text, or "*N* ·
+    needs *M*" for a drive that's too small; "Needs %@" replaced; Spanish strings.
+  - Verify: `DriveTests` (`subtitle`); offscreen renders of 3 and 6 drives; the full suite.
+  - Files: `Models/Drive.swift`, `Views/DriveView.swift`, `Resources/Localizable.xcstrings`,
+    `RelenteTests/DriveTests.swift`
+
+- [x] Task 10c: Many installers or drives (asked at Checkpoint D, canvas option 1 + 3)
+  - Acceptance: up to 4 items, the large row as before; from 5 (the add square counts), a grid of
+    5 columns of small items (128 pt, 64 pt icons) centered under the header, scrolling when it
+    doesn't fit, the selection scrolled into view; Up and Down move a row; chips without icon in
+    small items; the sliding selection works in both; previews with many installers and drives.
+    The sample installers include Catalina (unsupported). When it scrolls: a 16 pt fade at the
+    top and bottom (not on the scroller), 24 pt from the header and 20 pt from below; the chosen
+    item's artwork is handed to the assistant only while the screen changes, so it doesn't float
+    over the header when scrolled away. Found by the owner: a drive kept chosen after going back
+    slid in late on its own; artwork without a place on one of the two screens now stays with
+    its screen (`SharedArtwork.stayingWithScreens`, `SharedArtworkTests`; checked in frames).
+  - Verify: `PickLayoutTests`; offscreen renders (4, 5 and 15 installers, 6 drives, light and
+    dark); a temporary build with 15 installers and 10 drives checked by the owner (scrolling,
+    arrows, the flight to and from the grid); the full suite.
+  - Files: `Components/PickLayout.swift`, `Components/PickItemSize.swift`,
+    `Components/PickCollection.swift`, `Components/PickItem.swift`,
+    `Components/ArrowKeySelection.swift`, `Components/AddInstallerButton.swift`,
+    `Components/StatusChip.swift`, `Components/SharedArtwork.swift`, `Views/AssistantView.swift`,
+    `Views/InstallerView.swift`, `Views/DriveView.swift`, `App/RelenteApp.swift`,
+    `RelenteTests/PickLayoutTests.swift`
+
 ### Checkpoint D
-- [ ] Real hardware and a real installer, as listed in the plan.
+- [x] Real hardware and a real installer, as listed in the plan (2026-10-02; what wasn't
+  available is listed under "Where this was left").
 
 ## Phase 5: Finish
 
-- [ ] Task 16: UI test, strings and docs
+- [x] Task 16: UI test, strings and docs
   - Acceptance: the flow UI test covers the empty states with `-sampleData YES`; every new
     string translated; `docs/product.md`, README roadmap (step 5 ✓), spec Done, index updated.
   - Verify: full suite, lint, Debug and Release builds.
   - Files: `RelenteUITests/AssistantFlowUITests.swift`, `docs/product.md`, `README.md`,
     `specs/007-real-detection/spec.md`, `specs/README.md`
+  - Done (2026-10-02): `-sampleEmpty installers|drives` and the two empty-state UI tests;
+    `docs/product.md` and BUILDING; every string has Spanish (an empty key from the "Isn't a
+    macOS Installer" alert title was removed). The UI test found that VoiceOver couldn't reach
+    the add square in the empty state (ContentUnavailableView merged it into the title), so
+    `EmptyStateView` no longer uses a `Label`; its look is unchanged (compared in screenshots).
+  - Left for after Checkpoint D: spec Done, `specs/README.md`, README roadmap (step 5 ✓).
 
 ### Checkpoint E
-- [ ] Definition of Done (AGENTS.md).
+- [x] Definition of Done (AGENTS.md). (2026-10-02: full suite, lint, Debug and universal Release
+  builds with no warnings; VoiceOver and Reduce Motion on the new states by the owner; dark mode
+  in screenshots.)

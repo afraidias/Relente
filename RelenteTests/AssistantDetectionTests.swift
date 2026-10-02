@@ -140,6 +140,30 @@ extension AssistantDetectionTests {
         #expect(assistant.creation?.failure?.reason == .driveDisconnected)
     }
 
+    @Test func `Try Again after unplugging goes to USB Drive, even with the drive back`() {
+        let assistant = Assistant(
+            installerService: SampleInstallerService(installers: [tahoe]),
+            driveService: SampleDriveService(drives: [stick]),
+            creationService: NeverEndingCreationService())
+        assistant.updateInstallers([tahoe])
+        assistant.updateDrives([stick])
+        assistant.continueToDrive()
+        assistant.screenChangeDidEnd()
+        assistant.selectDrive(stick.id)
+        assistant.continueToReview()
+        assistant.screenChangeDidEnd()
+        assistant.hasConfirmed = true
+        assistant.eraseAndCreate()
+        assistant.screenChangeDidEnd()
+        assistant.updateDrives([])
+        // Plugged in again before "Try Again" (Checkpoint D): it comes back unselected.
+        assistant.updateDrives([stick])
+
+        assistant.tryAgain()
+        #expect(assistant.step == .drive)
+        #expect(assistant.selectedDriveID == nil)
+    }
+
     @Test func `the chosen installer disappearing on USB Drive or Review goes back to Installer`() {
         for toReview in [false, true] {
             let assistant = assistantWithStick(toReview: toReview)

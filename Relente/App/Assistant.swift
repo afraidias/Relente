@@ -291,10 +291,12 @@ final class Assistant {
         creation = .failed(CreationFailure(reason: .cancelled, progress: progress))
     }
 
-    /// Error's "Try Again": back to Review, where the erase is confirmed again.
+    /// Error's "Try Again": back to Review, where the erase is confirmed again. If the drive was
+    /// unplugged, its selection was cleared: back to USB Drive to pick it again, even if it's
+    /// connected again.
     func tryAgain() {
         guard step == .creating, creation?.failure != nil else { return }
-        change(to: .review, .back, .slide)
+        change(to: selectedDrive == nil ? .drive : .review, .back, .slide)
     }
 
     /// Error's "Start Over".

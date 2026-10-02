@@ -37,10 +37,10 @@ struct InstallerView: View {
                         drop(urls)
                     }
             } else {
-                Spacer()
-
-                // Top-aligned, so the dashed square lines up with the installers' icons.
-                HStack(alignment: .top, spacing: 24) {
+                // The add square counts as an item: it takes a place in the row or grid.
+                PickCollection(
+                    itemCount: installers.count + 1, selection: selectedID, onMoveSelection: onMoveSelection
+                ) {
                     ForEach(installers) { installer in
                         InstallerItem(installer: installer, isSelected: installer.id == selectedID) {
                             selectedID = installer.id
@@ -49,10 +49,6 @@ struct InstallerView: View {
 
                     AddInstallerButton(onChoose: { isChoosingFile = true }, onDrop: drop)
                 }
-                .selectsWithArrowKeys(onMoveSelection)
-                .slidingSelection(selectedID)
-
-                Spacer()
 
                 Button(action: downloadFromApple) {
                     Label("Download from Apple…", systemImage: "arrow.down.circle")
@@ -67,7 +63,7 @@ struct InstallerView: View {
             }
         }
         .alert(
-            Text(error?.title ?? ""),
+            error.map { Text($0.title) } ?? Text(verbatim: ""),
             isPresented: Binding(get: { error != nil }, set: { if !$0 { onDismissError() } }),
             presenting: error
         ) { _ in
@@ -158,6 +154,25 @@ struct InstallerFooter: View {
     InstallerView(installers: InstallerSource.samples, selectedID: $selectedID)
         .padding(32)
         .frame(width: 800, height: 480)
+}
+
+#Preview("Many installers (grid)") {
+    @Previewable @State var selectedID = InstallerSource.samples.first?.id
+
+    // Twelve items with the add square: the grid of small items, scrolling.
+    let copies = (1...3).flatMap { copy in
+        InstallerSource.samples.map { installer in
+            InstallerSource(
+                url: installer.url.deletingLastPathComponent().appending(
+                    path: "\(copy) \(installer.url.lastPathComponent)"),
+                name: installer.name, version: installer.version, kind: installer.kind, size: installer.size)
+        }
+    }
+    InstallerView(
+        installers: InstallerSource.samples + copies + [InstallerSource.unsupportedSample], selectedID: $selectedID
+    )
+    .padding(32)
+    .frame(width: 800, height: 480)
 }
 
 #Preview("Not supported") {

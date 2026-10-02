@@ -24,6 +24,8 @@ struct AssistantView: View {
     @State private var footerStep: AssistantStep
     /// How the change to `shownStep` moves.
     @State private var change = ScreenChange(direction: .forward, style: .crossfade)
+    /// While the screen changes, the step it changes from.
+    @State private var changingFrom: AssistantStep?
     /// The last disconnection VoiceOver announced, so each is said once.
     @State private var announcedDisconnection: UUID?
 
@@ -44,6 +46,8 @@ struct AssistantView: View {
                     .padding(.bottom, 24)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .environment(\.assistantScreen, shownStep)
+                    .environment(\.isChangingScreen, assistant.isChangingScreen)
+                    .environment(\.artworkStayingWithScreen, artworkStayingWithScreen)
                     // Whatever changes inside a screen while it slides (e.g. the phase bar
                     // filling up) moves with the screen instead of jumping to its final place.
                     .geometryGroup()
@@ -62,16 +66,18 @@ struct AssistantView: View {
             stepIndicator(at: anchors[footerStep]?[.stepIndicator])
         }
         .frame(width: Theme.Sizes.window.width, height: Theme.Sizes.window.height)
-        .onChange(of: assistant.step) { _, newStep in
+        .onChange(of: assistant.step) { oldStep, newStep in
             // First let the current screen learn how it will leave, then change it on the next
             // frame: a leaving screen keeps the transition it was last drawn with.
             change = assistant.lastChange
+            changingFrom = oldStep
             footerStep = newStep
             Task {
                 try? await Task.sleep(for: .milliseconds(16))
                 withAnimation(animation) {
                     shownStep = newStep
                 } completion: {
+                    changingFrom = nil
                     assistant.screenChangeDidEnd()
                     // VoiceOver reads the new screen from its title (see `ScreenHeader`).
                     AccessibilityNotification.ScreenChanged().post()
@@ -152,6 +158,13 @@ struct AssistantView: View {
             }
         }
         .allowsHitTesting(false)
+    }
+
+    /// While the screen changes, the artwork one of the two screens has no place for: it comes or
+    /// goes with its screen instead of being drawn here.
+    private var artworkStayingWithScreen: Set<SharedArtwork> {
+        guard let changingFrom else { return [] }
+        return SharedArtwork.stayingWithScreens(from: changingFrom, to: assistant.step)
     }
 
     /// With Reduce Motion, each screen gets its own drive and icon, which fade with it instead of

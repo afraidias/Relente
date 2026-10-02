@@ -117,4 +117,43 @@ struct DriveTests {
         #expect(statuses.contains(.tooSmall))
         #expect(statuses.contains { if case .willErase = $0 { true } else { false } })
     }
+
+    // MARK: - Usage bar
+
+    @Test func `the usage bar fills to the space in use`() {
+        #expect(drive(capacity: 16_000_000_000, used: .bytes(4_000_000_000)).usageFraction == 0.25)
+    }
+
+    @Test func `an empty drive's usage bar has no fill`() {
+        // Under 100 MB is "Empty", so the bar must not show a sliver either.
+        #expect(drive(capacity: 32_000_000_000, used: .bytes(99_999_999)).usageFraction == 0)
+    }
+
+    @Test func `data of unknown size leaves the usage bar unfilled`() {
+        #expect(drive(capacity: 32_000_000_000, used: .unknown).usageFraction == 0)
+    }
+
+    @Test func `the usage bar never overflows`() {
+        #expect(drive(capacity: 16_000_000_000, used: .bytes(20_000_000_000)).usageFraction == 1)
+    }
+
+    // MARK: - First line under the name
+
+    @Test func `the line under the name is the model`() {
+        let drive = Drive(
+            id: "1", bsdName: "disk9", name: "UNTITLED", model: "Kingston DataTraveler", kind: .usbDrive,
+            capacity: 64_000_000_000, usedSpace: .bytes(0))
+        #expect(drive.subtitle == "Kingston DataTraveler")
+    }
+
+    @Test func `when the name is the model, the line says what kind of drive it is`() {
+        let stick = Drive(
+            id: "1", bsdName: "disk9", name: "SanDisk Ultra", model: "SanDisk Ultra", kind: .usbDrive,
+            capacity: 32_000_000_000, usedSpace: .bytes(0))
+        let card = Drive(
+            id: "2", bsdName: "disk8", name: "SD Card", model: "SD Card", kind: .sdCard,
+            capacity: 32_000_000_000, usedSpace: .bytes(0))
+        #expect(stick.subtitle == DriveCatalog.genericUSBDriveName)
+        #expect(card.subtitle == DriveCatalog.genericSDCardName)
+    }
 }

@@ -14,6 +14,7 @@ struct AddInstallerButton: View {
     let onChoose: () -> Void
     let onDrop: ([URL]) -> Bool
 
+    @Environment(\.pickItemSize) private var size
     @State private var isTargeted = false
 
     var body: some View {
@@ -25,11 +26,11 @@ struct AddInstallerButton: View {
                     .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
                     .foregroundStyle(isTargeted ? AnyShapeStyle(Theme.Colors.accent) : AnyShapeStyle(.tertiary))
                 Image(systemName: "plus")
-                    .font(.system(size: 28, weight: .medium))
+                    .font(.system(size: size == .regular ? 28 : 20, weight: .medium))
                     .foregroundStyle(isTargeted ? AnyShapeStyle(Theme.Colors.accent) : AnyShapeStyle(.secondary))
             }
             // The same place an installer's icon takes in its item.
-            .frame(width: 84, height: 84)
+            .frame(width: size.plateSide - 28, height: size.plateSide - 28)
             .padding(14)
             .contentShape(.rect)
         }

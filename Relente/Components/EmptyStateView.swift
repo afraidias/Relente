@@ -21,10 +21,16 @@ struct EmptyStateView<Icon: View, Actions: View>: View {
 
     var body: some View {
         ContentUnavailableView {
-            Label {
-                Text(title)
-            } icon: {
+            // Not a `Label`: ContentUnavailableView merges a label's icon and title into one
+            // text for VoiceOver, which hid Installer's add square. These sizes match its look.
+            VStack(spacing: 0) {
                 icon
+                    .font(.system(size: 28))
+                    .imageScale(.large)
+                    .foregroundStyle(.tertiary)
+                    .padding(.bottom, 24)
+                Text(title)
+                    .font(.system(size: 15, weight: .bold))
             }
         } description: {
             description

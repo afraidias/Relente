@@ -1,8 +1,49 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
+    "%@ · needs %@" : {
+      "comment" : "Under a drive that's too small. Values: its capacity and the size the installer needs, e.g. 8 GB and 17.8 GB.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · necesita %2$@"
+          }
+        }
+      }
+    },
+    "%@ of %@ in use" : {
+      "comment" : "Under a drive's usage bar. Values: space in use and capacity, e.g. 10.89 GB of 15.52 GB.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ de %2$@ en uso"
+          }
+        }
+      }
+    },
+    "Contents unknown · %@" : {
+      "comment" : "Under a drive whose data Relente can't measure (e.g. formatted for Linux). The value is its capacity.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contenido desconocido · %@"
+          }
+        }
+      }
+    },
+    "Empty · %@" : {
+      "comment" : "Under an empty drive's usage bar. The value is its capacity.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vacía · %@"
+          }
+        }
+      }
     },
     "“%@”" : {
       "comment" : "Done screen, under the drive: the name it has now, in quotes, e.g. “Install macOS Tahoe”.",
@@ -94,17 +135,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ Cierra las ventanas o apps que la estén usando y vuelve a intentarlo."
-          }
-        }
-      }
-    },
-    "%@ will be erased" : {
-      "comment" : "Status chip under a drive that has data. The value is the space in use, e.g. 9.8 GB.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se borrarán %@"
           }
         }
       }
@@ -435,17 +465,6 @@
         }
       }
     },
-    "Data will be erased" : {
-      "comment" : "Status chip under a drive that has data Relente can't measure (e.g. formatted for Linux).",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se borrarán datos"
-          }
-        }
-      }
-    },
     "Done" : {
       "comment" : "Name of the assistant's last screen, once the installer is ready.",
       "localizations" : {
@@ -519,17 +538,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expúlsala y conéctala al Mac en el que quieras instalar macOS. Ha tardado %@."
-          }
-        }
-      }
-    },
-    "Empty" : {
-      "comment" : "Status chip under a drive with nothing on it.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vacía"
           }
         }
       }
@@ -793,17 +801,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Asegúrate de que es la memoria correcta. Se borrará todo lo que contiene."
-          }
-        }
-      }
-    },
-    "Needs %@" : {
-      "comment" : "Under a drive that's too small. The value is the minimum size, e.g. 17.8 GB.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Necesita %@"
           }
         }
       }

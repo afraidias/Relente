@@ -19,6 +19,22 @@ nonisolated enum SharedArtwork: Hashable, Sendable {
     case drive
     case installer
     case stepIndicator
+
+    /// Whether `step`'s screen has a place for this artwork.
+    func isMarked(on step: AssistantStep) -> Bool {
+        switch self {
+        case .installer, .stepIndicator: true
+        case .drive: step != .installer
+        }
+    }
+
+    /// The artwork that doesn't fly from `old` to `new`: the screens draw it, so it comes or goes
+    /// with them, exactly in step. That's artwork one of the two screens has no place for, and
+    /// everything when starting over from Creating (Error) or Done, which crossfades as a restart.
+    static func stayingWithScreens(from old: AssistantStep, to new: AssistantStep) -> Set<SharedArtwork> {
+        if new == .installer, old == .creating || old == .done { return [.drive, .installer] }
+        return Set([.drive, .installer].filter { !$0.isMarked(on: old) || !$0.isMarked(on: new) })
+    }
 }
 
 /// Where each screen wants each piece of artwork.
@@ -36,6 +52,15 @@ nonisolated struct SharedArtworkAnchors: PreferenceKey {
 extension EnvironmentValues {
     /// The assistant screen a view belongs to, or `nil` outside the assistant.
     @Entry var assistantScreen: AssistantStep?
+    /// Whether the assistant is moving from one screen to another.
+    @Entry var isChangingScreen = false
+    /// Inside a scroll view (the grid of many installers or drives), a mark hands its artwork to
+    /// the assistant only while the screen changes, so it can fly; at rest the view draws it
+    /// itself, so it scrolls, fades and is clipped with the rest.
+    @Entry var marksArtworkOnlyWhileChangingScreen = false
+    /// While the screen changes, the artwork that stays with its screen instead of flying
+    /// (`SharedArtwork.stayingWithScreens(from:to:)`): its marks draw it themselves.
+    @Entry var artworkStayingWithScreen: Set<SharedArtwork> = []
 }
 
 extension View {
@@ -51,9 +76,18 @@ private struct SharedArtworkMark: ViewModifier {
     let isActive: Bool
 
     @Environment(\.assistantScreen) private var screen
+    @Environment(\.isChangingScreen) private var isChangingScreen
+    @Environment(\.marksArtworkOnlyWhileChangingScreen) private var onlyWhileChangingScreen
+    @Environment(\.artworkStayingWithScreen) private var stayingWithScreen
+
+    /// Whether the assistant draws the artwork here instead of this view.
+    private var handsOver: Bool {
+        guard isActive, !stayingWithScreen.contains(artwork) else { return false }
+        return !onlyWhileChangingScreen || isChangingScreen
+    }
 
     func body(content: Content) -> some View {
-        if let screen, isActive {
+        if let screen, handsOver {
             content
                 .hidden()
                 .anchorPreference(key: SharedArtworkAnchors.self, value: .bounds) { [screen: [artwork: $0]] }
