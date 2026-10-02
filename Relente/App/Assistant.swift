@@ -14,8 +14,10 @@ import Observation
 @MainActor
 @Observable
 final class Assistant {
-    let installers: [InstallerSource]
-    let drives: [Drive]
+    /// Newest first, as the installer service finds them.
+    private(set) var installers: [InstallerSource] = []
+    /// As the drive service finds them.
+    private(set) var drives: [Drive] = []
 
     private(set) var step: AssistantStep = .installer
     private(set) var selectedInstallerID: InstallerSource.ID?
@@ -36,15 +38,106 @@ final class Assistant {
     /// What Done shows, once a run finishes.
     private(set) var result: CreationResult?
 
+    /// A drive unplugged on Review, which sent the assistant back to USB Drive. VoiceOver
+    /// announces it.
+    struct Disconnection: Equatable {
+        let driveName: String
+        /// Tells two disconnections of the same drive apart.
+        let id = UUID()
+    }
+
+    private(set) var disconnection: Disconnection?
+
+    /// True while Done's drive is being ejected.
+    private(set) var isEjecting = false
+    /// Why the last eject failed, shown as an alert on Done.
+    private(set) var ejectFailure: EjectError?
+    /// Why the file the user chose can't be used, shown as an alert on Installer.
+    private(set) var installerError: InstallerError?
+
+    private let installerService: any InstallerService
+    private let driveService: any DriveService
     /// `nil` in Release builds until roadmap step 7: "Erase and Create" is then disabled.
     private let creationService: (any CreationService)?
     private var creationTask: Task<Void, Never>?
+    private var hasStarted = false
 
-    init(installers: [InstallerSource], drives: [Drive], creationService: (any CreationService)? = nil) {
-        self.installers = installers
-        self.drives = drives
+    init(
+        installerService: any InstallerService, driveService: any DriveService,
+        creationService: (any CreationService)? = nil
+    ) {
+        self.installerService = installerService
+        self.driveService = driveService
         self.creationService = creationService
-        selectedInstallerID = installers.first?.id
+    }
+
+    /// An assistant that starts with these installers and drives, for previews and tests.
+    convenience init(installers: [InstallerSource], drives: [Drive], creationService: (any CreationService)? = nil) {
+        self.init(
+            installerService: SampleInstallerService(installers: installers),
+            driveService: SampleDriveService(drives: drives), creationService: creationService)
+        updateInstallers(installers)
+        updateDrives(drives)
+    }
+
+    // MARK: - Following the Mac
+
+    /// Follows the installers and drives on the Mac until the task is cancelled. The app calls it
+    /// once; later calls return at once.
+    func start() async {
+        guard !hasStarted else { return }
+        hasStarted = true
+        async let installers: Void = followInstallers()
+        async let drives: Void = followDrives()
+        _ = await (installers, drives)
+    }
+
+    private func followInstallers() async {
+        for await list in installerService.updates() {
+            updateInstallers(list)
+        }
+    }
+
+    private func followDrives() async {
+        for await list in driveService.updates() {
+            updateDrives(list)
+        }
+    }
+
+    /// A new list of installers. The selection stays if it's still there. If the chosen installer
+    /// disappeared on USB Drive or Review, the assistant goes back to the Installer screen; the
+    /// newest supported installer is then selected.
+    func updateInstallers(_ list: [InstallerSource]) {
+        let hadSelection = selectedInstallerID != nil
+        installers = InstallerSource.sorted(list)
+        guard selectedInstaller == nil else { return }
+        selectedInstallerID = InstallerSource.defaultSelection(in: installers)?.id
+        if hadSelection, step == .drive || step == .review {
+            selectedDriveID = nil
+            change(to: .installer, .back, .slide, byUser: false)
+        }
+    }
+
+    /// A new list of drives. If the chosen drive was unplugged, the selection is cleared; on
+    /// Review the assistant goes back to USB Drive, and a running creation fails.
+    func updateDrives(_ list: [Drive]) {
+        let unplugged = selectedDrive.flatMap { drive in list.contains { $0.id == drive.id } ? nil : drive }
+        drives = list
+
+        if step == .creating, case .running(let progress) = creation, let drive = creationDrive,
+            !list.contains(where: { $0.id == drive.id })
+        {
+            creationTask?.cancel()
+            creationTask = nil
+            creation = .failed(CreationFailure(reason: .driveDisconnected, progress: progress))
+        }
+
+        guard let unplugged else { return }
+        selectedDriveID = nil
+        if step == .review {
+            disconnection = Disconnection(driveName: unplugged.name)
+            change(to: .drive, .back, .slide, byUser: false)
+        }
     }
 
     // MARK: - Choices
@@ -64,7 +157,7 @@ final class Assistant {
     }
 
     func selectInstaller(_ id: InstallerSource.ID) {
-        guard installers.contains(where: { $0.id == id }) else { return }
+        guard installers.contains(where: { $0.id == id && $0.isSupported }) else { return }
         selectedInstallerID = id
         if let drive = selectedDrive, !isPickable(drive) {
             selectedDriveID = nil
@@ -76,13 +169,36 @@ final class Assistant {
         selectedDriveID = id
     }
 
-    /// Left and right arrows: the previous or next installer, or pickable drive, without wrapping.
+    /// "Choose Installer…": reads the file, adds it to the list and selects it (unless it's
+    /// unsupported, which is only shown). A file that isn't an installer sets `installerError`.
+    func chooseInstaller(at url: URL) async {
+        guard step == .installer else { return }
+        do {
+            let installer = try await installerService.add(url)
+            if !installers.contains(where: { $0.id == installer.id }) {
+                installers = InstallerSource.sorted(installers + [installer])
+            }
+            if installer.isSupported {
+                selectedInstallerID = installer.id
+            }
+        } catch {
+            installerError = error
+        }
+    }
+
+    /// The "Isn't a macOS Installer" alert's "OK".
+    func dismissInstallerError() {
+        installerError = nil
+    }
+
+    /// Left and right arrows: the previous or next supported installer, or pickable drive, without
+    /// wrapping.
     func moveSelection(by offset: Int) {
         switch step {
         case .installer:
-            guard let index = installers.firstIndex(where: { $0.id == selectedInstallerID }) else { return }
-            let next = min(max(index + offset, 0), installers.count - 1)
-            selectInstaller(installers[next].id)
+            let supported = installers.filter(\.isSupported)
+            guard let index = supported.firstIndex(where: { $0.id == selectedInstallerID }) else { return }
+            selectInstaller(supported[min(max(index + offset, 0), supported.count - 1)].id)
         case .drive:
             let pickable = drives.filter(isPickable)
             guard !pickable.isEmpty else { return }
@@ -175,10 +291,12 @@ final class Assistant {
         creation = .failed(CreationFailure(reason: .cancelled, progress: progress))
     }
 
-    /// Error's "Try Again": back to Review, where the erase is confirmed again.
+    /// Error's "Try Again": back to Review, where the erase is confirmed again. If the drive was
+    /// unplugged, its selection was cleared: back to USB Drive to pick it again, even if it's
+    /// connected again.
     func tryAgain() {
         guard step == .creating, creation?.failure != nil else { return }
-        change(to: .review, .back, .slide)
+        change(to: selectedDrive == nil ? .drive : .review, .back, .slide)
     }
 
     /// Error's "Start Over".
@@ -187,10 +305,40 @@ final class Assistant {
         restart()
     }
 
-    /// Done's "Eject".
-    func eject() {
-        guard step == .done else { return }
-        restart()
+    /// Done's "Eject" (and the alert's "Try Again"): ejects the drive, then goes back to the
+    /// Installer screen. If macOS refuses, `ejectFailure` holds why and the assistant stays on
+    /// Done. A drive that's already gone just goes back.
+    func eject() async {
+        await eject(force: false)
+    }
+
+    /// The eject alert's "Force Eject".
+    func forceEject() async {
+        await eject(force: true)
+    }
+
+    /// The eject alert's "Cancel": stay on Done.
+    func dismissEjectFailure() {
+        ejectFailure = nil
+    }
+
+    private func eject(force: Bool) async {
+        guard step == .done, !isEjecting, let drive = result?.drive else { return }
+        ejectFailure = nil
+        guard drives.contains(where: { $0.id == drive.id }) else {
+            restart()
+            return
+        }
+        isEjecting = true
+        defer { isEjecting = false }
+        do {
+            try await driveService.eject(drive, force: force)
+            restart()
+        } catch .notConnected {
+            restart()
+        } catch {
+            ejectFailure = error
+        }
     }
 
     /// Back to the Installer screen, keeping the installer and forgetting the drive.

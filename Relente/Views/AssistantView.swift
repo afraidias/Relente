@@ -24,6 +24,10 @@ struct AssistantView: View {
     @State private var footerStep: AssistantStep
     /// How the change to `shownStep` moves.
     @State private var change = ScreenChange(direction: .forward, style: .crossfade)
+    /// While the screen changes, the step it changes from.
+    @State private var changingFrom: AssistantStep?
+    /// The last disconnection VoiceOver announced, so each is said once.
+    @State private var announcedDisconnection: UUID?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -42,6 +46,8 @@ struct AssistantView: View {
                     .padding(.bottom, 24)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .environment(\.assistantScreen, shownStep)
+                    .environment(\.isChangingScreen, assistant.isChangingScreen)
+                    .environment(\.artworkStayingWithScreen, artworkStayingWithScreen)
                     // Whatever changes inside a screen while it slides (e.g. the phase bar
                     // filling up) moves with the screen instead of jumping to its final place.
                     .geometryGroup()
@@ -60,22 +66,39 @@ struct AssistantView: View {
             stepIndicator(at: anchors[footerStep]?[.stepIndicator])
         }
         .frame(width: Theme.Sizes.window.width, height: Theme.Sizes.window.height)
-        .onChange(of: assistant.step) { _, newStep in
+        .onChange(of: assistant.step) { oldStep, newStep in
             // First let the current screen learn how it will leave, then change it on the next
             // frame: a leaving screen keeps the transition it was last drawn with.
             change = assistant.lastChange
+            changingFrom = oldStep
             footerStep = newStep
             Task {
                 try? await Task.sleep(for: .milliseconds(16))
                 withAnimation(animation) {
                     shownStep = newStep
                 } completion: {
+                    changingFrom = nil
                     assistant.screenChangeDidEnd()
                     // VoiceOver reads the new screen from its title (see `ScreenHeader`).
                     AccessibilityNotification.ScreenChanged().post()
+                    announceDisconnection()
                 }
             }
         }
+    }
+
+    // MARK: - Announcements
+
+    /// After the chosen drive was unplugged on Review and the assistant went back to USB Drive,
+    /// VoiceOver says why, once the new screen is in place.
+    private func announceDisconnection() {
+        guard let disconnection = assistant.disconnection, disconnection.id != announcedDisconnection else { return }
+        announcedDisconnection = disconnection.id
+        AccessibilityNotification.Announcement(
+            String(
+                localized: "“\(disconnection.driveName)” was disconnected.",
+                comment: "VoiceOver, when the chosen drive is unplugged on Review. The value is the drive's name.")
+        ).post()
     }
 
     // MARK: - Motion
@@ -137,6 +160,13 @@ struct AssistantView: View {
         .allowsHitTesting(false)
     }
 
+    /// While the screen changes, the artwork one of the two screens has no place for: it comes or
+    /// goes with its screen instead of being drawn here.
+    private var artworkStayingWithScreen: Set<SharedArtwork> {
+        guard let changingFrom else { return [] }
+        return SharedArtwork.stayingWithScreens(from: changingFrom, to: assistant.step)
+    }
+
     /// With Reduce Motion, each screen gets its own drive and icon, which fade with it instead of
     /// flying from the previous screen.
     private var artworkIdentity: AnyHashable {
@@ -174,7 +204,9 @@ struct AssistantView: View {
         case .installer:
             InstallerView(
                 installers: assistant.installers, selectedID: installerSelection,
-                onMoveSelection: assistant.moveSelection)
+                onMoveSelection: assistant.moveSelection,
+                onChooseFile: { url in Task { await assistant.chooseInstaller(at: url) } },
+                error: assistant.installerError, onDismissError: assistant.dismissInstallerError)
         case .drive:
             if let installer = assistant.selectedInstaller {
                 DriveView(
@@ -226,7 +258,12 @@ struct AssistantView: View {
                 CreationErrorFooter(onStartOver: assistant.startOver, onTryAgain: assistant.tryAgain)
             }
         case .done:
-            DoneFooter(installerName: assistant.result?.installer.name ?? "", onEject: assistant.eject)
+            DoneFooter(
+                installerName: assistant.result?.installer.name ?? "", driveName: assistant.result?.drive.name ?? "",
+                isEjecting: assistant.isEjecting, ejectFailure: assistant.ejectFailure,
+                onEject: { Task { await assistant.eject() } },
+                onForceEject: { Task { await assistant.forceEject() } },
+                onDismissFailure: assistant.dismissEjectFailure)
         }
     }
 

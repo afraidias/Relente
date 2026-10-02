@@ -70,7 +70,7 @@ Early development. The roadmap (specs refer to these as "roadmap step N"):
 2. [x] Folder structure and design system
 3. [x] Static screens with sample data: 001 Installer ✓, 002 USB drive ✓, 003 Review ✓, 004 Creating (+ Error) ✓, 005 Done ✓
 4. [x] Assistant navigation and animations: 006 Assistant navigation ✓
-5. [ ] Real disk and installer detection
+5. [x] Real disk and installer detection: 007 Real detection ✓
 6. [ ] System helper, XPC and security checks (includes the Permissions screen)
 7. [ ] `createinstallmedia` with live progress
 8. [ ] Signing, notarization and first release

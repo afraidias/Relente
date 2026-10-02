@@ -12,14 +12,15 @@ struct DriveTests {
     /// Size of the sample Tahoe installer: 16.8 GB.
     let installerSize: Int64 = 16_800_000_000
 
-    private func drive(capacity: Int64, usedBytes: Int64 = 0) -> Drive {
+    private func drive(capacity: Int64, used: UsedSpace = .bytes(0), name: String = "Test Drive") -> Drive {
         Drive(
             id: "TEST",
             bsdName: "disk9",
-            name: "Test Drive",
+            name: name,
+            model: "SanDisk Ultra",
             kind: .usbDrive,
             capacity: capacity,
-            usedBytes: usedBytes
+            usedSpace: used
         )
     }
 
@@ -49,8 +50,30 @@ struct DriveTests {
     }
 
     @Test func `a drive with data reports how much will be erased`() {
-        let status = drive(capacity: 32_000_000_000, usedBytes: 9_800_000_000).status(forInstallerSize: installerSize)
-        #expect(status == .willErase(usedBytes: 9_800_000_000))
+        let status = drive(capacity: 32_000_000_000, used: .bytes(9_800_000_000)).status(
+            forInstallerSize: installerSize)
+        #expect(status == .willErase(.bytes(9_800_000_000)))
+    }
+
+    @Test func `a freshly formatted drive under 100 MB is empty`() {
+        // A file system always uses a little space for itself.
+        let status = drive(capacity: 32_000_000_000, used: .bytes(99_999_999)).status(forInstallerSize: installerSize)
+        #expect(status == .empty)
+    }
+
+    @Test func `100 MB in use counts as data`() {
+        let status = drive(capacity: 32_000_000_000, used: .bytes(100_000_000)).status(forInstallerSize: installerSize)
+        #expect(status == .willErase(.bytes(100_000_000)))
+    }
+
+    @Test func `data that can't be measured will be erased, size unknown`() {
+        let status = drive(capacity: 32_000_000_000, used: .unknown).status(forInstallerSize: installerSize)
+        #expect(status == .willErase(.unknown))
+    }
+
+    @Test func `too small wins over data that can't be measured`() {
+        let status = drive(capacity: 8_000_000_000, used: .unknown).status(forInstallerSize: installerSize)
+        #expect(status == .tooSmall)
     }
 
     @Test func `a drive smaller than required is too small`() {
@@ -62,17 +85,28 @@ struct DriveTests {
     }
 
     @Test func `being too small wins over having data`() {
-        let status = drive(capacity: 8_000_000_000, usedBytes: 1_000_000_000).status(forInstallerSize: installerSize)
+        let status = drive(capacity: 8_000_000_000, used: .bytes(1_000_000_000)).status(forInstallerSize: installerSize)
         #expect(status == .tooSmall)
     }
 
     @Test(arguments: [
-        (Drive.Status.willErase(usedBytes: 1), true),
+        (Drive.Status.willErase(.bytes(1)), true),
+        (.willErase(.unknown), true),
         (.empty, true),
         (.tooSmall, false),
     ])
     func `only drives that can be used are selectable`(status: Drive.Status, isSelectable: Bool) {
         #expect(status.isSelectable == isSelectable)
+    }
+
+    // MARK: - Detail line
+
+    @Test func `the line under the name shows the model and the capacity`() {
+        #expect(drive(capacity: 32_000_000_000, name: "Photos 2023").detail == "SanDisk Ultra · 32 GB")
+    }
+
+    @Test func `when the name is the model, the line only shows the capacity`() {
+        #expect(drive(capacity: 32_000_000_000, name: "SanDisk Ultra").detail == "32 GB")
     }
 
     // MARK: - Sample data
@@ -82,5 +116,44 @@ struct DriveTests {
         #expect(statuses.contains(.empty))
         #expect(statuses.contains(.tooSmall))
         #expect(statuses.contains { if case .willErase = $0 { true } else { false } })
+    }
+
+    // MARK: - Usage bar
+
+    @Test func `the usage bar fills to the space in use`() {
+        #expect(drive(capacity: 16_000_000_000, used: .bytes(4_000_000_000)).usageFraction == 0.25)
+    }
+
+    @Test func `an empty drive's usage bar has no fill`() {
+        // Under 100 MB is "Empty", so the bar must not show a sliver either.
+        #expect(drive(capacity: 32_000_000_000, used: .bytes(99_999_999)).usageFraction == 0)
+    }
+
+    @Test func `data of unknown size leaves the usage bar unfilled`() {
+        #expect(drive(capacity: 32_000_000_000, used: .unknown).usageFraction == 0)
+    }
+
+    @Test func `the usage bar never overflows`() {
+        #expect(drive(capacity: 16_000_000_000, used: .bytes(20_000_000_000)).usageFraction == 1)
+    }
+
+    // MARK: - First line under the name
+
+    @Test func `the line under the name is the model`() {
+        let drive = Drive(
+            id: "1", bsdName: "disk9", name: "UNTITLED", model: "Kingston DataTraveler", kind: .usbDrive,
+            capacity: 64_000_000_000, usedSpace: .bytes(0))
+        #expect(drive.subtitle == "Kingston DataTraveler")
+    }
+
+    @Test func `when the name is the model, the line says what kind of drive it is`() {
+        let stick = Drive(
+            id: "1", bsdName: "disk9", name: "SanDisk Ultra", model: "SanDisk Ultra", kind: .usbDrive,
+            capacity: 32_000_000_000, usedSpace: .bytes(0))
+        let card = Drive(
+            id: "2", bsdName: "disk8", name: "SD Card", model: "SD Card", kind: .sdCard,
+            capacity: 32_000_000_000, usedSpace: .bytes(0))
+        #expect(stick.subtitle == DriveCatalog.genericUSBDriveName)
+        #expect(card.subtitle == DriveCatalog.genericSDCardName)
     }
 }

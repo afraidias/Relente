@@ -152,12 +152,13 @@ struct CreatingHero: View {
     }
 
     private var driveName: some View {
-        Text(verbatim: "\(drive.name) · \(drive.formattedCapacity)")
+        Text(verbatim: "\(drive.name) · \(drive.detail)")
             .font(Theme.Fonts.footnote)
             .foregroundStyle(Theme.Colors.secondary)
             .lineLimit(1)
             .truncationMode(.middle)
-            .accessibilityLabel(Text(verbatim: "\(drive.name), \(drive.formattedCapacity)"))
+            .accessibilityLabel(
+                Text(verbatim: "\(drive.name), \(drive.detail.replacingOccurrences(of: " · ", with: ", "))"))
     }
 }
 

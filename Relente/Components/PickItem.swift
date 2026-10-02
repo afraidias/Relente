@@ -21,6 +21,7 @@ struct PickItem<Icon: View, Detail: View>: View {
     @Environment(\.isEnabled) private var isEnabled
     /// Inside `.slidingSelection`, the row draws the plate and capsule; the item only marks them.
     @Environment(\.drawsSelectionInRow) private var drawsSelectionInRow
+    @Environment(\.pickItemSize) private var size
 
     /// Font of the name, also used by the row's white copy of it (`SlidingSelection`).
     static var nameFont: Font { .body.weight(.medium) }
@@ -55,8 +56,8 @@ struct PickItem<Icon: View, Detail: View>: View {
         Button(action: action) {
             VStack(spacing: 6) {
                 icon
-                    .frame(width: 96, height: 96)
-                    .padding(8)
+                    .frame(width: size.iconSide, height: size.iconSide)
+                    .padding(PickItemSize.platePadding)
                     .background { selectionShape(.plate) }
 
                 Text(title)
@@ -74,7 +75,7 @@ struct PickItem<Icon: View, Detail: View>: View {
 
                 detail
             }
-            .frame(width: 160)
+            .frame(width: size.width)
             .opacity(isEnabled ? 1 : 0.45)
             .contentShape(Rectangle())
         }
@@ -112,7 +113,7 @@ struct PickItem<Icon: View, Detail: View>: View {
             ) {
                 FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
             } detail: {
-                Text(verbatim: installer.version)
+                Text(verbatim: installer.version.description)
                     .font(.subheadline)
                     .foregroundStyle(Theme.Colors.secondary)
             }

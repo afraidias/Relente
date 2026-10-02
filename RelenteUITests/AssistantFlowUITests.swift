@@ -3,7 +3,7 @@
 //  RelenteUITests
 //
 //  The whole assistant in the running app, with sample data and the Debug-only simulation.
-//  Spec: specs/006-assistant-navigation/spec.md
+//  Specs: specs/006-assistant-navigation/spec.md, specs/007-real-detection/spec.md
 //
 
 import XCTest
@@ -85,5 +85,36 @@ final class AssistantFlowUITests: XCTestCase {
         app.press(.return)
         expectScreen("Choose a USB Drive")
         XCTAssertTrue(app.element("Installer: macOS Tahoe 26.0, 16.8 GB").exists)
+    }
+
+    // MARK: - Empty states
+
+    @MainActor
+    func testWithNoInstallersTheEmptyStateWaitsAndContinueIsDisabled() {
+        app = .relente(extraArguments: ["-sampleEmpty", "installers"])
+        expectScreen("Choose an Installer")
+        expectScreen("No Installers Found")
+        XCTAssertTrue(app.element("Waiting for an installer…").exists)
+        XCTAssertTrue(app.buttons["Add Installer…"].exists)
+        XCTAssertTrue(app.buttons["Download from Apple…"].exists)
+        XCTAssertFalse(app.buttons["Continue"].isEnabled)
+
+        app.press(.return)
+        XCTAssertTrue(app.element("Choose an Installer").exists, "Return must not leave the screen")
+    }
+
+    @MainActor
+    func testWithNoDrivesTheEmptyStateWaitsAndContinueIsDisabled() {
+        app = .relente(extraArguments: ["-sampleEmpty", "drives"])
+        expectScreen("Choose an Installer")
+        app.press(.return)
+        expectScreen("Choose a USB Drive")
+        expectScreen("No USB Drive Connected")
+        XCTAssertTrue(app.element("Waiting for a drive…").exists)
+        XCTAssertTrue(app.element("Installer: macOS Tahoe 26.0, 16.8 GB").exists)
+        XCTAssertFalse(app.buttons["Continue"].isEnabled)
+
+        app.press(.return)
+        XCTAssertFalse(app.element("Review and Create").waitForExistence(timeout: 2))
     }
 }

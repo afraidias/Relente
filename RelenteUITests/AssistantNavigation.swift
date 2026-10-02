@@ -11,7 +11,8 @@ import XCTest
 
 extension XCUIApplication {
 
-    /// Launches Relente in English whatever the language of the Mac running the tests.
+    /// Launches Relente in English whatever the language of the Mac running the tests, with the
+    /// sample installers and drives instead of the Mac's.
     /// `simulationSpeed` "fast" makes the simulated creation last about 2 s.
     @MainActor
     static func relente(simulationSpeed: String = "normal", extraArguments: [String] = []) -> XCUIApplication {
@@ -19,7 +20,8 @@ extension XCUIApplication {
         // A fresh window each time: ignore the windows macOS saved from the last run.
         app.launchArguments =
             [
-                "-simulationSpeed", simulationSpeed, "-AppleLanguages", "(en)", "-AppleLocale", "en_US",
+                "-sampleData", "YES", "-simulationSpeed", simulationSpeed, "-AppleLanguages", "(en)",
+                "-AppleLocale", "en_US",
                 "-ApplePersistenceIgnoreState", "YES",
             ] + extraArguments
         app.launch()

@@ -8,8 +8,8 @@ import SwiftUI
 @main
 struct RelenteApp: App {
     @State private var assistant = Assistant(
-        installers: InstallerSource.samples,
-        drives: Drive.samples,
+        installerService: Self.installerService,
+        driveService: Self.driveService,
         creationService: Self.creationService
     )
 
@@ -17,6 +17,7 @@ struct RelenteApp: App {
         WindowGroup {
             AssistantView(assistant: assistant, thisMac: .current)
                 .environment(\.usesClassicControls, Self.forcesClassicControls)
+                .task { await assistant.start() }
         }
         // Only the window buttons in the top bar, no title.
         .windowStyle(.hiddenTitleBar)
@@ -25,6 +26,42 @@ struct RelenteApp: App {
         .commands {
             AssistantCommands(assistant: assistant)
         }
+    }
+
+    // MARK: - Services
+
+    /// Whether to show the sample installers and drives instead of the Mac's: always under unit
+    /// tests, which must never read the Mac's disks, and in Debug builds launched with
+    /// `-sampleData YES`.
+    private static var usesSampleData: Bool {
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return true }
+        #if DEBUG
+            return UserDefaults.standard.bool(forKey: "sampleData")
+        #else
+            return false
+        #endif
+    }
+
+    /// With sample data, `-sampleEmpty installers` or `-sampleEmpty drives` starts with that list
+    /// empty, to show its empty state. Unit tests make their own services.
+    private static var sampleEmpty: String? {
+        #if DEBUG
+            UserDefaults.standard.string(forKey: "sampleEmpty")
+        #else
+            nil
+        #endif
+    }
+
+    private static var installerService: any InstallerService {
+        guard usesSampleData else { return LiveInstallerService() }
+        // Catalina too, so the sample data shows an unsupported installer as well.
+        let installers = InstallerSource.samples + [InstallerSource.unsupportedSample]
+        return SampleInstallerService(installers: sampleEmpty == "installers" ? [] : installers)
+    }
+
+    private static var driveService: any DriveService {
+        guard usesSampleData else { return LiveDriveService() }
+        return SampleDriveService(drives: sampleEmpty == "drives" ? [] : Drive.samples)
     }
 
     /// How the installer is made. Until roadmap step 7 only Debug builds have one: a simulation

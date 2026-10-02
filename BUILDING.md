@@ -36,6 +36,15 @@ Until `createinstallmedia` is wired up (roadmap step 7), Debug builds simulate c
 - `-simulationSpeed fast`: the simulation lasts about 2 seconds instead of 15 (the UI tests use it).
 - `-simulateFailure driveDisconnected`: the simulation fails partway through Copy, to see the Error screen.
 
+## Sample data (Debug builds)
+
+The app shows the installers in `/Applications` and the USB drives and SD cards plugged in. To walk the assistant without them, run a Debug build with these launch arguments:
+
+- `-sampleData YES`: sample installers and drives instead of the Mac's (the UI tests use it), with every state: an unsupported installer (Catalina), and drives with data, empty and too small. Ejecting does nothing.
+- `-sampleEmpty installers` or `-sampleEmpty drives`, together with `-sampleData YES`: starts with that list empty, to see its empty state.
+
+Unit tests and previews always use the sample data and never read the Mac's disks or `/Applications`.
+
 ## Git hooks
 
 The repository has two git hooks in `.githooks/`: one checks formatting with swift-format before each commit, and the other checks that the commit message follows [Conventional Commits](https://www.conventionalcommits.org/). Turn them on once after cloning:

@@ -10,8 +10,8 @@
 import Foundation
 
 nonisolated struct ReviewSummary: Hashable, Sendable {
-    /// Space in use on the drive, in bytes. All of it will be erased.
-    let erasedBytes: Int64
+    /// What is stored on the drive. All of it will be erased.
+    let erased: UsedSpace
     /// Size of the installer that will be copied, in bytes.
     let installedBytes: Int64
     /// Estimated free space left on the drive afterwards, in bytes. Never negative.
@@ -20,7 +20,8 @@ nonisolated struct ReviewSummary: Hashable, Sendable {
     let installedFraction: Double
 
     init(installer: InstallerSource, drive: Drive) {
-        erasedBytes = drive.usedBytes
+        erased = drive.usedSpace
+        erasesNothing = drive.isEmpty
         installedBytes = installer.size
         freeAfterwardsBytes = max(drive.capacity - installer.size, 0)
         installedFraction =
@@ -29,8 +30,6 @@ nonisolated struct ReviewSummary: Hashable, Sendable {
             : 1
     }
 
-    /// Whether the drive has nothing on it, so nothing but the format will be lost.
-    var erasesNothing: Bool {
-        erasedBytes == 0
-    }
+    /// Whether the drive is empty, so nothing but its format will be lost.
+    let erasesNothing: Bool
 }

@@ -2,7 +2,7 @@
 //  StatusChip.swift
 //  Relente
 //
-//  Small colored label with an icon, such as "Empty" or "Too small".
+//  Small colored label with an icon, such as "Too small" or "Not supported".
 //
 
 import SwiftUI
@@ -41,11 +41,17 @@ struct StatusChip: View {
     let text: LocalizedStringResource
     let tone: Tone
 
+    /// Under a small item (`PickItemSize.compact`) the chip has no icon, so "Too small" fits; its
+    /// text says what the icon would.
+    @Environment(\.pickItemSize) private var itemSize
+
     var body: some View {
         Label {
             Text(text)
         } icon: {
-            Image(systemName: tone.systemImage)
+            if itemSize == .regular {
+                Image(systemName: tone.systemImage)
+            }
         }
         .font(Theme.Fonts.sectionLabel)
         .foregroundStyle(tone.color)
@@ -58,11 +64,11 @@ struct StatusChip: View {
 
 #Preview {
     VStack(alignment: .leading, spacing: 8) {
-        StatusChip(text: Drive.Status.empty.label, tone: .ok)
-        StatusChip(text: Drive.Status.willErase(usedBytes: 9_800_000_000).label, tone: .warning)
-        StatusChip(text: Drive.Status.tooSmall.label, tone: .error)
-        StatusChip(text: Drive.Status.empty.label, tone: .info)
-        StatusChip(text: Drive.Status.empty.label, tone: .neutral)
+        StatusChip(text: "This Mac", tone: .ok)
+        StatusChip(text: "Unknown size", tone: .warning)
+        StatusChip(text: "This Mac", tone: .info)
+        StatusChip(text: "Too small", tone: .error)
+        StatusChip(text: "Not supported", tone: .neutral)
     }
     .padding()
 }
