@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea for Relente.
+description: Suggest a new feature or an improvement to Relente.
 labels: ["enhancement"]
 body:
   - type: markdown
