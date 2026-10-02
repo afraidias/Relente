@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/afraidias/Relente/compare/v0.6.0...v0.7.0) (2026-10-02)
+
+
+### Features
+
+* detect real drives and installers ([#30](https://github.com/afraidias/Relente/issues/30)) ([d4ddbd0](https://github.com/afraidias/Relente/commit/d4ddbd0c7867b5cb94c528429248ed8c674730a4))
+
 ## [0.6.0](https://github.com/afraidias/Relente/compare/v0.5.0...v0.6.0) (2026-10-01)
 
 
