@@ -1,0 +1,52 @@
+name: Roadmap idea
+description: For maintainers. An idea for a roadmap step that no spec has deferred yet (see AGENTS.md).
+labels: ["idea", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are checked before a roadmap step is specified, and the pull request that builds one closes it.
+        Suggesting a feature as a user? Use **Feature request** instead.
+  # Keep these options in sync with the roadmap in README.md ("Project status").
+  - type: dropdown
+    id: roadmap-step
+    attributes:
+      label: Roadmap step
+      description: The step whose spec should consider this idea.
+      options:
+        - "1. Project setup"
+        - "2. Folder structure and design system"
+        - "3. Static screens with sample data"
+        - "4. Assistant navigation and animations"
+        - "5. Real disk and installer detection"
+        - "6. System helper, XPC and security checks"
+        - "7. createinstallmedia with live progress"
+        - "8. Signing, notarization and first release"
+        - "9. Download installers from Apple"
+        - "No roadmap step yet"
+    validations:
+      required: true
+  - type: input
+    id: why-this-step
+    attributes:
+      label: Why this step?
+      placeholder: "The accessibility pass before the first release"
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: What would change, and why. Name the files, types or screens involved.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Measurements, trade-offs, conflicts with AGENTS.md, and what to check when building it.
+  - type: input
+    id: found-in
+    attributes:
+      label: Where did it come from?
+      placeholder: "Found while checking spec 006 (assistant navigation)"
+    validations:
+      required: true
