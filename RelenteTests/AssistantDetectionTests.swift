@@ -132,7 +132,7 @@ extension AssistantDetectionTests {
         assistant.continueToReview()
         assistant.screenChangeDidEnd()
         assistant.hasConfirmed = true
-        assistant.eraseAndCreate()
+        await assistant.eraseAndCreate()
         assistant.screenChangeDidEnd()
 
         assistant.updateDrives([])
@@ -140,7 +140,7 @@ extension AssistantDetectionTests {
         #expect(assistant.creation?.failure?.reason == .driveDisconnected)
     }
 
-    @Test func `Try Again after unplugging goes to USB Drive, even with the drive back`() {
+    @Test func `Try Again after unplugging goes to USB Drive, even with the drive back`() async {
         let assistant = Assistant(
             installerService: SampleInstallerService(installers: [tahoe]),
             driveService: SampleDriveService(drives: [stick]),
@@ -153,7 +153,7 @@ extension AssistantDetectionTests {
         assistant.continueToReview()
         assistant.screenChangeDidEnd()
         assistant.hasConfirmed = true
-        assistant.eraseAndCreate()
+        await assistant.eraseAndCreate()
         assistant.screenChangeDidEnd()
         assistant.updateDrives([])
         // Plugged in again before "Try Again" (Checkpoint D): it comes back unselected.
@@ -216,9 +216,11 @@ extension AssistantDetectionTests {
 
 /// A run that never ends on its own, like one in progress.
 nonisolated private struct NeverEndingCreationService: CreationService {
-    var isSimulated: Bool { true }
+    var simulation: CreationSimulation? { .everything }
 
-    func create(installer: InstallerSource, drive: Drive) -> AsyncStream<CreationEvent> {
+    func create(installer: InstallerSource, drive: Drive, authorization: EraseAuthorization?)
+        -> AsyncStream<CreationEvent>
+    {
         AsyncStream { _ in }
     }
 }
@@ -293,7 +295,7 @@ extension AssistantDetectionTests {
         assistant.continueToReview()
         assistant.screenChangeDidEnd()
         assistant.hasConfirmed = true
-        assistant.eraseAndCreate()
+        await assistant.eraseAndCreate()
         await waitUntil { assistant.step == .done }
         assistant.screenChangeDidEnd()
         return assistant
@@ -348,9 +350,11 @@ extension AssistantDetectionTests {
 
 /// A run that finishes at once.
 nonisolated private struct FinishingCreationService: CreationService {
-    var isSimulated: Bool { true }
+    var simulation: CreationSimulation? { .everything }
 
-    func create(installer: InstallerSource, drive: Drive) -> AsyncStream<CreationEvent> {
+    func create(installer: InstallerSource, drive: Drive, authorization: EraseAuthorization?)
+        -> AsyncStream<CreationEvent>
+    {
         AsyncStream { continuation in
             continuation.yield(.finished)
             continuation.finish()

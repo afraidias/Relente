@@ -12,6 +12,7 @@ struct RelenteApp: App {
         driveService: Self.driveService,
         helperService: Self.helperService,
         helperClient: Self.helperClient,
+        authorizer: Self.authorizer,
         creationService: Self.creationService
     )
 
@@ -87,12 +88,20 @@ struct RelenteApp: App {
     /// One connection to the helper for the whole app.
     private static let liveHelperClient = LiveHelperClient()
 
-    /// How the installer is made. Until roadmap step 7 only Debug builds have one: a simulation
-    /// that erases nothing and says so on screen. `-simulationSpeed fast` makes it last about 2 s
-    /// and `-simulateFailure driveDisconnected` makes it fail during Copy. Release builds have
-    /// none, so "Erase and Create" stays disabled (spec 006).
+    /// Asks for the administrator's authorization before each real erase; pretended with sample
+    /// data, where nothing is erased.
+    private static var authorizer: any EraseAuthorizer {
+        usesSampleData ? SampleEraseAuthorizer() : LiveEraseAuthorizer()
+    }
+
+    /// How the installer is made. Until roadmap step 7 only Debug builds have one: with real
+    /// drives, the helper really formats the drive and the rest is simulated (spec 008); with
+    /// sample data, everything is simulated and nothing is erased. `-simulationSpeed fast` makes
+    /// the full simulation last about 2 s and `-simulateFailure driveDisconnected` makes it fail
+    /// during Copy. Release builds have none, so "Erase and Create" stays disabled (spec 006).
     private static var creationService: (any CreationService)? {
         #if DEBUG
+            guard usesSampleData else { return HelperCreationService(client: liveHelperClient) }
             let defaults = UserDefaults.standard
             return SimulatedCreationService(
                 speed: .init(launchArgument: defaults.string(forKey: "simulationSpeed")),

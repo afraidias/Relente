@@ -271,6 +271,12 @@ A drive unplugged during Format fails with the existing "The drive was disconnec
 - **An outdated helper** (an older app's helper still running after an update): the app compares
   `protocolVersion`; if it differs, it reconnects once (launchd starts the new one); if it still
   differs, the "didn't respond" failure.
+- **The format gives the drive a new identity:** erasing writes a new partition map, so the drive's
+  media UUID (the id the app follows it by, spec 007) changes. While a creation runs, and on Done,
+  the assistant follows the drive by its BSD name (`disk4`), which stays the same while it's
+  connected, so the run isn't taken for a disconnection and "Eject" still finds it. During Format
+  the drive may also vanish for a moment while `diskutil` repartitions it; a real disconnection
+  then comes from the helper ("The drive was disconnected.").
 - **The drive is unplugged and another one plugged in with the same BSD name:** the fingerprint
   differs, refused.
 - **A drive reformatted in Disk Utility between Review and the erase:** its media UUID changes,

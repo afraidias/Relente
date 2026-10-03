@@ -16,8 +16,8 @@ struct CreatingView: View {
     let drive: Drive
     /// Running, or stopped with a reason. Both share this layout, so the screen doesn't jump.
     let state: CreationState
-    /// Whether the creation is only simulated (Debug builds): a label then says so.
-    var isSimulated = false
+    /// What the creation only pretended (Debug builds), or `nil`: a label then says so.
+    var simulation: CreationSimulation?
 
     var body: some View {
         let progress = state.progress
@@ -32,8 +32,8 @@ struct CreatingView: View {
                 )
             }
 
-            if isSimulated {
-                SimulationLabel()
+            if let simulation {
+                SimulationLabel(simulation: simulation)
                     .padding(.top, 8)
             }
 
@@ -336,12 +336,12 @@ struct CreationErrorFooter: View {
 struct CreatingScreen: View {
     var state = CreationState.running(.sampleMidCopy)
     var isConfirmingCancel = false
-    var isSimulated = false
+    var simulation: CreationSimulation?
 
     var body: some View {
         VStack(spacing: 0) {
             CreatingView(
-                installer: InstallerSource.samples[0], drive: Drive.samples[0], state: state, isSimulated: isSimulated
+                installer: InstallerSource.samples[0], drive: Drive.samples[0], state: state, simulation: simulation
             )
             .padding(.horizontal, 32)
             .padding(.bottom, 24)
@@ -388,11 +388,11 @@ struct CreatingScreen: View {
 }
 
 #Preview("Simulated") {
-    CreatingScreen(isSimulated: true)
+    CreatingScreen(simulation: .everything)
 }
 
 #Preview("Error, simulated") {
-    CreatingScreen(state: .failed(.sampleDriveDisconnected), isSimulated: true)
+    CreatingScreen(state: .failed(.sampleDriveDisconnected), simulation: .afterFormat)
 }
 
 #Preview("Cancel confirmation") {

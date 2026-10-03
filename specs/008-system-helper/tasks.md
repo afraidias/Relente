@@ -138,7 +138,7 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
 
 ## Phase 3: Erase and Create
 
-- [ ] Task 10: Authorizer
+- [x] Task 10: Authorizer
   - Acceptance: `EraseAuthorizer` live (dialog in a `@concurrent` function, with Relente's own
     localized prompt, `.cancelled` when cancelled) and sample. (`HelperClient.format` and `cancel`
     were built in Task 9; a `nil` reply or a version that still differs after one reconnection
@@ -147,7 +147,7 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
   - Files: `Relente/Services/EraseAuthorizer.swift`, `Relente/Services/LiveEraseAuthorizer.swift`,
     `Relente/Resources/Localizable.xcstrings`
 
-- [ ] Task 11: Format, then simulate (test-driven where it's logic)
+- [x] Task 11: Format, then simulate (test-driven where it's logic)
   - Acceptance: `CreationService.simulation` (`.everything`, `.afterFormat`) replaces
     `isSimulated`; `HelperCreationService` (Debug) formats through the client with no percentage,
     then continues the simulated timeline from Copy, and maps outcomes to reasons; four new
@@ -159,7 +159,7 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
     `Relente/Models/CreationFailure.swift`, `Relente/Components/SimulationLabel.swift`,
     `RelenteTests/HelperCreationServiceTests.swift`
 
-- [ ] Task 12: Erase and Create asks first
+- [x] Task 12: Erase and Create asks first
   - Acceptance: `eraseAndCreate()` is async: helper not ready → the "System Helper Is Off" alert
     ("Open Settings…" default, "Cancel" Esc); authorization cancelled → stays on Review with the
     checkbox checked; otherwise Creating with the authorization; Review shows `touchid` or `lock`;
@@ -167,7 +167,9 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
   - Verify: `AssistantEraseTests` with sample authorizer and helper service; full unit suite.
   - Files: `Relente/App/Assistant.swift`, `Relente/App/RelenteApp.swift`,
     `Relente/Views/ReviewView.swift`, `Relente/Views/AssistantView.swift`,
-    `RelenteTests/AssistantEraseTests.swift`
+    `RelenteTests/AssistantEraseTests.swift`. *(Also: while creating and on Done the drive is
+    followed by its BSD name, since the format gives it a new media UUID; during Format a
+    vanishing drive is left to the helper to report. Spec Edge cases.)*
 
 ### Checkpoint C: Real erase (manual, with the owner's USB drive)
 - [ ] Authorization asked (note whether Touch ID is offered; if not, apply the spec's fallback);

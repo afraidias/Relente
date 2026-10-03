@@ -153,7 +153,7 @@ struct AssistantHelperTests {
             creationService: SimulatedCreationService(speed: .normal, failure: nil))
         goTo(.review, assistant)
         assistant.hasConfirmed = true
-        assistant.eraseAndCreate()
+        await assistant.eraseAndCreate()
         settle(assistant)
 
         try? await helper.unregister()
@@ -214,7 +214,7 @@ struct AssistantHelperTests {
         assistant.continueToReview()
         settle(assistant)
         assistant.hasConfirmed = true
-        assistant.eraseAndCreate()
+        await assistant.eraseAndCreate()
         #expect(assistant.step == .creating)
         #expect(!assistant.canUninstallHelper)
 

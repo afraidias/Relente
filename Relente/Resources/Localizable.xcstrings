@@ -1,6 +1,94 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Check it's the right drive and choose it again." : {
+      "comment" : "Error screen: what to do when the drive changed after confirming it.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba que es la memoria correcta y vuelve a elegirla."
+          }
+        }
+      }
+    },
+    "Relente can only erase USB drives and SD cards." : {
+      "comment" : "Error screen: the helper refused the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relente solo puede borrar memorias USB y tarjetas SD."
+          }
+        }
+      }
+    },
+    "Relente wants to erase a drive to make a macOS installer on it." : {
+      "comment" : "Shown in macOS's authorization dialog (Touch ID or password) before each erase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relente quiere borrar una memoria para crear en ella un instalador de macOS."
+          }
+        }
+      }
+    },
+    "SIMULATION · Only the format is real" : {
+      "comment" : "Label shown when the drive is really erased but the rest is simulated (Debug builds).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIMULACIÓN · Solo el formateo es real"
+          }
+        }
+      }
+    },
+    "The drive changed after you confirmed it." : {
+      "comment" : "Error screen: the drive about to be erased isn't the one confirmed on Review.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La memoria ha cambiado después de confirmarla."
+          }
+        }
+      }
+    },
+    "The drive couldn't be erased." : {
+      "comment" : "Error screen: diskutil failed to erase the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido borrar la memoria."
+          }
+        }
+      }
+    },
+    "The system helper didn't respond." : {
+      "comment" : "Error screen: the helper didn't answer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ayudante del sistema no ha respondido."
+          }
+        }
+      }
+    },
+    "The System Helper Is Off" : {
+      "comment" : "Title of the alert when Erase and Create finds the helper off.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ayudante del sistema está desactivado"
+          }
+        }
+      }
+    },
     "The system helper was turned off." : {
       "comment" : "VoiceOver, when the helper is turned off in System Settings and the app goes back to Permissions.",
       "localizations" : {
@@ -8,6 +96,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se ha desactivado el ayudante del sistema."
+          }
+        }
+      }
+    },
+    "Try again. If it keeps happening, quit and open Relente again." : {
+      "comment" : "Error screen: what to do when the helper didn't respond.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a intentarlo. Si sigue pasando, cierra Relente y vuelve a abrirlo."
+          }
+        }
+      }
+    },
+    "Turn on Relente in System Settings › General › Login Items, then try again." : {
+      "comment" : "Message of the alert when Erase and Create finds the helper off.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa Relente en Ajustes del Sistema › General › Ítems de inicio y vuelve a intentarlo."
+          }
+        }
+      }
+    },
+    "Use a different drive." : {
+      "comment" : "Error screen: what to do when the helper refused the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa otra memoria."
           }
         }
       }

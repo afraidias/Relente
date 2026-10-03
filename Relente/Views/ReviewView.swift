@@ -247,6 +247,10 @@ struct ReviewFooter: View {
     let hasConfirmed: Bool
     /// False in Release builds until roadmap step 7: the button stays disabled, with a help tag.
     var canCreate = true
+    /// Touch ID or the password: the symbol on "Erase and Create" says which macOS will ask for.
+    var authenticationMethod = AuthenticationMethod.touchID
+    /// True while macOS's authorization dialog is open.
+    var isAuthorizing = false
     let onBack: () -> Void
     let onErase: () -> Void
 
@@ -258,13 +262,13 @@ struct ReviewFooter: View {
                 Label {
                     Text("Erase and Create", comment: "Button that erases the drive and creates the installer.")
                 } icon: {
-                    // It asks for Touch ID (or the password; see spec 005, open items).
-                    Image(systemName: "touchid")
+                    // What macOS will ask for: Touch ID, or the password (`lock`) without it.
+                    Image(systemName: authenticationMethod.symbolName)
                 }
             }
             .buttonStyle(.primary)
             .tint(Theme.Colors.danger)
-            .disabled(!hasConfirmed || !canCreate)
+            .disabled(!hasConfirmed || !canCreate || isAuthorizing)
             .help(
                 canCreate
                     ? Text(verbatim: "")

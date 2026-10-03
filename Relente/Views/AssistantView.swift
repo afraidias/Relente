@@ -92,6 +92,18 @@ struct AssistantView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             assistant.refreshHelperStatus()
         }
+        .alert(
+            Text("The System Helper Is Off", comment: "Title of the alert when Erase and Create finds the helper off."),
+            isPresented: $assistant.isShowingHelperOffAlert
+        ) {
+            Button("Open Settings…", action: assistant.openHelperSettingsFromAlert)
+                .keyboardShortcut(.defaultAction)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(
+                "Turn on Relente in System Settings › General › Login Items, then try again.",
+                comment: "Message of the alert when Erase and Create finds the helper off.")
+        }
         .onChange(of: assistant.step) { oldStep, newStep in
             // First let the current screen learn how it will leave, then change it on the next
             // frame: a leaving screen keeps the transition it was last drawn with.
@@ -265,11 +277,11 @@ struct AssistantView: View {
             if let installer = assistant.creationInstaller, let drive = assistant.creationDrive,
                 let creation = assistant.creation
             {
-                CreatingView(installer: installer, drive: drive, state: creation, isSimulated: assistant.isSimulated)
+                CreatingView(installer: installer, drive: drive, state: creation, simulation: assistant.simulation)
             }
         case .done:
             if let result = assistant.result {
-                DoneView(result: result, thisMac: thisMac, isSimulated: assistant.isSimulated)
+                DoneView(result: result, thisMac: thisMac, simulation: assistant.simulation)
             }
         }
     }
@@ -298,8 +310,10 @@ struct AssistantView: View {
             ReviewFooter(
                 hasConfirmed: assistant.hasConfirmed,
                 canCreate: assistant.canCreate,
+                authenticationMethod: authenticationMethod,
+                isAuthorizing: assistant.isAuthorizing,
                 onBack: assistant.goBack,
-                onErase: assistant.eraseAndCreate
+                onErase: { Task { await assistant.eraseAndCreate() } }
             )
         case .creating:
             if assistant.creation?.failure == nil {
