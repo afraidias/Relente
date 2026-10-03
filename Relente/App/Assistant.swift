@@ -5,11 +5,12 @@
 //  The assistant's shared state: the current screen, what was chosen, and how the last screen
 //  change should animate. Every user action checks it's allowed on the current screen and does
 //  nothing otherwise.
-//  Spec: specs/006-assistant-navigation/spec.md
+//  Spec: specs/006-assistant-navigation/spec.md, specs/008-system-helper/spec.md
 //
 
 import Foundation
 import Observation
+import os
 
 @MainActor
 @Observable
@@ -19,7 +20,7 @@ final class Assistant {
     /// As the drive service finds them.
     private(set) var drives: [Drive] = []
 
-    private(set) var step: AssistantStep = .installer
+    private(set) var step: AssistantStep
     private(set) var selectedInstallerID: InstallerSource.ID?
     private(set) var selectedDriveID: Drive.ID?
     /// The Review checkbox. Unchecked every time Review is shown.
@@ -48,6 +49,10 @@ final class Assistant {
 
     private(set) var disconnection: Disconnection?
 
+    /// The helper stopped being ready on Installer, USB Drive or Review, which sent the assistant
+    /// back to Permissions. VoiceOver announces it; the id tells two of them apart.
+    private(set) var helperTurnedOff: UUID?
+
     /// True while Done's drive is being ejected.
     private(set) var isEjecting = false
     /// Why the last eject failed, shown as an alert on Done.
@@ -55,27 +60,48 @@ final class Assistant {
     /// Why the file the user chose can't be used, shown as an alert on Installer.
     private(set) var installerError: InstallerError?
 
+    /// Where the system helper stands, shown on Permissions.
+    private(set) var helperStatus: HelperStatus
+    /// Why uninstalling the helper failed, shown as an alert.
+    private(set) var helperUninstallError: HelperError?
+    /// "Uninstall System Helper…" was chosen: its confirmation is shown.
+    var isConfirmingHelperUninstall = false
+
     private let installerService: any InstallerService
     private let driveService: any DriveService
+    private let helperService: any HelperService
+    private let helperClient: any HelperClient
+    private let logger = Logger(subsystem: "com.afraidias.Relente", category: "helper")
     /// `nil` in Release builds until roadmap step 7: "Erase and Create" is then disabled.
     private let creationService: (any CreationService)?
     private var creationTask: Task<Void, Never>?
     private var hasStarted = false
 
+    /// Starts on Permissions when the system helper isn't ready, otherwise on Installer.
     init(
         installerService: any InstallerService, driveService: any DriveService,
+        helperService: any HelperService = SampleHelperService(), helperClient: any HelperClient = SampleHelperClient(),
         creationService: (any CreationService)? = nil
     ) {
         self.installerService = installerService
         self.driveService = driveService
+        self.helperService = helperService
+        self.helperClient = helperClient
         self.creationService = creationService
+        let status = helperService.status
+        helperStatus = status
+        step = status == .ready ? .installer : .permissions
     }
 
     /// An assistant that starts with these installers and drives, for previews and tests.
-    convenience init(installers: [InstallerSource], drives: [Drive], creationService: (any CreationService)? = nil) {
+    convenience init(
+        installers: [InstallerSource], drives: [Drive], helperService: any HelperService = SampleHelperService(),
+        creationService: (any CreationService)? = nil
+    ) {
         self.init(
             installerService: SampleInstallerService(installers: installers),
-            driveService: SampleDriveService(drives: drives), creationService: creationService)
+            driveService: SampleDriveService(drives: drives), helperService: helperService,
+            creationService: creationService)
         updateInstallers(installers)
         updateDrives(drives)
     }
@@ -89,7 +115,17 @@ final class Assistant {
         hasStarted = true
         async let installers: Void = followInstallers()
         async let drives: Void = followDrives()
-        _ = await (installers, drives)
+        async let helper: Void = followHelper()
+        _ = await (installers, drives, helper)
+    }
+
+    /// macOS doesn't say when the user turns the helper on or off in System Settings, so its
+    /// status is read every 2 s (and when the app becomes active, through the view).
+    private func followHelper() async {
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(2))
+            refreshHelperStatus()
+        }
     }
 
     private func followInstallers() async {
@@ -207,9 +243,97 @@ final class Assistant {
                 return
             }
             selectedDriveID = pickable[min(max(index + offset, 0), pickable.count - 1)].id
-        case .review, .creating, .done:
+        case .permissions, .review, .creating, .done:
             break
         }
+    }
+
+    // MARK: - System helper
+
+    /// Reads the helper's status again. If it stopped being ready on Installer, USB Drive or
+    /// Review, the assistant crossfades back to Permissions, keeping the chosen installer and
+    /// drive; a creation or Done is never interrupted.
+    func refreshHelperStatus() {
+        // A failure stays on screen until the user tries again.
+        if case .failed = helperStatus, helperService.status == .notInstalled { return }
+        let wasReady = helperStatus == .ready
+        updateHelperStatus(helperService.status)
+        guard wasReady, helperStatus != .ready, step == .installer || step == .drive || step == .review else {
+            return
+        }
+        helperTurnedOff = UUID()
+        change(to: .permissions, .back, .crossfade, byUser: false)
+    }
+
+    /// When the helper becomes ready, connects to it once: that starts it, which adds the erase
+    /// right, and shows in the log that the connection works.
+    private func updateHelperStatus(_ status: HelperStatus) {
+        let becameReady = status == .ready && helperStatus != .ready
+        helperStatus = status
+        guard becameReady else { return }
+        Task {
+            let connects = await helperClient.connectsToCurrentHelper()
+            logger.info("Helper ready; connection \(connects ? "works" : "failed", privacy: .public)")
+        }
+    }
+
+    /// Permissions' "Install" and "Try Again".
+    func installHelper() async {
+        guard step == .permissions else { return }
+        do {
+            try await helperService.register()
+            updateHelperStatus(helperService.status)
+        } catch {
+            helperStatus = .failed(error)
+        }
+    }
+
+    /// Permissions' "Open Settings…".
+    func openHelperSettings() {
+        helperService.openSettings()
+    }
+
+    /// Permissions' "Continue", once the helper is ready.
+    func continueFromPermissions() {
+        guard step == .permissions, helperStatus == .ready else { return }
+        change(to: .installer, .forward, .crossfade)
+    }
+
+    /// Whether "Uninstall System Helper…" is available: the helper is installed and no drive is
+    /// being formatted or created.
+    var canUninstallHelper: Bool {
+        guard helperStatus == .ready || helperStatus == .needsApproval else { return false }
+        if step == .creating, case .running = creation { return false }
+        return true
+    }
+
+    /// "Uninstall System Helper…": asks for confirmation first.
+    func requestHelperUninstall() {
+        guard canUninstallHelper else { return }
+        isConfirmingHelperUninstall = true
+    }
+
+    /// "Uninstall System Helper…", once confirmed: unregisters it and goes to Permissions,
+    /// keeping the chosen installer. If macOS refuses, `helperUninstallError` holds why.
+    func uninstallHelper() async {
+        isConfirmingHelperUninstall = false
+        guard canUninstallHelper else { return }
+        do {
+            try await helperService.unregister()
+        } catch {
+            helperUninstallError = error
+            return
+        }
+        helperStatus = helperService.status
+        selectedDriveID = nil
+        if step != .permissions {
+            change(to: .permissions, .back, .crossfade, byUser: false)
+        }
+    }
+
+    /// The uninstall failure alert's "OK".
+    func dismissHelperUninstallError() {
+        helperUninstallError = nil
     }
 
     // MARK: - Moving between screens
@@ -238,7 +362,7 @@ final class Assistant {
         switch step {
         case .drive: change(to: .installer, .back, .slide)
         case .review: change(to: .drive, .back, .slide)
-        case .installer, .creating, .done: break
+        case .permissions, .installer, .creating, .done: break
         }
     }
 

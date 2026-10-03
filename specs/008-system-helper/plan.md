@@ -46,7 +46,8 @@ choice, the helper-off alert, the new failure reasons, the simulation label's se
   Hardened Runtime, bundle identifier `com.afraidias.Relente.Helper` with its Info.plist embedded
   in the binary, so it signs with that identifier). Only the live pieces, which can't run in
   tests: `main.swift` (listener on the Mach service, `setConnectionCodeSigningRequirement`, run
-  loop, quits after 60 s idle), `HelperService.swift` (the exported object, calls the pipeline),
+  loop), `HelperListener.swift` (accepts connections, quits after 60 s idle),
+  `HelperRequestHandler.swift` (the exported object, calls the pipeline),
   `LiveAuthorizationChecker.swift` (creates the right if missing with `AuthorizationRightSet`,
   checks it with `AuthorizationCreateFromExternalForm` + `AuthorizationCopyRights` without
   interaction), `LiveDiskReader.swift` (DiskArbitration, using the shared mapping),

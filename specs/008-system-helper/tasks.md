@@ -68,7 +68,7 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
 
 ## Phase 2: The helper runs, and Permissions installs it
 
-- [ ] Task 6: Helper live pieces
+- [x] Task 6: Helper live pieces
   - Acceptance: listener on the Mach service with `setConnectionCodeSigningRequirement`; the
     exported object runs `FormatPipeline`; live authorization checker (creates the right if
     missing, checks without interaction), disk reader (DiskArbitration), formatter (`Process`,
@@ -76,10 +76,10 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
     `helper` without fingerprints or serial numbers.
   - Verify: builds with no warnings (checked running at Checkpoint B).
   - Files: `RelenteHelper/main.swift`, `RelenteHelper/HelperListener.swift`,
-    `RelenteHelper/LiveAuthorizationChecker.swift`, `RelenteHelper/LiveDiskReader.swift`,
+    `RelenteHelper/HelperRequestHandler.swift`, `RelenteHelper/LiveAuthorizationChecker.swift`, `RelenteHelper/LiveDiskReader.swift`,
     `RelenteHelper/LiveDiskFormatter.swift`
 
-- [ ] Task 7: Helper service and the Permissions step (test-driven on the assistant)
+- [x] Task 7: Helper service and the Permissions step (test-driven on the assistant)
   - Acceptance: `HelperService` live (`SMAppService`) and sample; `AssistantStep.permissions`
     without a step number; the assistant starts on Permissions unless the helper is ready;
     install, refresh, continue (crossfade) and uninstall (crossfade back, installer kept, not
@@ -89,25 +89,31 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
     `Relente/Services/SampleHelperService.swift`, `Relente/Models/AssistantStep.swift`,
     `Relente/App/Assistant.swift` (+ `RelenteApp.swift` wiring, `RelenteTests/AssistantHelperTests.swift`)
 
-- [ ] Task 8: Permissions screen
-  - Acceptance: header, two `PermissionRow`s with each status's badge and button, reassurance
-    line, footer without step indicator, "Continue" enabled and default only when Ready; refresh
-    every 2 s and on becoming active; VoiceOver announces status changes; `AuthenticationMethod`
-    picks `touchid`/`lock` and the texts; previews for every status (light, dark, classic);
-    strings in English and Spanish.
+- [x] Task 8: Permissions screen
+  - Acceptance: option E of the canvas (spec Decision 9): header, the app icon as hero with a
+    halo and `StatusBadge` per status, the status line and "Waiting for approval…", the blue
+    authorization `Callout`, and one footer button that is the default action; refresh every 2 s
+    and on becoming active; VoiceOver announces status changes; `AuthenticationMethod` picks
+    `touchid`/`lock` and the texts; previews for every status (light, dark, classic); strings in
+    English and Spanish. *(A first version with Settings-style rows was replaced at the owner's
+    request; `WarningCallout` became `Callout` with a warning and an info tone, and Error's badge
+    became the shared `StatusBadge`.)*
   - Verify: `AuthenticationMethodTests`; previews; screen reviewed at Checkpoint B.
-  - Files: `Relente/Views/PermissionsView.swift`, `Relente/Components/PermissionRow.swift`,
-    `Relente/Models/AuthenticationMethod.swift`, `Relente/Views/AssistantView.swift`,
-    `Relente/Resources/Localizable.xcstrings`
+  - Files: `Relente/Views/PermissionsView.swift`, `Relente/Components/Callout.swift`,
+    `Relente/Components/StatusBadge.swift`, `Relente/Models/AuthenticationMethod.swift`,
+    `Relente/Views/AssistantView.swift` (+ `Localizable.xcstrings`, `ReviewView.swift`,
+    `CreatingView.swift`)
 
-- [ ] Task 9: Uninstall menu item, and the first XPC call
+- [x] Task 9: Uninstall menu item, and the first XPC call
   - Acceptance: "Uninstall System Helper…" after About, disabled while creating; the alert
     ("Cancel" answers Return and Esc, "Uninstall" click only); failure alert. `HelperClient` with
     `protocolVersion` over a connection with `setCodeSigningRequirement`, called when Permissions
     reaches Ready.
   - Verify: builds; checked by hand at Checkpoint B.
   - Files: `Relente/App/AssistantCommands.swift`, `Relente/Views/AssistantView.swift`,
-    `Relente/Services/HelperClient.swift`, `Relente/Services/LiveHelperClient.swift`,
+    `Relente/Views/UninstallHelperSheet.swift`, `Relente/Components/AlertSheet.swift` (spec 004's
+    alert-like sheet, now shared with "Stop"), `Relente/Services/HelperClient.swift`,
+    `Relente/Services/LiveHelperClient.swift` (the whole client: version, format and cancel),
     `Relente/Resources/Localizable.xcstrings`
 
 ### Checkpoint B: Helper installed (manual, with the owner)
@@ -120,13 +126,14 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
 
 ## Phase 3: Erase and Create
 
-- [ ] Task 10: Authorizer and format over XPC
-  - Acceptance: `EraseAuthorizer` live (dialog in a `@concurrent` function, `.cancelled` when
-    cancelled) and sample; `HelperClient.format` and `cancel`; an interrupted connection or a
-    version that still differs after one reconnection gives `helperUnavailable`.
+- [ ] Task 10: Authorizer
+  - Acceptance: `EraseAuthorizer` live (dialog in a `@concurrent` function, with Relente's own
+    localized prompt, `.cancelled` when cancelled) and sample. (`HelperClient.format` and `cancel`
+    were built in Task 9; a `nil` reply or a version that still differs after one reconnection
+    becomes `helperUnavailable` in Task 11.)
   - Verify: builds; sample used in tests; checked at Checkpoint C.
   - Files: `Relente/Services/EraseAuthorizer.swift`, `Relente/Services/LiveEraseAuthorizer.swift`,
-    `Relente/Services/HelperClient.swift`, `Relente/Services/LiveHelperClient.swift`
+    `Relente/Resources/Localizable.xcstrings`
 
 - [ ] Task 11: Format, then simulate (test-driven where it's logic)
   - Acceptance: `CreationService.simulation` (`.everything`, `.afterFormat`) replaces

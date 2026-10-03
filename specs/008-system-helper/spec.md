@@ -18,8 +18,9 @@ the drive (spec 007) and the Permissions screen (spec 007, `docs/product.md`), a
 Create" shows a `lock` instead of `touchid` on Macs without Touch ID (specs 005 and 006).
 
 Chosen by the owner before writing the spec: real format with the rest simulated; Permissions
-with two items (helper and authorization), without Full Disk Access; Permissions shown whenever
-the helper is missing; uninstalling from the app menu.
+about the helper and the authorization, without Full Disk Access; Permissions shown whenever the
+helper is missing; uninstalling from the app menu. Permissions' layout was then chosen on a
+design canvas (Decision 9).
 
 ## Behavior
 
@@ -71,39 +72,44 @@ the helper is missing; uninstalling from the app menu.
   aren't written to the log.
 
 ### Permissions screen (new, "step 0")
-Shown at launch instead of Installer when the helper isn't installed and approved: first launch,
-after uninstalling it, or after the user turns it off in System Settings. When the helper is
-ready, the app starts on Installer and this screen is never shown.
+Shown whenever the helper isn't installed and approved (Decision 3):
+- **At launch**, instead of Installer: the first launch, after uninstalling it, or after the user
+  turned it off in System Settings. When the helper is ready, the app starts on Installer.
+- **While the app runs**, the app keeps reading the helper's status (every 2 s and when the app
+  becomes active). If it stops being ready on Installer, USB Drive or Review (the user turned
+  Relente off in System Settings, or removed it), the assistant crossfades back to Permissions,
+  keeping the chosen installer and drive, and VoiceOver says "The system helper was turned
+  off.". Once it's ready again, "Continue" goes to Installer with both still chosen.
+- **Never during a creation or on Done:** a format that loses the helper fails with "The system
+  helper didn't respond." (below); Done and Error stay as they are.
 
-Layout, as `docs/product.md` describes it (its contents change; see "Changes to earlier
-features"):
-- The app icon, then the header: **"Set Up Relente"** and the subtitle "Relente needs a small
-  system helper to erase drives. You only do this once.".
-- Two items in a column, styled like System Settings rows (a colored rounded-square icon, a title,
-  a line of explanation, and a status badge or action at the trailing edge):
+Layout: option **E** of the design canvas "Relente · Permissions", chosen by the owner so the
+screen looks like the assistant's other screens (Decision 9). It replaces the three
+Settings-style items `docs/product.md` described.
+- **Header:** **"Set Up Relente"** and the subtitle "Relente needs a small system helper to erase
+  drives. You only do this once.", as on every screen.
+- **Hero:** the app icon (104 pt) in a halo, like the drive on Review, Creating and Done. Under it,
+  one line saying where the helper stands, and the waiting indicator of the empty states while
+  macOS waits for the user:
 
-  | Item | Icon | Explanation | Trailing edge |
-  | --- | --- | --- | --- |
-  | **System Helper** | `lock.shield`, blue | "Erases and prepares drives for Relente. It runs only while Relente uses it." | The helper's status (below) |
-  | **Administrator Authorization** | `touchid` (`lock` on Macs without Touch ID), red | "Each erase asks for Touch ID or your password." (or "…for your password." without Touch ID) | Nothing: it's asked for at each erase |
+  | Status | Halo and badge | Line under the hero | Waiting indicator | Footer button |
+  | --- | --- | --- | --- | --- |
+  | Not installed | Blue (accent), no badge | "The system helper isn't installed." | — | **"Install Helper"** |
+  | Waiting for approval (macOS needs the user to turn it on) | Blue, no badge | "Turn on Relente in System Settings › General › Login Items." | "Waiting for approval…" | **"Open Settings…"**, which opens Login Items |
+  | Ready | Green, with a green check badge (as on Done) | "System helper ready." | — | **"Continue"** |
+  | Failed (registering failed) | Red, with a red badge (as on Error) | "The system helper couldn't be installed." and macOS's reason below it, gray | — | **"Try Again"** |
 
-- **System Helper's status**, which updates by itself (checked when the app becomes active, and
-  every 2 s while the screen is shown):
-
-  | Status | Trailing edge |
-  | --- | --- |
-  | Not installed | "Install" button |
-  | Waiting for approval (macOS needs the user to turn it on) | Orange "Needs approval" badge and "Open Settings…" button, which opens System Settings › General › Login Items |
-  | Ready | Green "Ready" badge |
-  | Failed (registering failed) | Red "Couldn't install" badge, the reason as the help tag, and "Try Again" |
-
-- Below the items, a gray reassurance line: "Relente never erases a drive without asking you
-  first."
-- **Footer:** no step indicator (it isn't one of the four steps); "Continue", primary, disabled
-  until System Helper is Ready, and the default action once it is. Before that, the default
-  action (Return) is the item's own button ("Install", "Open Settings…" or "Try Again").
+  The status updates by itself: it's read again when the app becomes active and every 2 s while
+  the screen is shown.
+- **Callout** (the content width, 640 pt, styled like Review's warning but blue, since it only
+  informs): the `touchid` symbol (`lock` without Touch ID), **"Each erase asks for your
+  permission"** and "With Touch ID or your administrator password, every time. Relente never
+  erases a drive without asking you first." (without Touch ID: "With your administrator password,
+  every time. …").
+- **Footer:** no step indicator (it isn't one of the four steps); one primary button, the default
+  action (Return), which is the next thing to do (table above).
 - "Continue" goes to Installer with a crossfade (as a start). VoiceOver announces each status
-  change of System Helper ("System helper ready.").
+  change ("System helper ready.").
 
 ### Erase and Create (changes specs 003, 004 and 006)
 In Debug builds with real drives:
@@ -161,19 +167,32 @@ A drive unplugged during Format fails with the existing "The drive was disconnec
   for approval to Ready after a moment, so the whole Permissions screen can be walked and tested.
 
 ## Changes to earlier features
+- **Spec 002 (USB Drive screen):** the drive's artwork (`DriveArtwork`) is drawn in the opaque
+  system gray (`systemGray`) instead of the see-through secondary color, so it's the same gray on
+  every screen: before, the hero's halo showed through it, tinting it blue on Review and Creating,
+  green on Done and red on Error (found by the owner while reviewing the badges; chosen on the
+  canvas, row "La memoria, igual en todas las pantallas").
 - **Spec 003 (Review screen):** "Erase and Create" asks for authorization first; cancelling the
   dialog stays on Review; the helper-off alert; `lock` instead of `touchid` without Touch ID.
 - **Spec 004 (Creating screen + Error):** Format is real in Debug with real drives, with no
-  percentage; four new failure reasons, two of which send "Try Again" to USB Drive.
-- **Spec 005 (Done screen):** the `lock` symbol item it deferred is done here (on Review).
+  percentage; four new failure reasons, two of which send "Try Again" to USB Drive. Error's red
+  badge becomes the shared `StatusBadge`: an opaque circle with a white cross, inside a ring that
+  sets it apart from the artwork (white in light mode, the window's background in dark mode). The
+  system symbol had no ring and, over the see-through drive, looked see-through too; found by the
+  owner while reviewing Permissions and chosen on the canvas (frame "Insignias").
+- **Spec 005 (Done screen):** the `lock` symbol item it deferred is done here (on Review). The
+  check on the installer's icon becomes the same `StatusBadge` (20 pt instead of 18, so the ring
+  fits), so every check and cross in the app looks alike.
 - **Spec 006 (Assistant navigation):** a Permissions screen before Installer, without a step
-  number, entered at launch or after uninstalling; the simulation label gets a second text;
+  number, entered at launch, after uninstalling, or when the helper stops being ready on
+  Installer, USB Drive or Review (crossfading back, keeping the choices); the simulation label gets a second text;
   `SimulatedCreationService` keeps the full simulation for sample data and the UI test.
 - **Spec 007 (Real detection):** the rule that tells which disks are USB drives or SD cards moves
   to the shared code, unchanged, so the helper uses the same one; drives also carry their serial
   number, for the fingerprint.
-- `docs/product.md`: Permissions screen (two items instead of three, shown whenever the helper is
-  missing), the label, the `lock` symbol, the menu item. SECURITY.md gains how to uninstall the
+- `docs/product.md`: Permissions screen (option E: header, the app icon as hero, a status line,
+  the authorization callout and one footer button, instead of three Settings-style items; shown
+  whenever the helper is missing), the label, the `lock` symbol, the menu item. SECURITY.md gains how to uninstall the
   helper. BUILDING.md: the helper target and how to approve it while developing.
 
 ## Acceptance criteria
@@ -200,9 +219,13 @@ A drive unplugged during Format fails with the existing "The drive was disconnec
 **Permissions**
 - [ ] With the helper missing, the app opens on Permissions; when ready, on Installer (tested on
   the assistant with the sample helper service).
-- [ ] Each System Helper status shows its badge and button; "Open Settings…" opens Login Items;
-  turning the helper on in System Settings updates the screen within 2 s without clicking; and
-  "Continue" is enabled only when Ready (tested with the sample service, and by hand).
+- [ ] Turning the helper off on Installer, USB Drive or Review goes back to Permissions within 2 s,
+  keeping the installer and drive; "Continue" then returns to Installer with both chosen; on
+  Creating and Done nothing changes (tested; and by hand in System Settings).
+- [ ] Each helper status shows its halo, badge, line and footer button (option E); "Open
+  Settings…" opens Login Items; turning the helper on in System Settings updates the screen within
+  2 s without clicking; and "Continue" appears only when Ready (tested with the sample service,
+  and by hand).
 - [ ] The UI test walks Permissions (`-sampleHelper notInstalled`) and then the whole flow.
 
 **Erase and Create**
@@ -239,9 +262,9 @@ A drive unplugged during Format fails with the existing "The drive was disconnec
 
 ## Edge cases
 - **The user cancels the authorization dialog:** stays on Review, nothing sent to the helper.
-- **The helper is turned off in System Settings while on steps 1–3:** the alert on "Erase and
-  Create" (above); Permissions is only shown at launch or after uninstalling, so the user doesn't
-  lose their place.
+- **The helper is turned off in System Settings while on steps 1–3:** back to Permissions, keeping
+  the choices (above). If it happens in the 2 s before the next check and the user clicks "Erase
+  and Create" first, the alert on "Erase and Create" (above) catches it.
 - **An outdated helper** (an older app's helper still running after an update): the app compares
   `protocolVersion`; if it differs, it reconnects once (launchd starts the new one); if it still
   differs, the "didn't respond" failure.
@@ -263,14 +286,17 @@ A drive unplugged during Format fails with the existing "The drive was disconnec
 1. **The format is real in this step; the rest stays simulated.** Chosen by the owner: it's the
    only way to check rules 3 and 5 end to end, with a real erase right after the fingerprint
    check. The label says so, since "Nothing is erased" would be false.
-2. **Permissions has two items, without Full Disk Access or "Signature verified".** Chosen by the
-   owner. The helper runs as root and writes to the disk directly, and the app never reads
+2. **Permissions is about the helper and the authorization, without Full Disk Access or
+   "Signature verified".** Chosen by the owner. The helper runs as root and writes to the disk directly, and the app never reads
    protected folders, so Full Disk Access isn't needed (to confirm in roadmap step 7 with
    `createinstallmedia`). The signature checks aren't something the user grants: they happen
    between the app and the helper, and are covered by rule 2.
-3. **Permissions appears whenever the helper is missing, at launch.** Chosen by the owner. During
-   the flow, a missing helper is an alert on "Erase and Create" instead, so the user doesn't lose
-   the installer and drive they chose.
+3. **Permissions appears whenever the helper is missing, also while the app runs.** Chosen by the
+   owner. The first version of this spec only showed it at launch, so turning the helper off with
+   the app open said nothing until "Erase and Create"; the owner found it at Checkpoint B and asked
+   for it to be noticed at once (seen on the canvas "Relente · Permissions", row "Si desactivas el
+   ayudante con la app abierta"). The assistant keeps the chosen installer and drive, as it does
+   when a drive is unplugged on Review (spec 007), and never interrupts a creation.
 4. **Uninstall from the app menu.** Chosen by the owner: no Settings window is needed for one
    action.
 5. **The helper accepts drives of 8 GB to 2 TB.** The smallest supported installer (Big Sur) needs
@@ -290,6 +316,14 @@ A drive unplugged during Format fails with the existing "The drive was disconnec
    click and one authorization. The name is Apple's; `createinstallmedia` renames the drive in
    roadmap step 7, and until then it's what the Finder shows after a simulated run (Done still
    shows the name the real creation will leave, as built in spec 005).
+
+9. **Permissions looks like the other screens (option E of the canvas "Relente · Permissions").**
+   Chosen by the owner after a first version with Settings-style rows (option A) and three other
+   layouts (compact rows, two columns, numbered steps) that didn't match the rest of the app. It
+   uses the parts every screen has: the header, a hero with a halo and a badge, the waiting
+   indicator of the empty states, a callout at the content width, and one primary button in the
+   footer that is always the next thing to do. The callout is blue rather than orange because it
+   only informs. The app icon is the hero because the helper has no artwork of its own.
 
 ## Open questions
 None.

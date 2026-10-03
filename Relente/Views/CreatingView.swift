@@ -101,9 +101,7 @@ struct CreatingHero: View {
                 .sharedArtwork(.drive)
         } badge: {
             if isFailed {
-                Image(systemName: "xmark.circle.fill")
-                    .resizable()
-                    .foregroundStyle(.white, Theme.Colors.danger)
+                StatusBadge(kind: .failure)
             } else {
                 FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
                     .sharedArtwork(.installer)
@@ -284,49 +282,17 @@ struct StopCreationSheet: View {
     let onStop: () -> Void
 
     var body: some View {
-        // Laid out like a macOS alert: the app's icon (centered), then the title and message.
-        VStack(alignment: .leading, spacing: 12) {
-            Image(nsImage: NSApplication.shared.applicationIconImage)
-                .resizable()
-                .frame(width: 64, height: 64)
-                .frame(maxWidth: .infinity)
-                .accessibilityHidden(true)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Stop creating the installer?", comment: "Title of the alert shown when cancelling the creation.")
-                    .font(.headline)
-                Text(
-                    "“\(driveName)” will be left unusable until it's erased again.",
-                    comment: "Message of the cancel alert. The value is the drive's name, e.g. SanDisk Ultra."
-                )
-            }
-            .multilineTextAlignment(.leading)
-            .fixedSize(horizontal: false, vertical: true)
-
-            HStack(spacing: 8) {
-                Button(role: .destructive, action: onStop) {
-                    Text("Stop", comment: "Alert button: stop creating the installer.")
-                        .frame(maxWidth: .infinity)
-                }
-                // Gray like the other choice in a macOS alert; still destructive for VoiceOver.
-                .buttonStyle(.secondary)
-
-                Button(action: onKeepGoing) {
-                    Text("Keep Going", comment: "Alert button: don't stop, keep creating the installer.")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.primary)
-                // Return keeps going…
-                .keyboardShortcut(.defaultAction)
-            }
-            // Large, as in macOS alerts; side by side because there are two (Apple's guidelines).
-            .controlSize(.large)
-            .padding(.top, 8)
-        }
-        .padding(20)
-        .frame(width: 300, alignment: .leading)
-        // …and so does Esc.
-        .onExitCommand(perform: onKeepGoing)
+        AlertSheet(
+            title: Text(
+                "Stop creating the installer?", comment: "Title of the alert shown when cancelling the creation."),
+            message: Text(
+                "“\(driveName)” will be left unusable until it's erased again.",
+                comment: "Message of the cancel alert. The value is the drive's name, e.g. SanDisk Ultra."),
+            action: Text("Stop", comment: "Alert button: stop creating the installer."),
+            actionRole: .destructive,
+            safeChoice: Text("Keep Going", comment: "Alert button: don't stop, keep creating the installer."),
+            onAction: onStop,
+            onSafeChoice: onKeepGoing)
     }
 }
 

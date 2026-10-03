@@ -22,8 +22,10 @@ struct DriveArtwork: View {
         Image(systemName: systemImage)
             .resizable()
             .scaledToFit()
-            .symbolRenderingMode(.hierarchical)
-            .foregroundStyle(.secondary)
+            // Opaque, so it's the same gray on every screen: a see-through gray took the color of
+            // the hero's halo behind it (spec 008).
+            .symbolRenderingMode(.monochrome)
+            .foregroundStyle(Color(nsColor: .systemGray))
             .padding(14)
             .accessibilityHidden(true)
     }

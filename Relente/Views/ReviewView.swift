@@ -218,7 +218,7 @@ struct EraseWarning: View {
     @Binding var hasConfirmed: Bool
 
     var body: some View {
-        WarningCallout(
+        Callout(
             title: LocalizedStringResource(
                 "Everything on “\(driveName)” will be permanently erased.",
                 comment: "Review screen warning. The value is the drive's name, e.g. SanDisk Ultra."

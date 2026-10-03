@@ -117,7 +117,7 @@ previews always use them.
   subtitle `.body` (13 pt), section labels `.subheadline.weight(.semibold)` (11 pt), small text
   `.callout` (12 pt).
 - Reusable components, one `View` each (e.g. `StatusChip`, `HeroArtwork`, `PickItem`, `BigStat`,
-  `PhaseBar`, `StepIndicator`, `WarningCallout`, `KeyCap`, `StartUpCard`).
+  `PhaseBar`, `StepIndicator`, `Callout`, `StatusBadge`, `KeyCap`, `StartUpCard`).
 - One content width for the column under the hero (figures, bars, callouts, cards):
   `Theme.Sizes.contentWidth` (640 pt), the same on every screen.
 - Buttons: `.buttonStyle(.primary)` for the main action, `.buttonStyle(.secondary)` for others,

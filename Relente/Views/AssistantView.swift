@@ -9,6 +9,7 @@
 //  Spec: specs/006-assistant-navigation/spec.md
 //
 
+import AppKit
 import SwiftUI
 
 struct AssistantView: View {
@@ -28,6 +29,11 @@ struct AssistantView: View {
     @State private var changingFrom: AssistantStep?
     /// The last disconnection VoiceOver announced, so each is said once.
     @State private var announcedDisconnection: UUID?
+    /// The last time the helper was turned off that VoiceOver announced.
+    @State private var announcedHelperTurnedOff: UUID?
+    /// Touch ID or the password, read again on every screen change (a keyboard with Touch ID may
+    /// have been connected).
+    @State private var authenticationMethod = AuthenticationMethod.current
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -66,12 +72,33 @@ struct AssistantView: View {
             stepIndicator(at: anchors[footerStep]?[.stepIndicator])
         }
         .frame(width: Theme.Sizes.window.width, height: Theme.Sizes.window.height)
+        .sheet(isPresented: $assistant.isConfirmingHelperUninstall) {
+            UninstallHelperSheet(
+                onUninstall: { Task { await assistant.uninstallHelper() } },
+                onCancel: { assistant.isConfirmingHelperUninstall = false })
+        }
+        .alert(
+            Text("The System Helper Couldn't Be Uninstalled", comment: "Title of the alert when uninstalling fails."),
+            isPresented: Binding(
+                get: { assistant.helperUninstallError != nil },
+                set: { if !$0 { assistant.dismissHelperUninstallError() } }),
+            presenting: assistant.helperUninstallError
+        ) { _ in
+            Button("OK", action: assistant.dismissHelperUninstallError)
+        } message: { error in
+            Text(error.message)
+        }
+        // The helper may have been turned on or off in System Settings meanwhile.
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            assistant.refreshHelperStatus()
+        }
         .onChange(of: assistant.step) { oldStep, newStep in
             // First let the current screen learn how it will leave, then change it on the next
             // frame: a leaving screen keeps the transition it was last drawn with.
             change = assistant.lastChange
             changingFrom = oldStep
             footerStep = newStep
+            authenticationMethod = .current
             Task {
                 try? await Task.sleep(for: .milliseconds(16))
                 withAnimation(animation) {
@@ -82,6 +109,7 @@ struct AssistantView: View {
                     // VoiceOver reads the new screen from its title (see `ScreenHeader`).
                     AccessibilityNotification.ScreenChanged().post()
                     announceDisconnection()
+                    announceHelperTurnedOff()
                 }
             }
         }
@@ -98,6 +126,19 @@ struct AssistantView: View {
             String(
                 localized: "“\(disconnection.driveName)” was disconnected.",
                 comment: "VoiceOver, when the chosen drive is unplugged on Review. The value is the drive's name.")
+        ).post()
+    }
+
+    /// After the helper was turned off and the assistant went back to Permissions, VoiceOver says
+    /// why, once the screen is in place.
+    private func announceHelperTurnedOff() {
+        guard let turnedOff = assistant.helperTurnedOff, turnedOff != announcedHelperTurnedOff else { return }
+        announcedHelperTurnedOff = turnedOff
+        AccessibilityNotification.Announcement(
+            String(
+                localized: "The system helper was turned off.",
+                comment:
+                    "VoiceOver, when the helper is turned off in System Settings and the app goes back to Permissions.")
         ).post()
     }
 
@@ -149,9 +190,9 @@ struct AssistantView: View {
     /// the number move when the step changes instead of being redrawn.
     private func stepIndicator(at mark: Anchor<CGRect>?) -> some View {
         GeometryReader { proxy in
-            if let mark {
+            if let mark, let number = footerStep.stepNumber {
                 let rect = proxy[mark]
-                StepIndicator(current: footerStep.stepNumber, total: AssistantStep.stepCount, name: footerStep.stepName)
+                StepIndicator(current: number, total: AssistantStep.stepCount, name: footerStep.stepName)
                     .fixedSize()
                     .frame(width: rect.width, height: rect.height, alignment: .leading)
                     .position(x: rect.midX, y: rect.midY)
@@ -181,7 +222,7 @@ struct AssistantView: View {
 
     private var shownDrive: Drive? {
         switch shownStep {
-        case .installer: nil
+        case .permissions, .installer: nil
         case .drive, .review: assistant.selectedDrive
         case .creating: assistant.creationDrive
         case .done: assistant.result?.drive
@@ -190,6 +231,7 @@ struct AssistantView: View {
 
     private var shownInstaller: InstallerSource? {
         switch shownStep {
+        case .permissions: nil
         case .installer, .drive, .review: assistant.selectedInstaller
         case .creating: assistant.creationInstaller
         case .done: assistant.result?.installer
@@ -201,6 +243,8 @@ struct AssistantView: View {
     @ViewBuilder
     private func screen(for step: AssistantStep) -> some View {
         switch step {
+        case .permissions:
+            PermissionsView(helperStatus: assistant.helperStatus, authenticationMethod: authenticationMethod)
         case .installer:
             InstallerView(
                 installers: assistant.installers, selectedID: installerSelection,
@@ -236,6 +280,12 @@ struct AssistantView: View {
     @ViewBuilder
     private func footer(for step: AssistantStep) -> some View {
         switch step {
+        case .permissions:
+            PermissionsFooter(
+                status: assistant.helperStatus,
+                onInstall: { Task { await assistant.installHelper() } },
+                onOpenSettings: assistant.openHelperSettings,
+                onContinue: assistant.continueFromPermissions)
         case .installer:
             InstallerFooter(canContinue: assistant.selectedInstaller != nil, onContinue: assistant.continueToDrive)
         case .drive:

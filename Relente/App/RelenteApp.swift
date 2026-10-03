@@ -10,6 +10,8 @@ struct RelenteApp: App {
     @State private var assistant = Assistant(
         installerService: Self.installerService,
         driveService: Self.driveService,
+        helperService: Self.helperService,
+        helperClient: Self.helperClient,
         creationService: Self.creationService
     )
 
@@ -63,6 +65,27 @@ struct RelenteApp: App {
         guard usesSampleData else { return LiveDriveService() }
         return SampleDriveService(drives: sampleEmpty == "drives" ? [] : Drive.samples)
     }
+
+    /// The system helper. With sample data it's pretended and ready, unless `-sampleHelper
+    /// notInstalled` starts it not installed, to walk Permissions; it's then approved by itself
+    /// a moment after "Install".
+    private static var helperService: any HelperService {
+        guard usesSampleData else { return LiveHelperService() }
+        #if DEBUG
+            if UserDefaults.standard.string(forKey: "sampleHelper") == "notInstalled" {
+                return SampleHelperService(status: .notInstalled)
+            }
+        #endif
+        return SampleHelperService(status: .ready)
+    }
+
+    /// Talks to the system helper over XPC; pretended with sample data.
+    private static var helperClient: any HelperClient {
+        usesSampleData ? SampleHelperClient() : liveHelperClient
+    }
+
+    /// One connection to the helper for the whole app.
+    private static let liveHelperClient = LiveHelperClient()
 
     /// How the installer is made. Until roadmap step 7 only Debug builds have one: a simulation
     /// that erases nothing and says so on screen. `-simulationSpeed fast` makes it last about 2 s
