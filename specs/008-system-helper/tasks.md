@@ -117,12 +117,24 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
     `Relente/Resources/Localizable.xcstrings`
 
 ### Checkpoint B: Helper installed (manual, with the owner)
-- [ ] Install → Needs approval → Open Settings… → turn on → Ready within 2 s → Continue; the
-  `helper` log shows the version request accepted.
-- [ ] An ad-hoc re-signed copy of the app is refused (rule 2); `codesign -d -r-` matches the
-  requirement strings.
-- [ ] Uninstall from the menu: gone from Login Items, Permissions shown.
-- [ ] Owner reviews Permissions (light, dark, classic, VoiceOver, Reduce Motion).
+- [x] Install → Needs approval → Open Settings… → turn on → Ready within 2 s → Continue; the
+  `helper` log shows the version request accepted. *(launchd runs it on demand; "Connection
+  accepted" and "Helper ready; connection works" in the log.)*
+- [x] An ad-hoc signed program is refused (rule 2). *(A small unsigned program calling
+  `protocolVersion` got "Couldn't communicate with a helper application"; the helper logged
+  "Dropping check-in message due to code signing requirement", status -67050. The "cannot open
+  file … DetachedSignatures" line the Security framework logs while checking signatures is
+  harmless.)*
+- [x] Turning Relente off in System Settings on Review: back to Permissions within 2 s, with the
+  installer and drive still chosen after turning it on again and pressing Continue.
+- [x] Uninstall from the menu: Return and Esc cancel; "Uninstall" removes it from Login Items and
+  Permissions is shown.
+- [x] Owner reviews Permissions (light, dark, classic, VoiceOver, Reduce Motion). *(Checked by
+  the agent with UI-test screenshots in Spanish: light and classic in the real app, dark through
+  renders; VoiceOver's order from the accessibility tree: title, subtitle, status line, "Waiting
+  for approval…", callout, button. The line under the hero now keeps its space in every status,
+  so the hero no longer moves up by 10 pt on "Needs approval". Reduce Motion: Permissions only
+  crossfades. Dark mode in the real app checked by the owner.)*
 
 ## Phase 3: Erase and Create
 

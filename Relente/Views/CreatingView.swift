@@ -97,8 +97,10 @@ struct CreatingHero: View {
         let tint = isFailed ? Theme.Colors.danger : Theme.Colors.accent
 
         let artwork = HeroArtwork(size: 90, haloColor: tint) {
+            // Once it stopped, the screen draws the drive itself: the assistant draws shared
+            // artwork above the whole screen, which would cover the cross's ring (spec 008).
             DriveArtwork(kind: drive.kind)
-                .sharedArtwork(.drive)
+                .sharedArtwork(.drive, isActive: !isFailed)
         } badge: {
             if isFailed {
                 StatusBadge(kind: .failure)

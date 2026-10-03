@@ -185,7 +185,10 @@ A drive unplugged during Format fails with the existing "The drive was disconnec
   fits), so every check and cross in the app looks alike.
 - **Spec 006 (Assistant navigation):** a Permissions screen before Installer, without a step
   number, entered at launch, after uninstalling, or when the helper stops being ready on
-  Installer, USB Drive or Review (crossfading back, keeping the choices); the simulation label gets a second text;
+  Installer, USB Drive or Review (crossfading back, keeping the choices); once a creation fails,
+  the Error screen draws the drive itself instead of handing it to the assistant, which draws
+  shared artwork above the whole screen and so covered the cross's ring (found by the owner); so
+  on "Try Again" the drive comes in with Review instead of flying to it; the simulation label gets a second text;
   `SimulatedCreationService` keeps the full simulation for sample data and the UI test.
 - **Spec 007 (Real detection):** the rule that tells which disks are USB drives or SD cards moves
   to the shared code, unchanged, so the helper uses the same one; drives also carry their serial

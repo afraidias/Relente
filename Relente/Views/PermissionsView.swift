@@ -84,21 +84,27 @@ struct PermissionsHero: View {
                 }
             }
 
-            VStack(spacing: 6) {
-                Text(statusLine)
-                    .font(.body.weight(.semibold))
-                    .multilineTextAlignment(.center)
-                if case .failed(let error) = status {
+            Text(statusLine)
+                .font(.body.weight(.semibold))
+                .multilineTextAlignment(.center)
+
+            // One line under it, whose space is always kept so the hero never moves when the
+            // status changes: the waiting indicator, macOS's reason for a failure, or nothing.
+            ZStack {
+                WaitingIndicator(text: "Waiting for approval…")
+                    .hidden()
+                switch status {
+                case .needsApproval:
+                    WaitingIndicator(text: "Waiting for approval…")
+                case .failed(let error):
                     Text(error.message)
                         .font(Theme.Fonts.footnote)
                         .foregroundStyle(Theme.Colors.secondary)
                         .multilineTextAlignment(.center)
+                        .lineLimit(1)
+                case .notInstalled, .ready:
+                    EmptyView()
                 }
-            }
-            .accessibilityElement(children: .combine)
-
-            if status == .needsApproval {
-                WaitingIndicator(text: "Waiting for approval…")
             }
         }
     }
