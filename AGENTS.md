@@ -57,8 +57,8 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild test -scheme
 # Universal Release build, warnings as errors (as CI does)
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild build -scheme Relente -configuration Release -destination 'generic/platform=macOS' CODE_SIGNING_ALLOWED=NO
 # Format and lint
-xcrun swift-format format -i -r Relente RelenteTests RelenteUITests
-xcrun swift-format lint -r --strict Relente RelenteTests RelenteUITests
+xcrun swift-format format -i -r Relente RelenteHelper Shared RelenteTests RelenteUITests
+xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteTests RelenteUITests
 ```
 
 ## Boundaries
@@ -204,7 +204,7 @@ macOS installers only, from Big Sur (11) onwards; destinations are USB drives an
 
 1. Builds with no errors or warnings.
 2. All tests pass; new logic has tests.
-3. `xcrun swift-format lint -r --strict Relente RelenteTests RelenteUITests` passes.
+3. `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteTests RelenteUITests` passes.
 4. New views have a `#Preview`.
 5. New strings are in the String Catalog with Spanish.
 6. Works in light and dark mode, with VoiceOver and with Reduce Motion (or the spec's Open Items

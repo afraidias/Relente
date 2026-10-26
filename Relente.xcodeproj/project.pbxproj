@@ -6,7 +6,19 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		722280B7306FFCEF00C4D635 /* RelenteHelper in Embed Helper */ = {isa = PBXBuildFile; fileRef = 722280A5306FF8B000C4D635 /* RelenteHelper */; };
+		722280BA306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist in Embed Launch Daemon */ = {isa = PBXBuildFile; fileRef = 722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		722280B4306FFC8F00C4D635 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72314885306D07860090943B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 722280A4306FF8B000C4D635;
+			remoteInfo = RelenteHelper;
+		};
 		7231489B306D07870090943B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 72314885306D07860090943B /* Project object */;
@@ -23,7 +35,30 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		722280B6306FFCAF00C4D635 /* Embed Helper */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = Executables;
+			files = (
+				722280B7306FFCEF00C4D635 /* RelenteHelper in Embed Helper */,
+			);
+			name = "Embed Helper";
+		};
+		722280B8306FFD0E00C4D635 /* Embed Launch Daemon */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = Contents/Library/LaunchDaemons;
+			dstSubfolder = Wrapper;
+			files = (
+				722280BA306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist in Embed Launch Daemon */,
+			);
+			name = "Embed Launch Daemon";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		722280A5306FF8B000C4D635 /* RelenteHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RelenteHelper; sourceTree = BUILT_PRODUCTS_DIR; };
+		722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = com.afraidias.Relente.Helper.plist; path = Config/com.afraidias.Relente.Helper.plist; sourceTree = "<group>"; };
 		7231488D306D07860090943B /* Relente.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Relente.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7231489A306D07870090943B /* RelenteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RelenteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		723148A4306D07870090943B /* RelenteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RelenteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -31,6 +66,16 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		722280A6306FF8B000C4D635 /* RelenteHelper */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RelenteHelper;
+			sourceTree = "<group>";
+		};
+		722280B1306FFBEB00C4D635 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		7231488F306D07860090943B /* Relente */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Relente;
@@ -49,6 +94,11 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		722280A2306FF8B000C4D635 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		7231488A306D07860090943B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -70,10 +120,13 @@
 		72314884306D07860090943B = {
 			isa = PBXGroup;
 			children = (
+				722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist */,
+				722280B1306FFBEB00C4D635 /* Shared */,
 				72F0A0022FB0000000000001 /* Config */,
 				7231488F306D07860090943B /* Relente */,
 				7231489D306D07870090943B /* RelenteTests */,
 				723148A7306D07870090943B /* RelenteUITests */,
+				722280A6306FF8B000C4D635 /* RelenteHelper */,
 				7231488E306D07860090943B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,6 +137,7 @@
 				7231488D306D07860090943B /* Relente.app */,
 				7231489A306D07870090943B /* RelenteTests.xctest */,
 				723148A4306D07870090943B /* RelenteUITests.xctest */,
+				722280A5306FF8B000C4D635 /* RelenteHelper */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -99,6 +153,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		722280A4306FF8B000C4D635 /* RelenteHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 722280A9306FF8B000C4D635 /* Build configuration list for PBXNativeTarget "RelenteHelper" */;
+			buildPhases = (
+				722280A1306FF8B000C4D635 /* Sources */,
+				722280A2306FF8B000C4D635 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				722280A6306FF8B000C4D635 /* RelenteHelper */,
+				722280B1306FFBEB00C4D635 /* Shared */,
+			);
+			name = RelenteHelper;
+			productName = RelenteHelper;
+			productReference = 722280A5306FF8B000C4D635 /* RelenteHelper */;
+			productType = "com.apple.product-type.tool";
+		};
 		7231488C306D07860090943B /* Relente */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 723148AC306D07870090943B /* Build configuration list for PBXNativeTarget "Relente" */;
@@ -106,10 +178,16 @@
 				72314889306D07860090943B /* Sources */,
 				7231488A306D07860090943B /* Frameworks */,
 				7231488B306D07860090943B /* Resources */,
+				722280B6306FFCAF00C4D635 /* Embed Helper */,
+				722280B8306FFD0E00C4D635 /* Embed Launch Daemon */,
 			);
 			buildRules = (
 			);
+			dependencies = (
+				722280B5306FFC8F00C4D635 /* PBXTargetDependency */,
+			);
 			fileSystemSynchronizedGroups = (
+				722280B1306FFBEB00C4D635 /* Shared */,
 				7231488F306D07860090943B /* Relente */,
 			);
 			name = Relente;
@@ -169,6 +247,9 @@
 				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
+					722280A4306FF8B000C4D635 = {
+						CreatedOnToolsVersion = 27.0;
+					};
 					7231488C306D07860090943B = {
 						CreatedOnToolsVersion = 27.0;
 					};
@@ -200,6 +281,7 @@
 				7231488C306D07860090943B /* Relente */,
 				72314899306D07870090943B /* RelenteTests */,
 				723148A3306D07870090943B /* RelenteUITests */,
+				722280A4306FF8B000C4D635 /* RelenteHelper */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +305,11 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		722280A1306FF8B000C4D635 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		72314889306D07860090943B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -241,6 +328,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		722280B5306FFC8F00C4D635 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 722280A4306FF8B000C4D635 /* RelenteHelper */;
+			targetProxy = 722280B4306FFC8F00C4D635 /* PBXContainerItemProxy */;
+		};
 		7231489C306D07870090943B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 7231488C306D07860090943B /* Relente */;
@@ -254,6 +346,38 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		722280AA306FF8B000C4D635 /* Debug configuration for PBXNativeTarget "RelenteHelper" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				DEVELOPMENT_TEAM = 99TLZFAX53;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.afraidias.Relente.Helper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+			};
+			name = Debug;
+		};
+		722280AB306FF8B000C4D635 /* Release configuration for PBXNativeTarget "RelenteHelper" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				DEVELOPMENT_TEAM = 99TLZFAX53;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.afraidias.Relente.Helper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+			};
+			name = Release;
+		};
 		723148AA306D07870090943B /* Debug configuration for PBXProject "Relente" */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72F0A0012FB0000000000001 /* Version.xcconfig */;
@@ -513,6 +637,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		722280A9306FF8B000C4D635 /* Build configuration list for PBXNativeTarget "RelenteHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				722280AA306FF8B000C4D635 /* Debug configuration for PBXNativeTarget "RelenteHelper" */,
+				722280AB306FF8B000C4D635 /* Release configuration for PBXNativeTarget "RelenteHelper" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		72314888306D07860090943B /* Build configuration list for PBXProject "Relente" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

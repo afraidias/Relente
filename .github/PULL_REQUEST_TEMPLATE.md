@@ -8,7 +8,7 @@
 
 - [ ] Builds with no errors or warnings (Swift 6 strict concurrency).
 - [ ] All tests pass, and new logic has tests.
-- [ ] `xcrun swift-format lint -r --strict Relente RelenteTests RelenteUITests` passes.
+- [ ] `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteTests RelenteUITests` passes.
 - [ ] New views have a `#Preview`.
 - [ ] New UI strings are in the String Catalog, with Spanish translations.
 - [ ] Checked in light and dark mode, with VoiceOver and with Reduce Motion (or the spec's Open items record where that check is deferred to).

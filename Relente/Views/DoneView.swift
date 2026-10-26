@@ -13,8 +13,8 @@ struct DoneView: View {
     let result: CreationResult
     /// The kind of Mac in use, whose start-up card is marked "This Mac".
     let thisMac: MacArchitecture
-    /// Whether the creation was only simulated (Debug builds): a label then says so.
-    var isSimulated = false
+    /// What the creation only pretended (Debug builds), or `nil`: a label then says so.
+    var simulation: CreationSimulation?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -26,8 +26,8 @@ struct DoneView: View {
                 )
             )
 
-            if isSimulated {
-                SimulationLabel()
+            if let simulation {
+                SimulationLabel(simulation: simulation)
                     .padding(.top, 8)
             }
 
@@ -267,13 +267,13 @@ struct DoneScreen: View {
     var result = CreationResult.sample
     var thisMac = MacArchitecture.appleSilicon
     var isShowingHelp = false
-    var isSimulated = false
+    var simulation: CreationSimulation?
     var isEjecting = false
     var ejectFailure: EjectError?
 
     var body: some View {
         VStack(spacing: 0) {
-            DoneView(result: result, thisMac: thisMac, isSimulated: isSimulated)
+            DoneView(result: result, thisMac: thisMac, simulation: simulation)
                 .padding(.horizontal, 32)
                 .padding(.bottom, 24)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -327,7 +327,7 @@ struct DoneScreen: View {
 }
 
 #Preview("Simulated") {
-    DoneScreen(isSimulated: true)
+    DoneScreen(simulation: .everything)
 }
 
 #Preview("Help open") {

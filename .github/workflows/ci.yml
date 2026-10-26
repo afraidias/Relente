@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: swift-format lint
-        run: xcrun swift-format lint -r --strict Relente RelenteTests RelenteUITests
+        run: xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteTests RelenteUITests
 
   build-and-test:
     name: Build & test
@@ -70,8 +70,12 @@ jobs:
       - name: Check architectures and minimum macOS
         run: |
           app=$(find ~/Library/Developer/Xcode/DerivedData -path '*/Build/Products/Release/Relente.app' -maxdepth 5 | head -n 1)
-          binary="$app/Contents/MacOS/Relente"
-          archs=$(lipo -archs "$binary")
-          echo "Architectures: $archs"
-          [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || { echo "::error::Release build is not universal"; exit 1; }
+          # The app and the system helper embedded in it.
+          for binary in "$app/Contents/MacOS/Relente" "$app/Contents/MacOS/RelenteHelper"; do
+            archs=$(lipo -archs "$binary")
+            echo "$(basename "$binary") architectures: $archs"
+            [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || { echo "::error::$(basename "$binary") is not universal"; exit 1; }
+          done
+          test -f "$app/Contents/Library/LaunchDaemons/com.afraidias.Relente.Helper.plist" \
+            || { echo "::error::The helper's launchd plist is missing"; exit 1; }
           echo "Minimum macOS: $(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$app/Contents/Info.plist")"

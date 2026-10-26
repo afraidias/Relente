@@ -3,18 +3,28 @@
 //  Relente
 //
 //  Says, under the header of Creating, Error and Done, that the creation is only simulated, so
-//  it can't be mistaken for the real thing. Debug builds only use it, until roadmap step 7.
+//  it can't be mistaken for the real thing: nothing at all is erased, or only the format is real
+//  (spec 008). Debug builds only use it, until roadmap step 7.
 //  Spec: specs/006-assistant-navigation/spec.md
 //
 
 import SwiftUI
 
 struct SimulationLabel: View {
+    let simulation: CreationSimulation
+
     var body: some View {
         Label {
-            Text(
-                "SIMULATION · Nothing is erased",
-                comment: "Label shown while the creation is only simulated (Debug builds).")
+            switch simulation {
+            case .everything:
+                Text(
+                    "SIMULATION · Nothing is erased",
+                    comment: "Label shown while the creation is only simulated (Debug builds).")
+            case .afterFormat:
+                Text(
+                    "SIMULATION · Only the format is real",
+                    comment: "Label shown when the drive is really erased but the rest is simulated (Debug builds).")
+            }
         } icon: {
             Image(systemName: "testtube.2")
         }
@@ -30,8 +40,8 @@ struct SimulationLabel: View {
 
 #Preview {
     VStack(spacing: 20) {
-        SimulationLabel()
-        SimulationLabel()
+        SimulationLabel(simulation: .everything)
+        SimulationLabel(simulation: .afterFormat)
             .environment(\.colorScheme, .dark)
             .padding()
             .background(.black)

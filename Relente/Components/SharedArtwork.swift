@@ -23,8 +23,8 @@ nonisolated enum SharedArtwork: Hashable, Sendable {
     /// Whether `step`'s screen has a place for this artwork.
     func isMarked(on step: AssistantStep) -> Bool {
         switch self {
-        case .installer, .stepIndicator: true
-        case .drive: step != .installer
+        case .installer, .stepIndicator: step != .permissions
+        case .drive: step != .installer && step != .permissions
         }
     }
 

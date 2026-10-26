@@ -20,6 +20,12 @@ The app itself runs on **macOS 14 Sonoma and later**, on Apple silicon and Intel
 
 The app is not sandboxed (it needs a privileged helper to erase disks), so it can't be distributed through the Mac App Store.
 
+### Testing the live helper
+
+For a real helper run, build the Debug app with your development team selected for both `Relente` and `RelenteHelper`. Launch the app and choose **Install Helper**. When macOS asks for approval, open **System Settings → General → Login Items & Extensions**, enable Relente under **Allow in the Background**, then return to the app and wait for **System helper ready** before continuing. The live helper erases a real USB drive; use only a drive you have chosen to erase.
+
+If macOS will not approve a helper launched from Xcode's build products, copy the signed Debug app to `/Applications/Relente.app` and launch that copy before installing the helper. To walk the Permissions screen without registering a real helper, use `-sampleData YES -sampleHelper notInstalled` as described below.
+
 ## Checking older macOS versions
 
 On macOS 26 and later the app uses Liquid Glass; on macOS 14 and 15 it falls back to the classic control styles. To see the classic look on a newer Mac:
@@ -42,6 +48,7 @@ The app shows the installers in `/Applications` and the USB drives and SD cards 
 
 - `-sampleData YES`: sample installers and drives instead of the Mac's (the UI tests use it), with every state: an unsupported installer (Catalina), and drives with data, empty and too small. Ejecting does nothing.
 - `-sampleEmpty installers` or `-sampleEmpty drives`, together with `-sampleData YES`: starts with that list empty, to see its empty state.
+- `-sampleHelper notInstalled`, together with `-sampleData YES`: starts on Permissions with a simulated missing helper. Install Helper moves through approval to Ready automatically; it does not register a real system helper.
 
 Unit tests and previews always use the sample data and never read the Mac's disks or `/Applications`.
 
@@ -56,7 +63,7 @@ git config core.hooksPath .githooks
 To format all the code:
 
 ```bash
-xcrun swift-format format -i -r Relente RelenteTests RelenteUITests
+xcrun swift-format format -i -r Relente RelenteHelper Shared RelenteTests RelenteUITests
 ```
 
 ## Versions
@@ -91,6 +98,9 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Rele
 | `Relente/Models` | Data types (installers, drives…). |
 | `Relente/Services` | Disk and installer detection, helper connection. |
 | `Relente/Resources` | App icon (`AppIcon.icon`, made with Icon Composer), asset catalog and String Catalog. |
+| `RelenteHelper` | The system helper: a command-line tool that runs as root, embedded in the app (`Contents/MacOS/RelenteHelper`) and registered with `SMAppService`. |
+| `Shared` | Code compiled into both the app and the helper: the XPC protocol and the security checks. |
+| `Config` | Build settings (`Version.xcconfig`) and the helper's launchd plist, copied to `Contents/Library/LaunchDaemons/`. |
 | `specs` | One folder per feature (`NNN-short-name/`) with its `spec.md`, and `plan.md` and `tasks.md` from feature 004 on. See [`specs/README.md`](specs/README.md). |
 | `docs` | Product and design overview ([`docs/product.md`](docs/product.md)): scope, supported Macs, screen flow and design system. |
 

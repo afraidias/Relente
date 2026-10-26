@@ -3,7 +3,8 @@
 //  RelenteUITests
 //
 //  The whole assistant in the running app, with sample data and the Debug-only simulation.
-//  Specs: specs/006-assistant-navigation/spec.md, specs/007-real-detection/spec.md
+//  Specs: specs/006-assistant-navigation/spec.md, specs/007-real-detection/spec.md,
+//  specs/008-system-helper/spec.md
 //
 
 import XCTest
@@ -44,6 +45,22 @@ final class AssistantFlowUITests: XCTestCase {
     }
 
     @MainActor
+    func testPermissionsThenTheWholeFlow() {
+        app = .relente(extraArguments: ["-sampleHelper", "notInstalled"])
+        expectScreen("Set Up Relente")
+        XCTAssertTrue(app.element("The system helper isn't installed.").exists)
+        XCTAssertTrue(app.buttons["Install Helper"].exists)
+
+        app.buttons["Install Helper"].click()
+        XCTAssertTrue(app.element("System helper ready.").waitForExistence(timeout: 5))
+        app.buttons["Continue"].click()
+        expectScreen("Choose an Installer")
+
+        app.goToDone()
+        expectScreen("Installer Ready")
+    }
+
+    @MainActor
     func testEscAndGoBackMenuGoBack() {
         app = .relente()
         expectScreen("Choose an Installer")
@@ -73,7 +90,7 @@ final class AssistantFlowUITests: XCTestCase {
         app = .relente()
         app.goToReview()
 
-        app.checkBoxes.firstMatch.click()
+        app.confirmErasure()
         app.press(.return)
         XCTAssertFalse(app.element("Creating Installer").waitForExistence(timeout: 2))
         XCTAssertTrue(app.element("Review and Create").exists)

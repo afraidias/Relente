@@ -79,11 +79,11 @@
         @Test func `the stream delivers the whole timeline`() async {
             let service = SimulatedCreationService(speed: .fast, failure: nil)
             var received: [CreationEvent] = []
-            for await event in service.create(installer: installer, drive: Drive.samples[0]) {
+            for await event in service.create(installer: installer, drive: Drive.samples[0], authorization: nil) {
                 received.append(event)
             }
             #expect(received == SimulatedCreationService.timeline(for: installer, failure: nil))
-            #expect(service.isSimulated)
+            #expect(service.simulation == .everything)
         }
     }
 #endif

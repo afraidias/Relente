@@ -47,6 +47,24 @@ nonisolated struct Drive: Identifiable, Hashable, Sendable {
     let capacity: Int64
     /// What is stored on it.
     let usedSpace: UsedSpace
+    /// What the helper compares, right before erasing, with the disk it's about to erase.
+    let fingerprint: DiskFingerprint
+
+    /// Without a `fingerprint` (sample drives), it's made from the id as media UUID and the
+    /// capacity.
+    init(
+        id: String, bsdName: String, name: String, model: String, kind: Kind, capacity: Int64,
+        fingerprint: DiskFingerprint? = nil, usedSpace: UsedSpace
+    ) {
+        self.id = id
+        self.bsdName = bsdName
+        self.name = name
+        self.model = model
+        self.kind = kind
+        self.capacity = capacity
+        self.usedSpace = usedSpace
+        self.fingerprint = fingerprint ?? DiskFingerprint(mediaUUID: id, serialNumber: nil, size: capacity)
+    }
 
     /// Capacity formatted for people, e.g. "32 GB".
     var formattedCapacity: String {

@@ -303,10 +303,10 @@ struct AssistantTests {
     }
 
     /// Takes the assistant to Review, confirmed, and starts the creation.
-    private func startCreating(_ assistant: Assistant) {
+    private func startCreating(_ assistant: Assistant) async {
         goToReview(assistant)
         assistant.hasConfirmed = true
-        assistant.eraseAndCreate()
+        await assistant.eraseAndCreate()
     }
 
     /// Lets the creation task read the stub's events.
@@ -317,25 +317,25 @@ struct AssistantTests {
         }
     }
 
-    @Test func `without a service the drive can't be erased`() {
+    @Test func `without a service the drive can't be erased`() async {
         let assistant = makeAssistant()
         #expect(assistant.canCreate == false)
-        startCreating(assistant)
+        await startCreating(assistant)
         #expect(assistant.step == .review)
-        #expect(assistant.isSimulated == false)
+        #expect(assistant.simulation == nil)
     }
 
-    @Test func `erase and create needs the confirmation`() {
+    @Test func `erase and create needs the confirmation`() async {
         let assistant = makeAssistant(service: StubCreationService(events: []))
         #expect(assistant.canCreate)
         goToReview(assistant)
-        assistant.eraseAndCreate()
+        await assistant.eraseAndCreate()
         #expect(assistant.step == .review)
     }
 
     @Test func `erase and create slides forward to creating and shows the progress`() async {
         let assistant = makeAssistant(service: StubCreationService(events: [.progress(copying)], finishes: false))
-        startCreating(assistant)
+        await startCreating(assistant)
         #expect(assistant.step == .creating)
         #expect(assistant.lastChange == ScreenChange(direction: .forward, style: .slide))
         #expect(assistant.creation?.failure == nil)
@@ -348,7 +348,7 @@ struct AssistantTests {
 
     @Test func `a finished creation crossfades to done with the chosen installer and drive`() async {
         let assistant = makeAssistant(service: StubCreationService(events: [.progress(copying), .finished]))
-        startCreating(assistant)
+        await startCreating(assistant)
         await waitUntil { assistant.step == .done }
 
         #expect(assistant.step == .done)
@@ -360,7 +360,7 @@ struct AssistantTests {
 
     @Test func `the creation ends in done even if a screen change is still running`() async {
         let assistant = makeAssistant(service: StubCreationService(events: [.finished]))
-        startCreating(assistant)
+        await startCreating(assistant)
         #expect(assistant.isChangingScreen)
         await waitUntil { assistant.step == .done }
         #expect(assistant.step == .done)
@@ -369,7 +369,7 @@ struct AssistantTests {
     @Test func `a failed creation stays on creating with the failure`() async {
         let failure = CreationFailure(reason: .driveDisconnected, progress: copying)
         let assistant = makeAssistant(service: StubCreationService(events: [.progress(copying), .failed(failure)]))
-        startCreating(assistant)
+        await startCreating(assistant)
         await waitUntil { assistant.creation?.failure != nil }
 
         #expect(assistant.step == .creating)
@@ -378,7 +378,7 @@ struct AssistantTests {
 
     @Test func `stop fails with cancelled at the last progress and stops the run`() async {
         let assistant = makeAssistant(service: StubCreationService(events: [.progress(copying)], finishes: false))
-        startCreating(assistant)
+        await startCreating(assistant)
         await waitUntil { assistant.creation == .running(copying) }
 
         assistant.stop()
@@ -387,9 +387,9 @@ struct AssistantTests {
     }
 
     @Test func `try again slides back to review, unconfirmed`() async {
-        let failure = CreationFailure(reason: .driveDisconnected, progress: copying)
+        let failure = CreationFailure(reason: .cancelled, progress: copying)
         let assistant = makeAssistant(service: StubCreationService(events: [.failed(failure)]))
-        startCreating(assistant)
+        await startCreating(assistant)
         await waitUntil { assistant.creation?.failure != nil }
         settle(assistant)
 
@@ -400,11 +400,37 @@ struct AssistantTests {
         #expect(assistant.selectedDriveID == big.id)
     }
 
+    @Test(arguments: [CreationFailure.Reason.driveChanged, .driveNotAllowed, .driveDisconnected])
+    func `try again goes to USB Drive when the drive must be picked again`(reason: CreationFailure.Reason) async {
+        let failure = CreationFailure(reason: reason, progress: copying)
+        let assistant = makeAssistant(service: StubCreationService(events: [.failed(failure)]))
+        await startCreating(assistant)
+        await waitUntil { assistant.creation?.failure != nil }
+        settle(assistant)
+
+        assistant.tryAgain()
+        #expect(assistant.step == .drive)
+        #expect(assistant.selectedDriveID == nil)
+    }
+
+    @Test(arguments: [CreationFailure.Reason.formatFailed, .helperUnavailable, .unknown])
+    func `try again goes to Review after other failures`(reason: CreationFailure.Reason) async {
+        let failure = CreationFailure(reason: reason, progress: copying)
+        let assistant = makeAssistant(service: StubCreationService(events: [.failed(failure)]))
+        await startCreating(assistant)
+        await waitUntil { assistant.creation?.failure != nil }
+        settle(assistant)
+
+        assistant.tryAgain()
+        #expect(assistant.step == .review)
+        #expect(assistant.selectedDriveID == big.id)
+    }
+
     @Test func `start over crossfades to the installer screen, keeping the installer only`() async {
         let failure = CreationFailure(reason: .driveDisconnected, progress: copying)
         let assistant = makeAssistant(service: StubCreationService(events: [.failed(failure)]))
         assistant.selectInstaller(sonoma.id)
-        startCreating(assistant)
+        await startCreating(assistant)
         await waitUntil { assistant.creation?.failure != nil }
         settle(assistant)
 
@@ -419,7 +445,7 @@ struct AssistantTests {
 
     @Test func `try again and start over do nothing while it's running`() async {
         let assistant = makeAssistant(service: StubCreationService(events: [.progress(copying)], finishes: false))
-        startCreating(assistant)
+        await startCreating(assistant)
         settle(assistant)
         assistant.tryAgain()
         assistant.startOver()
@@ -428,7 +454,7 @@ struct AssistantTests {
 
     @Test func `eject crossfades to the installer screen, keeping the installer only`() async {
         let assistant = makeAssistant(service: StubCreationService(events: [.finished]))
-        startCreating(assistant)
+        await startCreating(assistant)
         await waitUntil { assistant.step == .done }
         settle(assistant)
 
@@ -440,8 +466,9 @@ struct AssistantTests {
     }
 
     @Test func `the simulation label follows the service`() {
-        #expect(makeAssistant(service: StubCreationService(events: [], isSimulated: true)).isSimulated)
-        #expect(makeAssistant(service: StubCreationService(events: [], isSimulated: false)).isSimulated == false)
+        #expect(
+            makeAssistant(service: StubCreationService(events: [], simulation: .everything)).simulation == .everything)
+        #expect(makeAssistant(service: StubCreationService(events: [], simulation: nil)).simulation == nil)
     }
 }
 
@@ -452,9 +479,11 @@ struct AssistantTests {
 nonisolated private struct StubCreationService: CreationService {
     let events: [CreationEvent]
     var finishes = true
-    var isSimulated = true
+    var simulation: CreationSimulation? = .everything
 
-    func create(installer: InstallerSource, drive: Drive) -> AsyncStream<CreationEvent> {
+    func create(installer: InstallerSource, drive: Drive, authorization: EraseAuthorization?)
+        -> AsyncStream<CreationEvent>
+    {
         AsyncStream { continuation in
             for event in events {
                 continuation.yield(event)
