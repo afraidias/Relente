@@ -41,6 +41,14 @@ extension XCUIApplication {
         windows.firstMatch.typeKey(key, modifierFlags: [])
     }
 
+    /// Clicks the checkbox itself; clicking the center of its wide label can miss the control.
+    @MainActor
+    func confirmErasure(file: StaticString = #filePath, line: UInt = #line) {
+        let checkbox = checkBoxes.firstMatch
+        checkbox.coordinate(withNormalizedOffset: CGVector(dx: 0.04, dy: 0.5)).click()
+        XCTAssertEqual(checkbox.value as? Int, 1, "The erase must be confirmed", file: file, line: line)
+    }
+
     /// From the Installer screen to Review with the keyboard: Return, an arrow to pick the first
     /// drive (SanDisk Ultra), Return.
     @MainActor
@@ -57,7 +65,7 @@ extension XCUIApplication {
     @MainActor
     func startCreating(file: StaticString = #filePath, line: UInt = #line) {
         goToReview(file: file, line: line)
-        checkBoxes.firstMatch.click()
+        confirmErasure(file: file, line: line)
         buttons["Erase and Create"].click()
         XCTAssertTrue(element("Creating Installer").waitForExistence(timeout: 5), file: file, line: line)
     }

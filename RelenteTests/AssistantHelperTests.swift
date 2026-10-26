@@ -162,6 +162,25 @@ struct AssistantHelperTests {
         #expect(assistant.helperTurnedOff == nil)
     }
 
+    @Test func `turning the helper off does not interrupt Done`() async {
+        let helper = SampleHelperService(status: .ready)
+        let assistant = Assistant(
+            installers: InstallerSource.samples, drives: Drive.samples, helperService: helper,
+            creationService: SimulatedCreationService(speed: .fast, failure: nil))
+        goTo(.review, assistant)
+        assistant.hasConfirmed = true
+        await assistant.eraseAndCreate()
+
+        for _ in 0..<100 where assistant.step != .done {
+            try? await Task.sleep(for: .milliseconds(50))
+        }
+        #expect(assistant.step == .done)
+
+        try? await helper.unregister()
+        assistant.refreshHelperStatus()
+        #expect(assistant.step == .done)
+    }
+
     @Test func `a status that stays ready changes nothing`() {
         let assistant = makeAssistant(SampleHelperService(status: .ready))
         assistant.refreshHelperStatus()

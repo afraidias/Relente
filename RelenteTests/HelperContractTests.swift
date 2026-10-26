@@ -58,15 +58,11 @@ struct HelperContractTests {
         #expect(EraseRight.name == "com.afraidias.Relente.erase")
     }
 
-    @Test func `every erase asks an administrator, never reusing an earlier authorization`() {
+    @Test func `every erase asks an administrator, through macOS's non-shared admin rule`() {
         let rule = EraseRight.rule
-        #expect(rule["class"] as? String == "user")
-        #expect(rule["group"] as? String == "admin")
-        #expect(rule["shared"] as? Bool == false)
-        #expect(rule["timeout"] as? Int == 0)
-        #expect(rule["allow-root"] as? Bool == false)
-        #expect(rule["session-owner"] as? Bool == false)
-        #expect(rule["authenticate-user"] as? Bool == true)
+        #expect(rule["class"] as? String == "rule")
+        #expect(rule["rule"] as? [String] == ["authenticate-admin-nonshared"])
+        #expect(rule["version"] as? Int == 2)
     }
 
     // MARK: - Protocol
