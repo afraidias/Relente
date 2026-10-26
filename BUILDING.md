@@ -96,7 +96,27 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Rele
 
 ## App icon
 
-The icon is `Relente/Resources/AppIcon.icon`, made with Icon Composer; Xcode compiles it directly (there is no `AppIcon.appiconset`). Open it in Icon Composer to edit it. It's always dark: the Default appearance uses the *System Dark* fill, so only the Clear and Tinted appearances chosen in System Settings change it. The 512 px PNG in `.github/assets/icon.png`, used by the README, is an export of it; regenerate it when the icon changes.
+The icon is `Relente/Resources/AppIcon.icon`, made with Icon Composer; Xcode compiles it directly
+(there is no `AppIcon.appiconset`). `Assets/RelenteMark.svg` contains the outlined ivory dew/drop
+and lowercase “r” as one shape with an open, transparent counter. The solid ink-blue background
+is configured separately in `icon.json`; the system supplies masking and Liquid Glass effects.
+The default palette is sRGB ink blue `#24364D` and ivory `#F4F1E9`. Clear and Tinted appearances
+can change the colors while preserving the mark. Explicit Dark fills preserve the default
+blue/ivory contrast instead of relying on automatic recoloring. The Permissions hero and app alert sheets read the app's bundle icon.
+
+Open the `.icon` document in Icon Composer to preview appearance variants and adjust effects.
+Do not bake a rounded tile, highlights or shadows into the foreground SVG. The README uses
+`.github/assets/icon.png`, exported from this same asset at 512 px. To regenerate the macOS 26
+Default export with the installed Xcode's Icon Composer:
+
+```bash
+"/Applications/Xcode.app/Contents/Applications/Icon Composer.app/Contents/Executables/ictool" \
+  Relente/Resources/AppIcon.icon --export-image --output-file .github/assets/icon.png \
+  --platform macOS --rendition Default --width 512 --height 512 --scale 1 --design-generation 26
+```
+
+Check the exported PNG and the compiled bundle icon after changing the artwork. A classic-control
+preview on a newer macOS does not replace testing the compiled fallback on macOS 14–15.
 
 ## Localization
 
