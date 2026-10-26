@@ -49,7 +49,8 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
   - Acceptance: `HelperProtocol` (`protocolVersion`, `format`, `cancel` with simple types only),
     Mach service name and version; `CodeSigningRequirement` for app and helper (identifier + Team
     ID); `DiskutilCommand` (`/usr/sbin/diskutil`, `["eraseDisk", "JHFS+", "MyVolume", "GPT",
-    bsdName]`); `EraseRight` (name and rule: admin, not shared, timeout 0).
+    bsdName]`); `EraseRight` (name and rule: delegates to `authenticate-admin-nonshared`; changed at
+    Checkpoint C, see spec Decision 10).
   - Verify: `HelperContractTests` (requirement strings, diskutil arguments, right's rule).
   - Files: `Shared/HelperProtocol.swift`, `Shared/CodeSigningRequirement.swift`,
     `Shared/DiskutilCommand.swift`, `Shared/EraseRight.swift`, `RelenteTests/HelperContractTests.swift`
@@ -93,9 +94,9 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
   - Acceptance: option E of the canvas (spec Decision 9): header, the app icon as hero with a
     halo and `StatusBadge` per status, the status line and "Waiting for approval…", the blue
     authorization `Callout`, and one footer button that is the default action; refresh every 2 s
-    and on becoming active; VoiceOver announces status changes; `AuthenticationMethod` picks
-    `touchid`/`lock` and the texts; previews for every status (light, dark, classic); strings in
-    English and Spanish. *(A first version with Settings-style rows was replaced at the owner's
+    and on becoming active; VoiceOver announces status changes; `AuthenticationMethod` shows Touch ID when available or password fallback with matching text; previews for every status (light, dark, classic); strings in
+    English and Spanish; failed registration shows plain-language recovery guidance without raw
+    macOS error details; install/retry shows disabled progress while registration runs. *(A first version with Settings-style rows was replaced at the owner's
     request; `WarningCallout` became `Callout` with a warning and an info tone, and Error's badge
     became the shared `StatusBadge`.)*
   - Verify: `AuthenticationMethodTests`; previews; screen reviewed at Checkpoint B.
@@ -162,7 +163,7 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
 - [x] Task 12: Erase and Create asks first
   - Acceptance: `eraseAndCreate()` is async: helper not ready → the "System Helper Is Off" alert
     ("Open Settings…" default, "Cancel" Esc); authorization cancelled → stays on Review with the
-    checkbox checked; otherwise Creating with the authorization; Review shows `touchid` or `lock`;
+    checkbox checked; otherwise Creating with the authorization; Review shows the available Touch ID indicator or password fallback lock;
     `RelenteApp` wires `HelperCreationService` in Debug without sample data.
   - Verify: `AssistantEraseTests` with sample authorizer and helper service; full unit suite.
   - Files: `Relente/App/Assistant.swift`, `Relente/App/RelenteApp.swift`,
@@ -172,25 +173,81 @@ Lint: `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteT
     vanishing drive is left to the helper to report. Spec Edge cases.)*
 
 ### Checkpoint C: Real erase (manual, with the owner's USB drive)
-- [ ] Authorization asked (note whether Touch ID is offered; if not, apply the spec's fallback);
+Manual run on 2026-10-26: `ZZRealEraseUITests.testRealErase` passed with the owner's confirmed
+TOSHIBA USB FLASH DRIVE (15.52 GB, `MyVolume`). Authorization was accepted on the first dialog;
+the flow reached Done and ejected the drive. The remaining creation steps were simulated.
+The owner observed Touch ID in the authorization dialog on a later run (after an earlier password dialog). The cancellation-only UI test passed:
+Review remained visible, its checkbox stayed checked and the erase button became enabled again.
+Read-only verification with `diskutil` confirmed GUID partitioning and `MyVolume` as Mac OS
+Extended (Journaled). The combined authorization-and-format item below is complete; the remaining
+failure scenarios and authorization indicator verification remain open. The temporary test requires
+`RELENTE_REAL_ERASE_TEST=YES` in the test runner environment.
+
+A separately authorized Stop-during-Format run on 2026-10-26 passed its UI test. Helper logs
+confirmed `Erasing disk6`, `Cancel requested`, `Stopping diskutil`, and `diskutil: interrupted`
+before `formatFailed`; the app reached Error. The USB still enumerated with GUID, EFI and
+`MyVolume` afterwards; enumeration alone does not establish filesystem integrity after interruption.
+
+A separately authorized unplug-during-Format run on 2026-10-26 passed its UI test. Helper logs
+confirmed `Erasing disk6`, then `diskutil` failed during unmount with `-69808`; the helper returned
+`driveDisconnected` and the app reached Error. After reconnecting, macOS restored GUID,
+`MyVolume` and Journaled HFS+. `diskutil verifyVolume disk6s2` returned exit code 0 and reported
+that the volume was OK.
+
+- [x] Authorization asked (Touch ID observed; password remains the fallback);
   cancelling leaves Review; accepting erases as "MyVolume" (Mac OS Extended (Journaled), GPT) and
   ends on Done with the new label.
-- [ ] Reformatting the drive between Review and Erase is refused as changed; unplugging during
-  Format fails as disconnected; Stop during Format.
-- [ ] Helper turned off in System Settings → the alert on Erase and Create.
+- [x] With the Toshiba and Lexar both named `MyVolume`, ejecting the selected Toshiba while on
+  Review returned Relente to USB Drive, cleared the previous selection and left Continue disabled;
+  no drive was erased. The helper fingerprint mismatch is covered by unit tests. Stop and unplug
+  during Format are verified above. Reformatting the same Toshiba alone was not a substitute test: it
+  retained the same physical identity, was accepted, and the resulting volume passed verification.
+- [x] Helper turned off in System Settings → the alert on Erase and Create.
+  - Manual observation on 2026-10-26: disabling Relente under Allow in the Background while on
+    Review and immediately clicking "Erase and Create" showed "The System Helper Is Off" with
+    the Settings instructions. Cancel kept the app safe; no authorization or format started.
+    Relente was re-enabled afterwards and the app reported "System helper ready." The normal
+    status-monitor path also returns to Permissions when the helper is turned off before the click.
 
 ## Phase 4: Finish
 
-- [ ] Task 13: UI test and docs
+- [x] Task 13: UI test and docs
   - Acceptance: the UI test walks Permissions with `-sampleHelper notInstalled` and then the whole
-    flow; `docs/product.md` (Permissions, label, `lock`, menu item), SECURITY.md (uninstalling),
+    flow; Review has the approved spacing adjustment; `docs/product.md` (Permissions, label,
+    Touch ID or password indicator, menu item), SECURITY.md (uninstalling),
     BUILDING.md (helper, approving it while developing, `-sampleHelper`), README roadmap step 6
     checked; spec Status Done and index.
   - Verify: full test suite including UI tests; lint.
-  - Files: `RelenteUITests/RelenteUITests.swift`, `docs/product.md`, `SECURITY.md`,
+  - Files: `Relente/Views/ReviewView.swift`, `RelenteUITests/AssistantFlowUITests.swift`, `docs/product.md`, `SECURITY.md`,
     `BUILDING.md`, `README.md` (+ `specs/008-system-helper/spec.md`, `specs/README.md`)
+  - Progress on 2026-10-26: the Permissions-to-Done UI walkthrough with `-sampleHelper notInstalled`
+    passed. The full suite passed with 286 tests and one opt-in real-drive UI test skipped (264 unit
+    test runs and 22 UI tests). Debug and universal Release builds passed; Release treats compiler
+    warnings as errors. Strict lint and `git diff --check` passed. The helper is universal
+    (`x86_64 arm64`) and its launch daemon plist is embedded. All String Catalog entries have Spanish
+    translations. Review, Permissions, alerts and error screens were checked in the documented
+    appearances and accessibility modes; no clipping was seen.
+  - Follow-up on 2026-10-26: the helper-off alert was reproduced on Review and Cancel left the USB
+    untouched. In sample mode, Permissions, Installer, USB Drive and Review were visually checked in
+    Spanish and light appearance; Review was also checked with classic controls, VoiceOver and Reduce
+    Motion. No clipping was seen. These checks cover the current Review flow; alerts and error screens
+    still need the full accessibility and appearance review. A simulated `driveDisconnected` failure
+    was checked in Spanish in light and dark appearance: Retry returned to USB Drive with the
+    selection cleared, and Start Over returned to Installer. The cancel confirmation was checked;
+    Return continued to Done, while Detener showed the cancellation error. The cancellation error was
+    also checked in light appearance with classic controls, VoiceOver and Reduce Motion; its actions
+    and status were exposed accessibly and nothing clipped. All checks used sample data; no disk was
+    modified. VoiceOver and Reduce Motion were turned off, appearance restored to Dark, and temporary
+    sample/classic-control preferences were removed afterward. A later isolated rerun of
+    `CreatingScreenUITests.testASimulatedFailureShowsItsReason` failed twice before creation: clicking
+    the center of the wide checkbox label left erase confirmation unchecked. The shared UI-test
+    navigation now clicks the checkbox itself and asserts confirmation before proceeding. The
+    simulated failure test and `AssistantFlowUITests.testReturnOnReviewDoesNotErase` then passed
+    together; no disk was modified. Temporary launch preferences were removed after the attempt. The
+    full suite subsequently passed with the repaired helper. The helper-off alert and real authorization
+    flow were manually verified on 2026-10-26.
 
 ### Checkpoint D: Definition of Done
-- [ ] Full test suite, lint, Debug and universal Release builds with no warnings; light and dark,
+- [x] Full test suite, lint, Debug and universal Release builds with no warnings; light and dark,
   VoiceOver and Reduce Motion on Permissions, the alerts and the new failures; every acceptance
   criterion of the spec checked or recorded in Open items.

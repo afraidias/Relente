@@ -66,7 +66,9 @@ choice, the helper-off alert, the new failure reasons, the simulation label's se
   `openSettings()`. `HelperStatus`: `.notInstalled`, `.needsApproval`, `.ready`,
   `.failed(HelperError)`. `LiveHelperService` wraps `SMAppService.daemon(plistName:)`;
   `SampleHelperService` starts in a given status and, on `register()`, moves to `.needsApproval`
-  and then `.ready` after a moment (for `-sampleHelper notInstalled`).
+  and then `.ready` after a moment (for `-sampleHelper notInstalled`). Registration errors show a
+  localized recovery hint; raw macOS details stay in the helper log. The install/retry footer
+  shows progress and disables itself while registration is running.
 - **`EraseAuthorizer`** (`Services/EraseAuthorizer.swift`): `authorize() async throws(AuthorizationError) -> Data`
   (the external form). Live: `AuthorizationCopyRights` with interaction in a `@concurrent`
   function (it blocks while the dialog is open); `.cancelled` when the user cancels. Sample:
@@ -156,14 +158,13 @@ choice, the helper-off alert, the new failure reasons, the simulation label's se
 - [ ] Task 11: `CreationService.simulation`, `HelperCreationService`, new failure reasons and
   "Try Again" destinations, the label's second text (test-driven where it's logic).
 - [ ] Task 12: Assistant's `eraseAndCreate` with authorization and the helper-off alert;
-  `touchid`/`lock` on Review; app wiring.
+  available Touch ID indicator or password-fallback `lock` on Review; app wiring.
 
 ### Checkpoint C: Real erase (manual, with the owner and a USB drive that can be erased)
-- [ ] Erase and Create asks for authorization (note whether Touch ID is offered); cancelling
+- [ ] Erase and Create asks for authorization (Touch ID when available, otherwise password); cancelling
   leaves Review unchanged; accepting erases the drive as "MyVolume" (Mac OS Extended
   (Journaled), GPT) and the run ends on Done with "SIMULATION · Only the format is real".
-- [ ] Reformat the drive in Disk Utility between Review and Erase: refused as "changed", nothing
-  erased. Unplug during Format: "disconnected". Stop during Format: "You stopped the process."
+- [x] With the Toshiba and Lexar both named `MyVolume`, eject the selected Toshiba while on Review: Relente returns to USB Drive, clears selection, and disables Continue; no drive is erased. The helper fingerprint mismatch is covered by unit tests. Unplug and Stop during Format are verified above.
 - [ ] Turning the helper off in System Settings, then Erase and Create: the helper-off alert.
 
 ### Phase 4: Finish
@@ -180,7 +181,7 @@ choice, the helper-off alert, the new failure reasons, the simulation label's se
 | --- | --- | --- |
 | Adding a target and Copy Files phases in Xcode is new for the owner, and a wrong setting breaks signing or embedding | High | Task 1 first and alone, step by step in Xcode; then I check the result in `project.pbxproj` and by inspecting the built app (`codesign -dv`, `lipo`, file layout). |
 | macOS may not register a daemon from an app outside `/Applications` (e.g. DerivedData), or may keep a stale registration after rebuilding | High | Found at Checkpoint B. If it's needed, BUILDING.md documents copying the Debug app to `/Applications` and resetting with `sfltool resetbtm`. |
-| The authorization dialog may not offer Touch ID for a custom right | Medium | Seen at Checkpoint C. If so, `AuthenticationMethod` always returns `.password` and the texts say "password" (spec Edge cases). |
+| The authorization dialog may vary across hardware or macOS versions | Medium | Touch ID and password have both been observed. UI availability is a hint; system authorization and the helper's custom-right check remain authoritative; see issue #33. |
 | The right doesn't exist yet when the app asks for it (the helper creates it), so macOS applies its default rule | Medium | The app always calls `protocolVersion` before authorizing, which starts the helper and creates the right. |
 | Swift 6 concurrency with XPC callbacks, Authorization Services and DiskArbitration in the helper | Medium | Callbacks bridged with checked continuations; blocking calls in `@concurrent` functions; the helper's state in one actor. No `DispatchQueue`: the helper runs on `RunLoop.main`. |
 | The code-signing requirement fails in Debug if the development certificate doesn't carry the Team ID in its OU | Medium | Checked at Checkpoint B with `codesign -d -r-`; the requirement string is one function, easy to adjust. |
@@ -205,5 +206,39 @@ choice, the helper-off alert, the new failure reasons, the simulation label's se
   `-sampleData YES` and in UI tests.
 
 ## Open questions
-None. Answered when approving the plan: Task 1 is done in Xcode step by step by the owner, and the
-owner has a USB drive that can be erased for Checkpoint C.
+Issue #33 tracks verifying Authorization Services' Touch ID availability and password fallback across supported Macs and macOS versions; the helper continues to verify the fresh custom right for each erase.
+
+Review layout follow-up, approved 2026-10-26: in `ReviewView`, remove the repeated drive name and
+capacity heading from `UsageBar`; use 36 pt after the hero, 16 pt between stats and bar, and 20 pt
+between the bar and warning. This keeps the warning in place and gives it more separation from the
+usage legend. Preserve window size, typography and footer. Check English and Spanish, light and
+dark mode, and classic controls.
+
+## Checkpoint C: Touch ID investigation (2026-10-26)
+
+- Observed: the custom right showed a password dialog in an earlier run and Touch ID in a later
+  run on 2026-10-26. Cancelling leaves Review visible with its checkbox checked; the
+  cancellation-only UI test passed.
+- Apple DTS documents an Apple-signature check in the Authorization Services authentication
+  mechanism, and says a LocalAuthentication context cannot be transferred from an app's login
+  context into a launchd daemon's security context. Source:
+  [Integrating TouchID with Authorization Services](https://developer.apple.com/forums/thread/106386)
+  (responses from 2020 and 2022; historical guidance, consistent with this manual test).
+- The current SDK's public Authorization Services environment tags provide no documented
+  LAContext bridge. No supported integration preserving the custom erase right has been verified.
+- Adding `evaluatePolicy` in the app alone does not grant the custom right checked by the helper;
+  sending a success boolean is not independent verification. Neither is an implementation plan.
+- Keep the existing authorization checks intact during investigation. Do not substitute shell
+  execution, private APIs, cached credentials or an app-only biometric check.
+- Before implementation, establish a supported authorization mechanism, its macOS 14 fallback,
+  fresh-authorization and replay protections, and how administrator status is verified. Any
+  proposal that replaces the custom Authorization Services right also requires the owner's
+  explicit approval to change AGENTS.md rule 5; no such change is approved or made here.
+
+
+### Authorization indicator correction (2026-10-26)
+Use `LAContext` only as a display hint: show `touchid` when Touch ID is available and `lock` for password fallback. Authorization Services performs authorization, and the helper independently verifies the custom right for each erase.
+
+
+### Fingerprint manual check correction (2026-10-26)
+The owner authorized reformatting the Toshiba while it remained selected on Review. The helper accepted the same physical disk and formatted it again; `diskutil verifyVolume` then passed. This is not a different-device substitution test. Later, with the Toshiba and Lexar both named `MyVolume`, ejecting the selected Toshiba while on Review returned Relente to USB Drive, cleared selection and disabled Continue. No drive was erased in the substitution check; the helper fingerprint mismatch remains covered by unit tests.

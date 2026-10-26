@@ -39,14 +39,14 @@ To build it yourself, see [BUILDING.md](BUILDING.md).
 1. Open Relente. The first time, it asks you to approve its system helper, which is the part that formats the drive.
 2. **Installer:** choose one of the macOS installers found on your Mac, or download one from Apple.
 3. **USB drive:** choose the drive to use. Drives that are too small are marked.
-4. **Review:** check what will be erased, confirm, and authenticate with Touch ID or your password.
-5. **Creating:** wait until the drive is formatted, copied, made bootable and verified.
+4. **Review:** check what will be erased, confirm, and authorize the erase with Touch ID when available or your administrator password otherwise.
+5. **Creating:** in the current Debug build the drive is formatted and the remaining creation steps are simulated. Release builds keep the erase button disabled until `createinstallmedia` is implemented in roadmap step 7.
 
 When it's done, the app explains how to start up from the drive on a Mac with Apple silicon or with an Intel processor. Apple's guide [Create a bootable installer for macOS](https://support.apple.com/en-us/101578) covers the same steps from the command line.
 
 ### Uninstall
 
-1. In Relente, remove the system helper from the app's settings. (You can also turn it off in **System Settings → General → Login Items & Extensions**.)
+1. In Relente, choose **Uninstall System Helper…** from the app menu. (You can also turn it off in **System Settings → General → Login Items & Extensions**.)
 2. Move Relente to the Trash.
 
 ## How it works
@@ -54,9 +54,9 @@ When it's done, the app explains how to start up from the drive on a Mac with Ap
 Relente has two parts:
 
 - **The app** runs without special privileges. It shows the interface, finds macOS installers, and detects removable drives.
-- **A small system helper** runs as root, registered through `SMAppService`. It only knows how to do three things: format a drive, run `createinstallmedia`, and report progress. It has no network access and accepts requests only from the signed Relente app.
+- **A small system helper** runs as root, registered through `SMAppService`. It currently formats a drive and reports progress; running `createinstallmedia` is planned for roadmap step 7. It has no network access and accepts requests only from the signed Relente app.
 
-Before erasing anything, the helper checks on its own that the drive is external and removable, that it is not the startup disk, that it's the same drive you confirmed, and that the installer is signed by Apple. See [SECURITY.md](SECURITY.md) for details.
+Before erasing anything, the helper checks on its own that the drive is external and removable, that it is not the startup disk, and that it's the same physical drive you confirmed. Installer signature verification will be added with `createinstallmedia` in roadmap step 7. See [SECURITY.md](SECURITY.md) for details.
 
 ## Contributing
 
@@ -71,9 +71,9 @@ Early development. The roadmap (specs refer to these as "roadmap step N"):
 3. [x] Static screens with sample data: 001 Installer ✓, 002 USB drive ✓, 003 Review ✓, 004 Creating (+ Error) ✓, 005 Done ✓
 4. [x] Assistant navigation and animations: 006 Assistant navigation ✓
 5. [x] Real disk and installer detection: 007 Real detection ✓
-6. [ ] System helper, XPC and security checks (includes the Permissions screen)
+6. [x] System helper, XPC and security checks (includes the Permissions screen)
 7. [ ] `createinstallmedia` with live progress
-8. [ ] Signing, notarization and first release
+8. [ ] Signing, notarization, Authorization Services compatibility across supported Macs, and first release
 9. [ ] Download installers from Apple (Download screen)
 
 Relente is built with spec-driven development: every feature has a specification in [`specs/`](specs), and the project's rules are in [AGENTS.md](AGENTS.md).
