@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/afraidias/Relente/compare/v0.7.0...v0.8.0) (2026-10-26)
+
+
+### Features
+
+* **helper:** add privileged helper for secure drive erasure ([#35](https://github.com/afraidias/Relente/issues/35)) ([f4a3323](https://github.com/afraidias/Relente/commit/f4a3323829adffb71fd452ebfc700c4d0cc7712d))
+
 ## [0.7.0](https://github.com/afraidias/Relente/compare/v0.6.0...v0.7.0) (2026-10-02)
 
 
