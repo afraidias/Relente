@@ -15,10 +15,8 @@ struct InstallerBadge: View {
     var body: some View {
         FileIcon(url: installer.url, fallbackType: installer.kind.contentType)
             .overlay(alignment: .topTrailing) {
-                Image(systemName: "checkmark.circle.fill")
-                    .resizable()
-                    .foregroundStyle(.white, Theme.Colors.success)
-                    .frame(width: 18, height: 18)
+                StatusBadge(kind: .success)
+                    .frame(width: 20, height: 20)
                     .offset(x: 6, y: -6)
                     .opacity(isChecked ? 1 : 0)
             }

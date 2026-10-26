@@ -32,9 +32,10 @@ centered; the footer shows the step indicator on the left (dots plus "Step X of 
 buttons on the right. The footer stays still when the screen changes: its buttons swap at once and
 the step indicator animates (the pill stretches to the new step and the number rolls).
 
-0. **Permissions** (first launch only): app icon; three permissions as Settings-style icons with a
-   status badge (System helper, Signature verified, Full Disk Access + "Open Settings…"); a
-   reassurance line about Touch ID.
+0. **Permissions** (while the system helper is not ready): app icon and status badge, a status
+   line with an approval indicator when macOS is waiting, a blue callout with the Touch ID symbol
+   when available or a lock for password fallback, and one footer button for the next action: Install Helper,
+   Open Settings…, Continue, or Try Again.
 1. **Installer:** the `Install macOS *.app` in `/Applications`, found live, as Finder-style
    options with the real file icon (`NSWorkspace.shared.icon(forFile:)`), newest first, the newest
    supported one selected; the selected one has a gray plate behind it and its name in a blue
@@ -61,10 +62,11 @@ the step indicator animates (the pill stretches to the new step and the number r
    needs 17.8 GB" below. "Back" and "Continue".
    2b. **No drive:** "No USB Drive Connected", an empty state that waits for one to be plugged in,
    with the screen header and the installer label above it.
-3. **Review:** the drive as the hero; WILL BE ERASED / WILL BE INSTALLED / FREE AFTERWARDS; usage
-   bar (the drive's name and capacity above it; the installer and the free space as two segments
-   with a gap; a legend with each part's size); orange warning with a checkbox, unchecked every
-   time Review is shown; "Back" and the red "Erase and Create" with the Touch ID symbol. If the
+3. **Review:** the drive as the hero; WILL BE ERASED / WILL BE INSTALLED / FREE AFTERWARDS; a more
+   spacious usage bar (the installer and free space as two segments with a gap; a legend with each
+   part's size); orange warning with a checkbox, unchecked every
+   time Review is shown; "Back" and the red "Erase and Create" with the Touch ID symbol when
+   available or a lock for password fallback. If the
    drive is unplugged, the assistant goes back to step 2 and VoiceOver says so; if the installer
    disappears, on steps 2 or 3, back to step 1.
 4. **Creating:** progress ring around the drive; COPIED / SPEED / REMAINING; a 4-phase bar
@@ -117,7 +119,7 @@ previews always use them.
   subtitle `.body` (13 pt), section labels `.subheadline.weight(.semibold)` (11 pt), small text
   `.callout` (12 pt).
 - Reusable components, one `View` each (e.g. `StatusChip`, `HeroArtwork`, `PickItem`, `BigStat`,
-  `PhaseBar`, `StepIndicator`, `WarningCallout`, `KeyCap`, `StartUpCard`).
+  `PhaseBar`, `StepIndicator`, `Callout`, `StatusBadge`, `KeyCap`, `StartUpCard`).
 - One content width for the column under the hero (figures, bars, callouts, cards):
   `Theme.Sizes.contentWidth` (640 pt), the same on every screen.
 - Buttons: `.buttonStyle(.primary)` for the main action, `.buttonStyle(.secondary)` for others,

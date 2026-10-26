@@ -17,12 +17,49 @@ struct CreationFailureTests {
         return String(localized: resource)
     }
 
+    private func spanish(_ resource: LocalizedStringResource) -> String {
+        var resource = resource
+        resource.locale = Locale(identifier: "es_ES")
+        return String(localized: resource)
+    }
+
     // MARK: - Reasons
 
     @Test(arguments: CreationFailure.Reason.allCases)
     func `every reason has a title and a recovery line`(reason: CreationFailure.Reason) {
         #expect(!english(reason.title).isEmpty)
         #expect(!english(reason.recovery).isEmpty)
+    }
+
+    @Test func `new helper failures have the specified English and Spanish copy`() {
+        let cases: [(CreationFailure.Reason, String, String, String, String)] = [
+            (
+                .driveChanged, "The drive changed after you confirmed it.",
+                "Check it's the right drive and choose it again.", "La memoria ha cambiado después de confirmarla.",
+                "Comprueba que es la memoria correcta y vuelve a elegirla."
+            ),
+            (
+                .driveNotAllowed, "Relente can only erase USB drives and SD cards.", "Use a different drive.",
+                "Relente solo puede borrar memorias USB y tarjetas SD.", "Usa otra memoria."
+            ),
+            (
+                .formatFailed, "The drive couldn't be erased.", "Try again, or use a different drive.",
+                "No se ha podido borrar la memoria.", "Inténtalo de nuevo o usa otra memoria."
+            ),
+            (
+                .helperUnavailable, "The system helper didn't respond.",
+                "Try again. If it keeps happening, quit and open Relente again.",
+                "El ayudante del sistema no ha respondido.",
+                "Vuelve a intentarlo. Si sigue pasando, cierra Relente y vuelve a abrirlo."
+            ),
+        ]
+
+        for (reason, title, recovery, spanishTitle, spanishRecovery) in cases {
+            #expect(english(reason.title) == title)
+            #expect(english(reason.recovery) == recovery)
+            #expect(spanish(reason.title) == spanishTitle)
+            #expect(spanish(reason.recovery) == spanishRecovery)
+        }
     }
 
     @Test func `a disconnected drive says so and what to do`() {

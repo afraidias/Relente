@@ -3,7 +3,7 @@
 //  Relente
 //
 //  Why making the bootable installer stopped, and where: shown on the Error screen.
-//  Spec: specs/004-creating-screen/spec.md
+//  Spec: specs/004-creating-screen/spec.md, specs/008-system-helper/spec.md
 //
 
 import Foundation
@@ -16,7 +16,25 @@ nonisolated struct CreationFailure: Hashable, Sendable {
         case cancelled
         case installerDamaged
         case verificationFailed
+        /// The drive isn't the one the user confirmed (the helper's fingerprint check).
+        case driveChanged
+        /// The helper refused the drive: it isn't a USB drive or SD card it may erase.
+        case driveNotAllowed
+        /// `diskutil` couldn't erase the drive.
+        case formatFailed
+        /// The helper didn't answer, or is an older one.
+        case helperUnavailable
         case unknown
+
+        /// Whether "Try Again" goes back to USB Drive, to pick the drive again, instead of Review:
+        /// after a disconnection or when the drive isn't the one confirmed (spec 007 Decision 13).
+        var sendsBackToDriveScreen: Bool {
+            switch self {
+            case .driveDisconnected, .driveChanged, .driveNotAllowed: true
+            case .cancelled, .installerDamaged, .verificationFailed, .formatFailed, .helperUnavailable, .unknown:
+                false
+            }
+        }
 
         /// What happened, the first sentence of the Error screen's subtitle.
         var title: LocalizedStringResource {
@@ -35,6 +53,20 @@ nonisolated struct CreationFailure: Hashable, Sendable {
                 LocalizedStringResource(
                     "The drive didn't pass the final check.",
                     comment: "Error screen: the finished drive failed Relente's verification.")
+            case .driveChanged:
+                LocalizedStringResource(
+                    "The drive changed after you confirmed it.",
+                    comment: "Error screen: the drive about to be erased isn't the one confirmed on Review.")
+            case .driveNotAllowed:
+                LocalizedStringResource(
+                    "Relente can only erase USB drives and SD cards.",
+                    comment: "Error screen: the helper refused the drive.")
+            case .formatFailed:
+                LocalizedStringResource(
+                    "The drive couldn't be erased.", comment: "Error screen: diskutil failed to erase the drive.")
+            case .helperUnavailable:
+                LocalizedStringResource(
+                    "The system helper didn't respond.", comment: "Error screen: the helper didn't answer.")
             case .unknown:
                 LocalizedStringResource(
                     "Something went wrong while creating the installer.",
@@ -62,6 +94,21 @@ nonisolated struct CreationFailure: Hashable, Sendable {
                 LocalizedStringResource(
                     "Try again, or use a different drive.",
                     comment: "Error screen: what to do when the finished drive failed the check.")
+            case .driveChanged:
+                LocalizedStringResource(
+                    "Check it's the right drive and choose it again.",
+                    comment: "Error screen: what to do when the drive changed after confirming it.")
+            case .driveNotAllowed:
+                LocalizedStringResource(
+                    "Use a different drive.", comment: "Error screen: what to do when the helper refused the drive.")
+            case .formatFailed:
+                LocalizedStringResource(
+                    "Try again, or use a different drive.",
+                    comment: "Error screen: what to do when the drive couldn't be erased.")
+            case .helperUnavailable:
+                LocalizedStringResource(
+                    "Try again. If it keeps happening, quit and open Relente again.",
+                    comment: "Error screen: what to do when the helper didn't respond.")
             case .unknown:
                 LocalizedStringResource(
                     "Try again. If it keeps happening, use a different drive.",

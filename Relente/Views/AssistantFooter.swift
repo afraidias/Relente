@@ -30,8 +30,10 @@ struct AssistantFooter<Leading: View, Actions: View>: View {
         HStack {
             HStack(spacing: 12) {
                 leading
-                StepIndicator(current: step.stepNumber, total: AssistantStep.stepCount, name: step.stepName)
-                    .sharedArtwork(.stepIndicator)
+                if let number = step.stepNumber {
+                    StepIndicator(current: number, total: AssistantStep.stepCount, name: step.stepName)
+                        .sharedArtwork(.stepIndicator)
+                }
             }
 
             Spacer()

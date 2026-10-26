@@ -35,7 +35,7 @@
         /// Why it fails partway through Copy, or `nil` to finish.
         let failure: CreationFailure.Reason?
 
-        var isSimulated: Bool { true }
+        var simulation: CreationSimulation? { .everything }
 
         /// The failure to simulate from `-simulateFailure`. Only a drive being unplugged can be
         /// simulated; cancelling is done with the Cancel button.
@@ -43,9 +43,16 @@
             launchArgument == "driveDisconnected" ? .driveDisconnected : nil
         }
 
-        func create(installer: InstallerSource, drive: Drive) -> AsyncStream<CreationEvent> {
-            let events = Self.timeline(for: installer, failure: failure)
-            let interval = speed.duration / events.count
+        func create(installer: InstallerSource, drive: Drive, authorization: EraseAuthorization?)
+            -> AsyncStream<CreationEvent>
+        {
+            Self.play(Self.timeline(for: installer, failure: failure), over: speed.duration)
+        }
+
+        /// Sends the events one after another, spread over `duration`. Cancelling the task that
+        /// reads the stream stops it.
+        static func play(_ events: [CreationEvent], over duration: Duration) -> AsyncStream<CreationEvent> {
+            let interval = duration / max(events.count, 1)
             return AsyncStream { continuation in
                 let task = Task {
                     for event in events {

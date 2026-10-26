@@ -47,39 +47,40 @@ struct DriveCatalogTests {
     // MARK: - Which disks
 
     @Test func `a removable USB disk is a candidate`() {
-        #expect(DriveCatalog.isCandidate(usbStick(), bootDisks: []))
+        #expect(DiskRules.isUSBDriveOrSDCard(usbStick(), bootDisks: []))
     }
 
     @Test func `an SD card is a candidate, also in a built-in slot`() {
-        #expect(DriveCatalog.isCandidate(usbStick(deviceProtocol: "Secure Digital"), bootDisks: []))
-        #expect(DriveCatalog.isCandidate(usbStick(isInternal: true, deviceProtocol: "Secure Digital"), bootDisks: []))
+        #expect(DiskRules.isUSBDriveOrSDCard(usbStick(deviceProtocol: "Secure Digital"), bootDisks: []))
+        #expect(
+            DiskRules.isUSBDriveOrSDCard(usbStick(isInternal: true, deviceProtocol: "Secure Digital"), bootDisks: []))
     }
 
     @Test func `an external SSD, which reports fixed media, isn't`() {
-        #expect(!DriveCatalog.isCandidate(usbStick(isRemovable: false), bootDisks: []))
+        #expect(!DiskRules.isUSBDriveOrSDCard(usbStick(isRemovable: false), bootDisks: []))
     }
 
     @Test(arguments: ["SATA", "PCI-Express", "Apple Fabric", "Virtual Interface", "Disk Image", "Thunderbolt"])
     func `internal, Thunderbolt and virtual disks aren't`(deviceProtocol: String) {
-        #expect(!DriveCatalog.isCandidate(usbStick(deviceProtocol: deviceProtocol), bootDisks: []))
+        #expect(!DiskRules.isUSBDriveOrSDCard(usbStick(deviceProtocol: deviceProtocol), bootDisks: []))
     }
 
     @Test func `an internal USB device isn't`() {
-        #expect(!DriveCatalog.isCandidate(usbStick(isInternal: true), bootDisks: []))
+        #expect(!DiskRules.isUSBDriveOrSDCard(usbStick(isInternal: true), bootDisks: []))
     }
 
     @Test func `a partition isn't, only whole disks`() {
-        #expect(!DriveCatalog.isCandidate(partition("disk4s1"), bootDisks: []))
+        #expect(!DiskRules.isUSBDriveOrSDCard(partition("disk4s1"), bootDisks: []))
     }
 
     @Test func `the disk the Mac started up from isn't`() {
-        #expect(!DriveCatalog.isCandidate(usbStick("disk4"), bootDisks: ["disk4"]))
+        #expect(!DiskRules.isUSBDriveOrSDCard(usbStick("disk4"), bootDisks: ["disk4"]))
     }
 
     @Test func `a synthesized APFS container isn't`() {
         let container = DiskDescription(
             bsdName: "disk5", isWhole: true, isRemovable: true, deviceProtocol: "USB", physicalWholeDisk: "disk4")
-        #expect(!DriveCatalog.isCandidate(container, bootDisks: []))
+        #expect(!DiskRules.isUSBDriveOrSDCard(container, bootDisks: []))
     }
 
     @Test func `drives are listed in disk order, with only their own partitions`() throws {
@@ -222,6 +223,13 @@ struct DriveCatalogTests {
             used: ["disk5s1": 4_000_000_000, "disk5s2": 4_000_000_000])
         #expect(drive.name == "Backup")
         #expect(drive.usedSpace == .bytes(4_000_000_000))
+    }
+
+    // MARK: - Fingerprint
+
+    @Test func `the fingerprint is the whole disk's media UUID, serial number and size`() throws {
+        let drive = try onlyDrive([usbStick(), partition("disk4s1", volumeName: "Photos")])
+        #expect(drive.fingerprint == DiskFingerprint(mediaUUID: "UUID-4", serialNumber: "123", size: 32_000_000_000))
     }
 
     @Test func `a locked APFS volume makes the use unknown`() throws {

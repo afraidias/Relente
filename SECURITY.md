@@ -18,9 +18,9 @@ The project hasn't had a release yet. Once it does, only the latest release will
 
 The app itself runs without privileges. Only a small helper, registered with `SMAppService`, runs as root. These rules are part of the design:
 
-1. **Minimal, typed helper API.** The helper can only format a drive, run `createinstallmedia`, and report progress. There is no "run this command" function and no shell: fixed executable paths and arguments passed as arrays.
+1. **Minimal, typed helper API.** In this release step, the helper only formats a drive and reports progress. Roadmap step 7 will add the fixed `createinstallmedia` operation. There is no "run this command" function and no shell: fixed executable paths and arguments passed as arrays.
 2. **Mutual code-signing checks over XPC.** The helper only accepts connections from the Relente app signed by the same team, and the app only talks to the genuine helper. Hardened Runtime and library validation are enabled.
 3. **The helper re-validates everything.** The disk identifier must be a whole disk (`diskN`) that is external, removable, and connected over USB or SD, and it can't be the startup disk. Before erasing, the helper compares the disk's fingerprint (media UUID, serial number and size) with the one the user confirmed, to prevent time-of-check/time-of-use attacks.
-4. **Only Apple-signed installers.** The installer app and its `createinstallmedia` tool must be signed by Apple, checked right before running them. Symbolic links are rejected, and disk images are mounted read-only.
-5. **Administrator authorization for every erase**, with Touch ID or the user's password, through a dedicated Authorization Services right that the helper verifies.
+4. **Installer verification before creation is planned.** Roadmap step 7 will require the installer app and its `createinstallmedia` tool to be signed by Apple, checked right before running them; it will reject symbolic links and mount disk images read-only. This step only formats the drive; installer copying is simulated.
+5. **Administrator authorization for every erase** through a dedicated Authorization Services right that the helper verifies. macOS offers Touch ID when available and falls back to the administrator password; the helper verifies the authorization independently before formatting.
 6. **No networking in the helper.** Activity is logged with the unified logging system (`os_log`), and the helper can be uninstalled from the app.
