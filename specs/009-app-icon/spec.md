@@ -1,6 +1,6 @@
 # 009 · App icon
 
-**Status:** Approved · **Roadmap step:** 8 (visual polish before the first release) · **Branch:** `feature/009-app-icon`
+**Status:** Done · **Roadmap step:** 8 (visual polish before the first release) · **Branch:** `feature/009-app-icon`
 
 ## Objective
 
@@ -42,24 +42,27 @@ improve small-size clarity while preserving the selected B design.
 
 - [x] `Relente/Resources/AppIcon.icon` contains the new outlined vector foreground and ink-blue
       background; no arrow, slot or rainbow layers remain in the active icon asset.
-- [ ] The compiled app displays the new icon in Finder, Dock, application switching and the
-      Permissions hero. Check relevant system dialogs without performing a disk erase.
+- [x] The compiled app displays the new icon in Finder, Dock and the Permissions hero. Check
+      safely reachable dialogs without performing a disk erase; application-switcher inspection
+      is deferred in Open items.
 - [x] The drop and open letter remain distinguishable at 32, 64 and 128 px; at 16 px the drop
       silhouette and open counter remain recognizable rather than merging into a solid blob.
-- [ ] The icon is visually checked on light and dark backgrounds and in Default, Dark, Clear
+- [x] The icon is visually checked on light and dark backgrounds and in Default, Dark, Clear
       and Tinted appearances supported by the installed macOS/Icon Composer.
-- [ ] On macOS 14–15 the compiled fallback preserves the design. Record the actual OS versions
-      tested; an unavailable OS must not be reported as verified.
-- [ ] The Permissions hero and badge are visually checked with classic controls and the current
-      macOS appearance, including Reduce Motion and VoiceOver; no new announcement is introduced
-      for the decorative mark and the existing status information remains accessible.
+- [x] Inspect the compiled compatibility icon at available sizes on light and dark backgrounds;
+      verify that the compiled asset catalog contains the multi-size icon. Record the actual OS
+      used for the inspection and do not report an unavailable OS as runtime verified.
+- [x] The Permissions hero and badge are visually checked with classic controls and the current
+      macOS appearance, including checks with Reduce Motion and VoiceOver enabled. The decorative
+      mark is hidden from accessibility and status information is accessible. Audible VoiceOver
+      announcement verification is deferred in Open items.
 - [x] `.github/assets/icon.png` is a 512 × 512 export of the final icon, and an inventory confirms
       no other active project presentation uses the old artwork.
 - [x] `docs/product.md` and `BUILDING.md` describe the new icon accurately; update README content
       only where needed, keeping the existing image path and alt text.
 - [x] Debug tests, universal Release build and strict swift-format lint pass using AGENTS.md's
       commands. No new logic or automated tests are required for this artwork-only change.
-- [ ] The spec and index become Done in the final commit of their own PR, before merging.
+- [x] The spec and index become Done in the final commit of their own PR, before merging.
 
 ## Boundaries
 
@@ -95,6 +98,14 @@ improve small-size clarity while preserving the selected B design.
 
 6. **Liquid Glass approved, 2026-10-26.** The owner approved the real Icon Composer macOS 26
    preview of B. Preserve this restrained glass direction and verify the production asset.
+7. **Compatibility evidence approved, 2026-10-26.** Since macOS 14 and 15 are unavailable, the
+   owner accepts inspection of the compiled compatibility icon and asset catalog for this feature.
+   This visual evidence does not verify runtime behavior or change the app's supported versions;
+   the unverified icon rendering remains an Open item for roadmap step 8.
+8. **Manual checks deferred, 2026-10-26.** The owner accepts deferring audible VoiceOver
+   announcement verification and visual inspection of the application-switcher icon to roadmap
+   step 8. The app's accessibility calls and other icon consumers were checked as recorded below;
+   neither deferred check is reported as passed.
 
 ## Open questions
 
@@ -102,8 +113,15 @@ None. Approved by the owner on 2026-10-26.
 
 ## Open items
 
-None deferred by this feature. This icon exploration is not a trademark clearance or a claim
-that no other product uses a similar mark.
+- The owner has no macOS 14 or 15 installation available, so the icon's compiled fallback has not
+  been visually verified on either OS. Release preparation (roadmap step 8) must account for this
+  unverified icon rendering; the app's macOS 14 minimum deployment target is unchanged.
+- Roadmap step 8: verify VoiceOver's audible ready and error announcements. The corresponding
+  accessibility calls were checked while VoiceOver was enabled, but the speech was not observed.
+- Roadmap step 8: visually inspect the new icon in the macOS application switcher. The icon was
+  checked in Finder, the Dock, the Permissions hero and the uninstall confirmation sheet.
+- This icon exploration is not a trademark clearance or a claim that no other product uses a
+  similar mark.
 
 ## Implementation evidence · 2026-10-26
 
@@ -137,15 +155,63 @@ that no other product uses a similar mark.
 - `PermissionsHero` and `AlertSheet` both consume `applicationIconImage`; no Swift code or
   project build settings changed. Product and build/export documentation are updated.
 
-### Outstanding verification and integration
+### Integration verification · 2026-10-26
 
-- Complete safe sample-data review of the Permissions hero in light/dark mode and classic controls,
-  plus Reduce Motion, ready/error badges, VoiceOver announcements and safely reachable alert sheets.
-  Dock and app switching remain unchecked. Keep Task 3 and its acceptance criteria unchecked until
-  reviewed.
-- Check runtime behavior on macOS 14 and 15, and macOS 26 itself if available; the current host is
-  macOS 27.0.1 and the macOS 26 evidence above is Icon Composer rendering only.
-- Wait for spec 008 to be integrated, reconcile shared docs/index with its final main state and
-  rerun checks on the combined tree. No commits, pushes, PRs or merges have been requested.
-- Keep this spec Approved until outstanding criteria are resolved and the owner authorizes its
-  final PR commit. Nothing here marks spec 008 or roadmap step 8 complete.
+- Verified that main's merged spec 008 commit is an ancestor of PR #37's head. The diff against
+  main contains only the icon, its presentation and spec 009 documentation; no earlier spec changed.
+- On macOS 27.0.1 arm64 with Xcode 27.0, the combined tree passed the Debug unit suite with
+  `CODE_SIGNING_ALLOWED=NO` (267 tests, 326 runs, no failures or skips), the unsigned universal
+  Release build and strict swift-format lint. Both app and helper contain arm64 and x86_64.
+- Re-exported the macOS 26 Default icon at 512 × 512 with the documented Icon Composer command.
+  Compared with the repository PNG, nine pixels differed by at most three channel levels.
+  This is an export comparison, not runtime verification on macOS 26 or earlier.
+- Re-exported and inspected Default at 16, 32, 64 and 128 px and the Dark, Clear Light,
+  Clear Dark, Tinted Light and Tinted Dark variants at 128 px against light and dark backgrounds.
+  These are Icon Composer's macOS 26 renderings, not runtime checks on that OS.
+- Attempted the existing sample-data Permissions UI test without signing. The test runner started
+  but did not launch Relente, and the attempt was stopped. Retrying with ad hoc signing passed
+  `AssistantFlowUITests.testPermissionsThenTheWholeFlow`, using sample services. This verifies the
+  exercised flow; it does not replace the outstanding visual and accessibility checks.
+- Inspected the Permissions hero in light appearance with `-classicControls YES` on macOS 27.0.1,
+  before and after simulated helper installation. The icon, blue and green halos, and ready badge
+  were visible. A temporary sample-data UI test captured both states; it touched no real helper or
+  disk. The compiled app's 128 px `.icns` rendition was also inspected. Neither check establishes
+  how the app behaves when actually run on macOS 14 or 15.
+- For a closer compatibility review, inspected the Release bundle's generated `AppIcon.icns`
+  renditions at 16, 32, 128 and 256 px against light and dark backgrounds. `assetutil -Z` also
+  validated `Assets.car`, whose `AppIcon` multi-size entries cover 16–1024 points. The bundle names
+  `AppIcon` in both icon plist keys and retains minimum macOS 14. Apple's
+  [Icon Composer documentation](https://developer.apple.com/documentation/xcode/creating-your-app-icon-using-icon-composer)
+  says Xcode generates icon images at build time for earlier releases. This inspects compiled
+  resources; it does not establish which resource an older macOS selects or test that OS at runtime.
+- A temporary copy forced light and dark SwiftUI appearances and a simulated registration error.
+  With VoiceOver and Reduce Motion enabled, sample-data UI checks passed for current and classic
+  controls in both appearances, including not-installed and ready states and the cancel path of
+  the uninstall confirmation. The error badge was inspected in dark classic appearance. XCTest
+  found the status text; spoken VoiceOver announcements and the animation fallback were not
+  independently observed. VoiceOver and Reduce Motion were restored to their original off states.
+- Inspected the Dock icon while the sample-data Debug app was running on macOS 27.0.1; it shows
+  the new droplet mark. This does not establish how it renders on earlier macOS versions.
+- With Reduce Motion enabled, a temporary probe in a sample-data build confirmed that the
+  Installer-to-Drive transition selected the crossfade branch even though the requested transition
+  was a slide. This verifies the selected path, not a frame-by-frame recording of the animation.
+- With VoiceOver enabled and its existing caption-panel setting on, captured the sample helper's
+  ready state. The captures did not show the VoiceOver caption panel, so they do not verify the
+  spoken announcement. Both XCTest screenshots and a direct desktop capture while holding
+  Command-Tab failed to show the application-switcher overlay. Both checks remain outstanding.
+  VoiceOver and Reduce Motion were restored to their original off states.
+- In a subsequent sample-data build instrumented only in a temporary copy, XCTest confirmed that
+  the ready and simulated-error paths called `AccessibilityNotification.Announcement.post()` with
+  their expected localized messages while `NSWorkspace.isVoiceOverEnabled` was true. The probe
+  observes the app's calls, not the speech or braille presented by VoiceOver. VoiceOver was on
+  when this check began and was left on.
+
+### Final review
+
+- The owner accepted the deferred checks recorded in Open items. The Reduce Motion crossfade path
+  was exercised with a temporary probe, but animation frames were not recorded.
+- Runtime icon rendering on macOS 14, 15 and 26 remains unverified; the current host is macOS
+  27.0.1, the owner has no macOS 14 or 15 installation, and the macOS 26 evidence above is Icon
+  Composer rendering only.
+- The owner authorized the final PR commit. This feature is Done; its Open items do not mark
+  roadmap step 8 complete.

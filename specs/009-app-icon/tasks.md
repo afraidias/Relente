@@ -1,10 +1,10 @@
 # 009 · App icon — tasks
 
-**Status:** Approved by the owner on 2026-10-26; resources and automated checks complete,
-manual verification and spec 008 integration outstanding.
+**Status:** Done; implementation and available checks complete, with owner-approved manual
+deferrals recorded in the spec's Open items.
 
-The owner is still working on spec 008 in another chat. Tasks 1–5 can proceed independently
-in this checkout after approval; final integration waits for 008.
+Spec 008 has merged into main and is included in this branch. The combined tree has been checked;
+the owner authorized the final commit, and PR integration remains outstanding.
 
 - [x] Task 1: Prepare the production icon.
   - Acceptance: one outlined B foreground with a transparent open letter, ivory on a full-bleed
@@ -22,17 +22,19 @@ in this checkout after approval; final integration waits for 008.
 
 ## Checkpoint A · Fidelity
 
-- [ ] Review the real icon at 16, 32, 64 and 128 px and Dock size; preserve the drop and open counter.
-- [ ] Review available Default, Dark, Clear and Tinted appearances on light/dark backgrounds.
+- [x] Review the real icon at 16, 32, 64 and 128 px and Dock size; preserve the drop and open counter.
+- [x] Review available Default, Dark, Clear and Tinted appearances on light/dark backgrounds.
       Record unavailable modes as pending. Present material design deviations to the owner.
 
-- [ ] Task 3: Verify the compiled app's icon consumers.
-  - Acceptance: Finder, Dock, app switching and Permissions display the new icon; the hero's
-    halo, badge and accessible status remain correct without new image-loading code.
+- [x] Task 3: Verify the compiled app's icon consumers.
+  - Acceptance: Finder, Dock and Permissions display the new icon; the hero's halo, badge and
+    accessible status remain correct without new image-loading code. The owner-approved
+    application-switcher and audible VoiceOver checks are recorded as Open items for step 8.
   - Verify: build with separate DerivedData; inspect safe sample UI with classic/current controls,
     light/dark appearance, Reduce Motion and VoiceOver. Inspect safely reachable system dialogs.
-    Do not authorize an erase or install/uninstall the helper. Inspect legacy fallback outputs;
-    record actual runtime OS versions tested, keeping unavailable macOS 14–15 checks outstanding.
+    Do not authorize an erase or install/uninstall the helper. Inspect compiled compatibility
+    resources and record actual runtime OS versions tested; do not claim unavailable systems
+    were verified. Record the macOS 14–15 icon-rendering risk in Open items.
   - Files: verification evidence in `specs/009-app-icon/spec.md`; no Swift edits expected.
   - Depends on: Tasks 1–2 and Checkpoint A.
 
@@ -46,8 +48,8 @@ in this checkout after approval; final integration waits for 008.
 
 ## Checkpoint B · Consistency
 
-- [ ] Bundle icon, Permissions hero and README show the same final design.
-- [ ] Unavailable manual/OS checks remain explicitly outstanding.
+- [x] Bundle icon, Permissions hero and README show the same final design.
+- [x] Unavailable manual/OS checks remain explicitly outstanding.
 
 - [x] Task 5: Run quality gates and review the diff.
   - Acceptance: Debug unit tests, universal Release build, strict swift-format lint and architecture
@@ -57,7 +59,7 @@ in this checkout after approval; final integration waits for 008.
   - Files: evidence in `specs/009-app-icon/spec.md`.
   - Depends on: Tasks 3–4.
 
-- [ ] Task 6: Reconcile with the completed helper work before integration.
+- [x] Task 6: Reconcile with the completed helper work before integration.
   - Acceptance: after 008 reaches main, 009 preserves the final helper and shared documentation
     changes, with a reviewable icon-only diff against main.
   - Verify: refresh Git state, reconcile overlapping docs/index and rerun quality gates and affected
@@ -69,8 +71,8 @@ in this checkout after approval; final integration waits for 008.
 
 ## Checkpoint C · Final review
 
-- [ ] Present final render, evidence and any remaining manual verification to the owner.
-- [ ] Satisfy all spec acceptance criteria before claiming completion.
-- [ ] Mark spec/index Done only in the authorized final commit of this feature's PR, before merge.
+- [x] Present final render, evidence and any remaining manual verification to the owner.
+- [x] Satisfy all spec acceptance criteria before claiming completion.
+- [x] Mark spec/index Done only in the authorized final commit of this feature's PR, before merge.
 
 Evidence and the exact remaining manual checks are recorded in `spec.md` under Implementation evidence.

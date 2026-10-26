@@ -53,10 +53,12 @@ review → README export → documentation and final quality gates.
 
 ### Phase 2: App and repository presentation
 
-3. Inspect a newly built bundle in Finder, Dock and application switching. Check Permissions in
+3. Inspect a newly built bundle in Finder and Dock. Check Permissions in
    current and classic-control appearances, light/dark backgrounds, Reduce Motion and VoiceOver.
    Use sample data; do not authorize an erase or install/uninstall the helper for icon checks.
    If a system dialog can be safely displayed without those actions, check its icon too.
+   The owner deferred application-switcher inspection and audible VoiceOver announcement checks
+   to roadmap step 8; retain them in the spec's Open items rather than marking them as verified.
 4. Export the 512 px README image from the final Composer asset. Update `docs/product.md` and
    `BUILDING.md`, and verify README's existing image path and accessible description still work.
 
@@ -65,8 +67,8 @@ review → README export → documentation and final quality gates.
 - Bundle icon, Permissions hero and README represent the same final design.
 - Inventory tracked images and references for any remaining active use of the old artwork;
   preserve historical specifications. Inspect previews rather than assuming caches have updated.
-- Verify the compiled legacy fallback contents. Actual runtime checks on macOS 14–15 require
-  those OS versions; classic-control previews on the current OS do not prove OS compatibility.
+- Inspect the compiled compatibility icon and multi-size asset catalog. Record the OS actually
+  used; classic-control previews and compiled resources do not prove runtime behavior on 14–15.
 
 ### Phase 3: Quality gates and review
 
@@ -102,7 +104,7 @@ review → README export → documentation and final quality gates.
 | Color-space mismatch shifts the approved blue | Medium | Use explicit sRGB interpretation and compare the actual rendered Default icon. |
 | Cached icon masks the resource update | Medium | Inspect the new built bundle first, then relaunch normally; do not change bundle identity. |
 | Installed Composer tool/export syntax differs | Medium | Inspect supported local capabilities and validate the asset through Composer and Xcode. |
-| Legacy OS runtime is unavailable | Medium | Inspect generated fallback, record unverified OS versions and keep that criterion outstanding for owner testing. |
+| Legacy OS runtime is unavailable | Medium | Inspect generated compatibility resources, record unverified OS versions and carry the icon-rendering risk to roadmap step 8. |
 | Parallel helper work changes shared docs | Medium | Keep checkout isolated; reconcile against the final integration base without overwriting that work. |
 
 ## Rules check

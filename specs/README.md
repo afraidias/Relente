@@ -34,7 +34,7 @@ once in [AGENTS.md](../AGENTS.md), and the screen flow and design system in
 | [006 · Assistant navigation](006-assistant-navigation/spec.md) | 4 | Done |
 | [007 · Real disk and installer detection](007-real-detection/spec.md) | 5 | Done |
 | [008 · System helper, XPC and security checks](008-system-helper/spec.md) | 6 | Done |
-| [009 · App icon](009-app-icon/spec.md) | 8 | Approved |
+| [009 · App icon](009-app-icon/spec.md) | 8 | Done |
 
 ## Templates
 
