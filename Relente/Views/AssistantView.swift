@@ -31,8 +31,7 @@ struct AssistantView: View {
     @State private var announcedDisconnection: UUID?
     /// The last time the helper was turned off that VoiceOver announced.
     @State private var announcedHelperTurnedOff: UUID?
-    /// Touch ID or the password, read again on every screen change (a keyboard with Touch ID may
-    /// have been connected).
+    /// Authorization hint shown in the UI; Authorization Services performs actual authentication.
     @State private var authenticationMethod = AuthenticationMethod.current
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -91,6 +90,7 @@ struct AssistantView: View {
         // The helper may have been turned on or off in System Settings meanwhile.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             assistant.refreshHelperStatus()
+            authenticationMethod = .current
         }
         .alert(
             Text("The System Helper Is Off", comment: "Title of the alert when Erase and Create finds the helper off."),
@@ -295,6 +295,7 @@ struct AssistantView: View {
         case .permissions:
             PermissionsFooter(
                 status: assistant.helperStatus,
+                isInstalling: assistant.isInstallingHelper,
                 onInstall: { Task { await assistant.installHelper() } },
                 onOpenSettings: assistant.openHelperSettings,
                 onContinue: assistant.continueFromPermissions)

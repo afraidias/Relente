@@ -19,7 +19,7 @@ nonisolated struct LiveEraseAuthorizer: EraseAuthorizer {
     func authorize() async throws(EraseAuthorizationError) -> EraseAuthorization {
         let prompt = String(
             localized: "Relente wants to erase a drive to make a macOS installer on it.",
-            comment: "Shown in macOS's authorization dialog (Touch ID or password) before each erase.")
+            comment: "Shown in macOS's Touch ID or administrator-password authorization dialog before each erase.")
         let result = await Self.requestRight(prompt: prompt)
         switch result {
         case .success(let authorization):

@@ -137,7 +137,7 @@ struct PermissionsHero: View {
 
 // MARK: - Callout
 
-/// What each erase will ask for: Touch ID or the password.
+/// What each erase will ask for through the current Authorization Services flow.
 struct AuthorizationCallout: View {
     let method: AuthenticationMethod
 
@@ -152,13 +152,9 @@ struct AuthorizationCallout: View {
     private var message: LocalizedStringResource {
         switch method {
         case .touchID:
-            LocalizedStringResource(
-                "With Touch ID or your administrator password, every time. Relente never erases a drive without asking you first.",
-                comment: "Permissions callout, on a Mac with Touch ID.")
+            "With Touch ID or your administrator password, every time. Relente never erases a drive without asking you first."
         case .password:
-            LocalizedStringResource(
-                "With your administrator password, every time. Relente never erases a drive without asking you first.",
-                comment: "Permissions callout, on a Mac without Touch ID.")
+            "With your administrator password, every time. Relente never erases a drive without asking you first."
         }
     }
 }
@@ -168,6 +164,7 @@ struct AuthorizationCallout: View {
 /// One button, the default action: always the next thing to do.
 struct PermissionsFooter: View {
     let status: HelperStatus
+    var isInstalling = false
     let onInstall: () -> Void
     let onOpenSettings: () -> Void
     let onContinue: () -> Void
@@ -177,18 +174,32 @@ struct PermissionsFooter: View {
             Group {
                 switch status {
                 case .notInstalled:
-                    Button("Install Helper", action: onInstall)
+                    helperButton(title: "Install Helper", progressTitle: "Installing Helper…")
                 case .needsApproval:
                     Button("Open Settings…", action: onOpenSettings)
                 case .ready:
                     Button("Continue", action: onContinue)
                 case .failed:
-                    Button("Try Again", action: onInstall)
+                    helperButton(title: "Try Again", progressTitle: "Trying Again…")
                 }
             }
             .buttonStyle(.primary)
             .keyboardShortcut(.defaultAction)
         }
+    }
+
+    private func helperButton(title: LocalizedStringResource, progressTitle: LocalizedStringResource) -> some View {
+        Button(action: onInstall) {
+            if isInstalling {
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Text(progressTitle)
+                }
+            } else {
+                Text(title)
+            }
+        }
+        .disabled(isInstalling)
     }
 }
 
@@ -197,7 +208,7 @@ struct PermissionsFooter: View {
 /// The whole screen as it will appear in the window: content and footer.
 private struct PermissionsScreenPreview: View {
     let status: HelperStatus
-    var method = AuthenticationMethod.touchID
+    var method = AuthenticationMethod.password
 
     var body: some View {
         VStack(spacing: 0) {

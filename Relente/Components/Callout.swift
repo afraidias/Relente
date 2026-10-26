@@ -101,9 +101,9 @@ extension Callout where Content == EmptyView {
 
 #Preview("Info") {
     Callout(
-        tone: .info(systemImage: "touchid"), title: "Each erase asks for your permission",
+        tone: .info(systemImage: "lock"), title: "Each erase asks for your permission",
         message:
-            "With Touch ID or your administrator password, every time. Relente never erases a drive without asking you first."
+            "With your administrator password, every time. Relente never erases a drive without asking you first."
     )
     .frame(width: Theme.Sizes.contentWidth)
     .padding()

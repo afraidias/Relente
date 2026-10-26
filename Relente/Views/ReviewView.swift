@@ -24,23 +24,24 @@ struct ReviewView: View {
                 subtitle: "Make sure this is the right drive. Everything on it will be erased."
             )
 
-            Spacer(minLength: 16)
+            Spacer(minLength: 24)
 
             ReviewHero(installer: installer, drive: drive)
 
-            Spacer(minLength: 16)
+            Spacer(minLength: 36)
 
-            VStack(spacing: 20) {
+            VStack(spacing: 0) {
                 ReviewStats(installerName: installer.name, summary: summary)
+                    .padding(.bottom, 16)
 
                 UsageBar(
                     installerName: installer.name,
-                    driveName: drive.name,
                     installedBytes: summary.installedBytes,
                     freeBytes: summary.freeAfterwardsBytes,
                     capacity: drive.capacity,
                     installedFraction: summary.installedFraction
                 )
+                .padding(.bottom, 20)
 
                 EraseWarning(driveName: drive.name, hasConfirmed: $hasConfirmed)
             }
@@ -130,11 +131,9 @@ struct ReviewStats: View {
 
 // MARK: - Usage bar
 
-/// How the drive will look afterwards: the drive and its capacity, then two segments with a gap
-/// (the installer in the accent color, free space in gray) and a legend with each part's size.
+/// The installer and remaining free space as two segments and a legend with each size.
 struct UsageBar: View {
     let installerName: String
-    let driveName: String
     let installedBytes: Int64
     let freeBytes: Int64
     let capacity: Int64
@@ -148,16 +147,6 @@ struct UsageBar: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            HStack {
-                Text(verbatim: driveName)
-                    .textCase(.uppercase)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                Spacer(minLength: 16)
-                Text(verbatim: Self.bytes(capacity))
-            }
-            .sectionLabelStyle()
-
             GeometryReader { proxy in
                 let available = proxy.size.width - Self.gap
                 let installedWidth = min(
@@ -247,8 +236,8 @@ struct ReviewFooter: View {
     let hasConfirmed: Bool
     /// False in Release builds until roadmap step 7: the button stays disabled, with a help tag.
     var canCreate = true
-    /// Touch ID or the password: the symbol on "Erase and Create" says which macOS will ask for.
-    var authenticationMethod = AuthenticationMethod.touchID
+    /// The current Authorization Services flow asks for the administrator password.
+    var authenticationMethod = AuthenticationMethod.password
     /// True while macOS's authorization dialog is open.
     var isAuthorizing = false
     let onBack: () -> Void
@@ -262,7 +251,7 @@ struct ReviewFooter: View {
                 Label {
                     Text("Erase and Create", comment: "Button that erases the drive and creates the installer.")
                 } icon: {
-                    // What macOS will ask for: Touch ID, or the password (`lock`) without it.
+                    // The current Authorization Services flow is password-only.
                     Image(systemName: authenticationMethod.symbolName)
                 }
             }

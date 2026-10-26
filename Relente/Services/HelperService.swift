@@ -36,24 +36,21 @@ nonisolated enum HelperStatus: Hashable, Sendable {
 
 /// Why installing or uninstalling the helper failed.
 nonisolated enum HelperError: Error, Hashable, Sendable {
-    /// `reason` is macOS's own explanation, when it gives one.
+    /// macOS's technical explanation, when it gives one. Kept for diagnostics, not shown verbatim.
     case registrationFailed(reason: String?)
     case unregistrationFailed(reason: String?)
 
-    /// Shown as the help tag of "Couldn't install", or in the uninstall alert.
+    /// A recovery hint shown in Permissions or the uninstall alert. Raw system details stay in logs.
     var message: LocalizedStringResource {
         switch self {
-        case .registrationFailed(let reason?), .unregistrationFailed(let reason?):
+        case .registrationFailed:
             LocalizedStringResource(
-                "\(reason)", comment: "Helper error: macOS's own explanation, e.g. “Operation not permitted”.")
-        case .registrationFailed(nil):
+                "Install a signed copy of Relente in Applications, then try again.",
+                comment: "Recovery hint when macOS couldn't register the system helper.")
+        case .unregistrationFailed:
             LocalizedStringResource(
-                "macOS didn't install the system helper. Try again.",
-                comment: "Help tag of “Couldn't install” when macOS gives no reason.")
-        case .unregistrationFailed(nil):
-            LocalizedStringResource(
-                "macOS didn't uninstall the system helper. Try again.",
-                comment: "Uninstall failure alert when macOS gives no reason.")
+                "Try again. If the problem continues, restart your Mac.",
+                comment: "Recovery hint when macOS couldn't unregister the system helper.")
         }
     }
 }

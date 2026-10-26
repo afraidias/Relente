@@ -1,138 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Check it's the right drive and choose it again." : {
-      "comment" : "Error screen: what to do when the drive changed after confirming it.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comprueba que es la memoria correcta y vuelve a elegirla."
-          }
-        }
-      }
-    },
-    "Relente can only erase USB drives and SD cards." : {
-      "comment" : "Error screen: the helper refused the drive.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Relente solo puede borrar memorias USB y tarjetas SD."
-          }
-        }
-      }
-    },
-    "Relente wants to erase a drive to make a macOS installer on it." : {
-      "comment" : "Shown in macOS's authorization dialog (Touch ID or password) before each erase.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Relente quiere borrar una memoria para crear en ella un instalador de macOS."
-          }
-        }
-      }
-    },
-    "SIMULATION · Only the format is real" : {
-      "comment" : "Label shown when the drive is really erased but the rest is simulated (Debug builds).",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SIMULACIÓN · Solo el formateo es real"
-          }
-        }
-      }
-    },
-    "The drive changed after you confirmed it." : {
-      "comment" : "Error screen: the drive about to be erased isn't the one confirmed on Review.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La memoria ha cambiado después de confirmarla."
-          }
-        }
-      }
-    },
-    "The drive couldn't be erased." : {
-      "comment" : "Error screen: diskutil failed to erase the drive.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se ha podido borrar la memoria."
-          }
-        }
-      }
-    },
-    "The system helper didn't respond." : {
-      "comment" : "Error screen: the helper didn't answer.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El ayudante del sistema no ha respondido."
-          }
-        }
-      }
-    },
-    "The System Helper Is Off" : {
-      "comment" : "Title of the alert when Erase and Create finds the helper off.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El ayudante del sistema está desactivado"
-          }
-        }
-      }
-    },
-    "The system helper was turned off." : {
-      "comment" : "VoiceOver, when the helper is turned off in System Settings and the app goes back to Permissions.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se ha desactivado el ayudante del sistema."
-          }
-        }
-      }
-    },
-    "Try again. If it keeps happening, quit and open Relente again." : {
-      "comment" : "Error screen: what to do when the helper didn't respond.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vuelve a intentarlo. Si sigue pasando, cierra Relente y vuelve a abrirlo."
-          }
-        }
-      }
-    },
-    "Turn on Relente in System Settings › General › Login Items, then try again." : {
-      "comment" : "Message of the alert when Erase and Create finds the helper off.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activa Relente en Ajustes del Sistema › General › Ítems de inicio y vuelve a intentarlo."
-          }
-        }
-      }
-    },
-    "Use a different drive." : {
-      "comment" : "Error screen: what to do when the helper refused the drive.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usa otra memoria."
-          }
-        }
-      }
-    },
     "“%@”" : {
       "comment" : "Done screen, under the drive: the name it has now, in quotes, e.g. “Install macOS Tahoe”.",
       "localizations" : {
@@ -189,7 +57,7 @@
       }
     },
     "%@" : {
-      "comment" : "Done screen subtitle, how long it took. The value is a duration, e.g. 12 minutes or 1 hour, 5 minutes.\nHelper error: macOS's own explanation, e.g. “Operation not permitted”.",
+      "comment" : "Done screen subtitle, how long it took. The value is a duration, e.g. 12 minutes or 1 hour, 5 minutes.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -428,6 +296,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancelar"
+          }
+        }
+      }
+    },
+    "Check it's the right drive and choose it again." : {
+      "comment" : "Error screen: what to do when the drive changed after confirming it.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba que es la memoria correcta y vuelve a elegirla."
           }
         }
       }
@@ -828,6 +707,17 @@
         }
       }
     },
+    "Installing Helper…" : {
+      "comment" : "Permissions: progress label shown while installing the system helper.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalando el ayudante…"
+          }
+        }
+      }
+    },
     "Installer" : {
       "comment" : "Name of the first assistant step, where the macOS installer is chosen.",
       "localizations" : {
@@ -1124,6 +1014,17 @@
         }
       }
     },
+    "Relente can only erase USB drives and SD cards." : {
+      "comment" : "Error screen: the helper refused the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relente solo puede borrar memorias USB y tarjetas SD."
+          }
+        }
+      }
+    },
     "Relente can't create installers without it. You can install it again at any time." : {
       "comment" : "Message of the alert before uninstalling the helper.",
       "localizations" : {
@@ -1142,6 +1043,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Relente necesita un pequeño ayudante del sistema para borrar memorias. Solo tendrás que hacerlo una vez."
+          }
+        }
+      }
+    },
+    "Relente wants to erase a drive to make a macOS installer on it." : {
+      "comment" : "Shown in macOS's administrator-password authorization dialog before each erase.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relente quiere borrar una memoria para crear en ella un instalador de macOS."
           }
         }
       }
@@ -1208,6 +1120,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SIMULACIÓN · No se borra nada"
+          }
+        }
+      }
+    },
+    "SIMULATION · Only the format is real" : {
+      "comment" : "Label shown when the drive is really erased but the rest is simulated (Debug builds).",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIMULACIÓN · Solo el formateo es real"
           }
         }
       }
@@ -1345,6 +1268,28 @@
         }
       }
     },
+    "The drive changed after you confirmed it." : {
+      "comment" : "Error screen: the drive about to be erased isn't the one confirmed on Review.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La memoria ha cambiado después de confirmarla."
+          }
+        }
+      }
+    },
+    "The drive couldn't be erased." : {
+      "comment" : "Error screen: diskutil failed to erase the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido borrar la memoria."
+          }
+        }
+      }
+    },
     "The drive didn't pass the final check." : {
       "comment" : "Error screen: the finished drive failed Relente's verification.",
       "localizations" : {
@@ -1400,6 +1345,28 @@
         }
       }
     },
+    "Install a signed copy of Relente in Applications, then try again." : {
+      "comment" : "Recovery hint when macOS couldn't register the system helper.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instala una copia firmada de Relente en Aplicaciones y vuelve a intentarlo."
+          }
+        }
+      }
+    },
+    "Try again. If the problem continues, restart your Mac." : {
+      "comment" : "Recovery hint when macOS couldn't unregister the system helper.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a intentarlo. Si el problema continúa, reinicia el Mac."
+          }
+        }
+      }
+    },
     "The System Helper Couldn't Be Uninstalled" : {
       "comment" : "Title of the alert when uninstalling fails.",
       "localizations" : {
@@ -1411,6 +1378,28 @@
         }
       }
     },
+    "The system helper didn't respond." : {
+      "comment" : "Error screen: the helper didn't answer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ayudante del sistema no ha respondido."
+          }
+        }
+      }
+    },
+    "The System Helper Is Off" : {
+      "comment" : "Title of the alert when Erase and Create finds the helper off.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ayudante del sistema está desactivado"
+          }
+        }
+      }
+    },
     "The system helper isn't installed." : {
       "comment" : "Permissions, under the hero: before installing.",
       "localizations" : {
@@ -1418,6 +1407,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El ayudante del sistema no está instalado."
+          }
+        }
+      }
+    },
+    "The system helper was turned off." : {
+      "comment" : "VoiceOver, when the helper is turned off in System Settings and the app goes back to Permissions.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha desactivado el ayudante del sistema."
           }
         }
       }
@@ -1466,6 +1466,17 @@
         }
       }
     },
+    "Trying Again…" : {
+      "comment" : "Permissions: progress label shown while retrying system helper installation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentando…"
+          }
+        }
+      }
+    },
     "Try again to erase the drive and start over." : {
       "comment" : "Error screen: what to do after cancelling.",
       "localizations" : {
@@ -1478,12 +1489,23 @@
       }
     },
     "Try again, or use a different drive." : {
-      "comment" : "Error screen: what to do when the finished drive failed the check.",
+      "comment" : "Error screen: what to do when the drive couldn't be erased.\nError screen: what to do when the finished drive failed the check.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inténtalo de nuevo o usa otra memoria."
+          }
+        }
+      }
+    },
+    "Try again. If it keeps happening, quit and open Relente again." : {
+      "comment" : "Error screen: what to do when the helper didn't respond.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a intentarlo. Si sigue pasando, cierra Relente y vuelve a abrirlo."
           }
         }
       }
@@ -1495,6 +1517,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inténtalo de nuevo. Si sigue pasando, usa otra memoria."
+          }
+        }
+      }
+    },
+    "Turn on Relente in System Settings › General › Login Items, then try again." : {
+      "comment" : "Message of the alert when Erase and Create finds the helper off.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa Relente en Ajustes del Sistema › General › Ítems de inicio y vuelve a intentarlo."
           }
         }
       }
@@ -1572,6 +1605,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Memoria USB"
+          }
+        }
+      }
+    },
+    "Use a different drive." : {
+      "comment" : "Error screen: what to do when the helper refused the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa otra memoria."
           }
         }
       }
@@ -1654,7 +1698,7 @@
       }
     },
     "With Touch ID or your administrator password, every time. Relente never erases a drive without asking you first." : {
-      "comment" : "Permissions callout, on a Mac with Touch ID.",
+      "comment" : "Permissions callout when Touch ID is available for authorization.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1665,7 +1709,7 @@
       }
     },
     "With your administrator password, every time. Relente never erases a drive without asking you first." : {
-      "comment" : "Permissions callout, on a Mac without Touch ID.",
+      "comment" : "Permissions callout when Touch ID is unavailable and password is the authorization fallback.",
       "localizations" : {
         "es" : {
           "stringUnit" : {

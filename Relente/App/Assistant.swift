@@ -62,6 +62,8 @@ final class Assistant {
 
     /// Where the system helper stands, shown on Permissions.
     private(set) var helperStatus: HelperStatus
+    /// True while the helper is being installed or retried.
+    private(set) var isInstallingHelper = false
     /// Why uninstalling the helper failed, shown as an alert.
     private(set) var helperUninstallError: HelperError?
     /// "Uninstall System Helper…" was chosen: its confirmation is shown.
@@ -307,7 +309,10 @@ final class Assistant {
 
     /// Permissions' "Install" and "Try Again".
     func installHelper() async {
-        guard step == .permissions else { return }
+        guard step == .permissions, !isInstallingHelper else { return }
+        isInstallingHelper = true
+        defer { isInstallingHelper = false }
+        await Task.yield()
         do {
             try await helperService.register()
             updateHelperStatus(helperService.status)
