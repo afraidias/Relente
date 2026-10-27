@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/afraidias/Relente/compare/v0.8.0...v0.9.0) (2026-10-27)
+
+
+### Features
+
+* refresh app icon ([#37](https://github.com/afraidias/Relente/issues/37)) ([528675c](https://github.com/afraidias/Relente/commit/528675c0e1088f5b24cefa00f7b443a1b84eda24))
+
 ## [0.8.0](https://github.com/afraidias/Relente/compare/v0.7.0...v0.8.0) (2026-10-26)
 
 
