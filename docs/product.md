@@ -9,6 +9,15 @@ in [AGENTS.md](../AGENTS.md).
 *Relente* is Spanish for the cool dew that falls at night. It was chosen because it was unused and
 unrelated to the app's function. The name must never include "Mac" (Apple trademark).
 
+## App identity
+
+The app icon is an ivory dew droplet with a lowercase “r” cut out through its lower edge,
+on an ink-blue background (sRGB `#F4F1E9` and `#24364D`). The letter has a flat-topped upright
+and a curved shoulder with a firm terminal. The droplet connects the mark to Relente's name.
+Icon Composer supplies the system mask and Liquid Glass finish; Clear and Tinted appearances
+retain the same silhouette. The Permissions hero uses this same app icon with its status halo
+and badge. The app's blue system accent and disk/installer illustrations are independent of it.
+
 ## Scope
 
 macOS installers only, from Big Sur (11) onwards: a local `Install macOS *.app`, a
