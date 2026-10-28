@@ -142,8 +142,10 @@ UI strings are written in English and translated in `Relente/Resources/Localizab
 
 The repository includes skills for AI coding agents in `.claude/skills/`, each with its own `LICENSE` (MIT). The project's rules for agents are in [AGENTS.md](AGENTS.md).
 
+Codex discovers repository skills in `.agents/skills/`; relative symbolic links share the portable skill files with Claude Code. `doubt-driven-development` is not linked because its current instructions depend on Claude-specific orchestration and references.
+
 - [`write-swift`](.claude/skills/write-swift), by Emil Kowalski.
-- Twelve skills from [Addy Osmani's agent-skills](https://github.com/addyosmani/agent-skills), copied as plain Markdown (no scripts): `spec-driven-development`, `planning-and-task-breakdown`, `incremental-implementation`, `interview-me`, `test-driven-development`, `code-review-and-quality`, `debugging-and-error-recovery`, `source-driven-development`, `api-and-interface-design`, `security-and-hardening`, `doubt-driven-development` and `documentation-and-adrs`. Where they differ from AGENTS.md (for example, committing after every task, or saving specs as `SPEC.md`), AGENTS.md wins.
+- Twelve skills from [Addy Osmani's agent-skills](https://github.com/addyosmani/agent-skills), copied as plain Markdown (no scripts); eleven portable skills were synced to [upstream revision `aeac41d`](https://github.com/addyosmani/agent-skills/tree/aeac41d4d005999432bb7312f7ff06383a91d59d): `spec-driven-development`, `planning-and-task-breakdown`, `incremental-implementation`, `interview-me`, `test-driven-development`, `code-review-and-quality`, `debugging-and-error-recovery`, `source-driven-development`, `api-and-interface-design`, `security-and-hardening`, `doubt-driven-development` and `documentation-and-adrs`. Where they differ from AGENTS.md (for example, committing after every task, or saving specs as `SPEC.md`), AGENTS.md wins.
 
 Apple's skills that ship with Xcode 27 are not included (they can't be redistributed). To add them locally:
 
