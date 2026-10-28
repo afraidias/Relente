@@ -76,6 +76,6 @@ jobs:
             echo "$(basename "$binary") architectures: $archs"
             [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || { echo "::error::$(basename "$binary") is not universal"; exit 1; }
           done
-          test -f "$app/Contents/Library/LaunchDaemons/com.afraidias.Relente.Helper.plist" \
+          test -f "$app/Contents/Library/LaunchDaemons/com.afraidias.Relente.Helper.LiveCreation.plist" \
             || { echo "::error::The helper's launchd plist is missing"; exit 1; }
           echo "Minimum macOS: $(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$app/Contents/Info.plist")"
