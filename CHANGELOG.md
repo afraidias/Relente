@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/afraidias/Relente/compare/v0.9.0...v0.10.0) (2026-10-28)
+
+
+### Features
+
+* create bootable macOS installers ([a1f38ba](https://github.com/afraidias/Relente/commit/a1f38ba1d6468c002e568c6a2e56e47c22b05e45))
+
 ## [0.9.0](https://github.com/afraidias/Relente/compare/v0.8.0...v0.9.0) (2026-10-27)
 
 
