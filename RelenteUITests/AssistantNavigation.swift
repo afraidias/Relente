@@ -38,14 +38,14 @@ extension XCUIApplication {
 
     @MainActor
     func press(_ key: XCUIKeyboardKey) {
-        windows.firstMatch.typeKey(key, modifierFlags: [])
+        typeKey(key, modifierFlags: [])
     }
 
-    /// Clicks the checkbox itself; clicking the center of its wide label can miss the control.
+    /// Activates the checkbox through its accessibility element and verifies the state change.
     @MainActor
     func confirmErasure(file: StaticString = #filePath, line: UInt = #line) {
         let checkbox = checkBoxes.firstMatch
-        checkbox.coordinate(withNormalizedOffset: CGVector(dx: 0.04, dy: 0.5)).click()
+        checkbox.click()
         XCTAssertEqual(checkbox.value as? Int, 1, "The erase must be confirmed", file: file, line: line)
     }
 

@@ -46,6 +46,7 @@ nonisolated enum DriveCatalog {
             kind: kind,
             capacity: whole.size,
             fingerprint: DiskFingerprint(whole),
+            volumeURL: volumes.compactMap(\.mountPoint).first,
             usedSpace: usedSpace(
                 whole: whole, partitions: dataPartitions, apfsVolumes: apfsVolumes, usedBytes: usedBytes)
         )

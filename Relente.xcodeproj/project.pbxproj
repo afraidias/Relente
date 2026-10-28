@@ -8,7 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		722280B7306FFCEF00C4D635 /* RelenteHelper in Embed Helper */ = {isa = PBXBuildFile; fileRef = 722280A5306FF8B000C4D635 /* RelenteHelper */; };
-		722280BA306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist in Embed Launch Daemon */ = {isa = PBXBuildFile; fileRef = 722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist */; };
+		722280BA306FFD9500C4D635 /* com.afraidias.Relente.Helper.LiveCreation.plist in Embed Launch Daemon */ = {isa = PBXBuildFile; fileRef = 722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.LiveCreation.plist */; };
+		A01000000000000000000001 /* RelenteHelper/LiveCreateInstallMediaRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01000000000000000000002 /* RelenteHelper/LiveCreateInstallMediaRunner.swift */; };
+		A01000000000000000000003 /* RelenteHelper/HelperRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01000000000000000000004 /* RelenteHelper/HelperRequestHandler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,7 +52,7 @@
 			dstPath = Contents/Library/LaunchDaemons;
 			dstSubfolder = Wrapper;
 			files = (
-				722280BA306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist in Embed Launch Daemon */,
+				722280BA306FFD9500C4D635 /* com.afraidias.Relente.Helper.LiveCreation.plist in Embed Launch Daemon */,
 			);
 			name = "Embed Launch Daemon";
 		};
@@ -58,11 +60,13 @@
 
 /* Begin PBXFileReference section */
 		722280A5306FF8B000C4D635 /* RelenteHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RelenteHelper; sourceTree = BUILT_PRODUCTS_DIR; };
-		722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = com.afraidias.Relente.Helper.plist; path = Config/com.afraidias.Relente.Helper.plist; sourceTree = "<group>"; };
+		722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.LiveCreation.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = com.afraidias.Relente.Helper.LiveCreation.plist; path = Config/com.afraidias.Relente.Helper.LiveCreation.plist; sourceTree = "<group>"; };
 		7231488D306D07860090943B /* Relente.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Relente.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7231489A306D07870090943B /* RelenteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RelenteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		723148A4306D07870090943B /* RelenteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RelenteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		72F0A0012FB0000000000001 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
+		A01000000000000000000002 /* RelenteHelper/LiveCreateInstallMediaRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelenteHelper/LiveCreateInstallMediaRunner.swift; sourceTree = SOURCE_ROOT; };
+		A01000000000000000000004 /* RelenteHelper/HelperRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelenteHelper/HelperRequestHandler.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -120,7 +124,7 @@
 		72314884306D07860090943B = {
 			isa = PBXGroup;
 			children = (
-				722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.plist */,
+				722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.LiveCreation.plist */,
 				722280B1306FFBEB00C4D635 /* Shared */,
 				72F0A0022FB0000000000001 /* Config */,
 				7231488F306D07860090943B /* Relente */,
@@ -128,6 +132,7 @@
 				723148A7306D07870090943B /* RelenteUITests */,
 				722280A6306FF8B000C4D635 /* RelenteHelper */,
 				7231488E306D07860090943B /* Products */,
+				7275447230923F8600474640 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -140,6 +145,14 @@
 				722280A5306FF8B000C4D635 /* RelenteHelper */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7275447230923F8600474640 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				A01000000000000000000002 /* RelenteHelper/LiveCreateInstallMediaRunner.swift */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		72F0A0022FB0000000000001 /* Config */ = {
@@ -318,6 +331,8 @@
 		72314896306D07870090943B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				A01000000000000000000001 /* RelenteHelper/LiveCreateInstallMediaRunner.swift in Sources */,
+				A01000000000000000000003 /* RelenteHelper/HelperRequestHandler.swift in Sources */,
 			);
 		};
 		723148A0306D07870090943B /* Sources */ = {
@@ -574,7 +589,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.afraidias.RelenteTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) RELENTE_TESTS";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
@@ -592,7 +609,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.afraidias.RelenteTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) RELENTE_TESTS";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;

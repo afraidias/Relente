@@ -192,6 +192,14 @@ struct DriveCatalogTests {
         #expect(drive.usedSpace == .unknown)
     }
 
+    @Test func `a drive carries the first mounted volume path for the helper`() throws {
+        let drive = try onlyDrive([
+            usbStick(), partition("disk4s1", volumeName: "Unmounted", mounted: false),
+            partition("disk4s2", volumeName: "Target"),
+        ])
+        #expect(drive.volumeURL == URL(filePath: "/Volumes/Target"))
+    }
+
     @Test func `a file system right on the disk is measured`() throws {
         let card = usbStick(content: "", mountPoint: URL(filePath: "/Volumes/CARD"), volumeName: "CARD")
         let drive = try onlyDrive([card], used: ["disk4": 3_000_000_000])

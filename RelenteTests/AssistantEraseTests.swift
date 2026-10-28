@@ -41,6 +41,10 @@ struct AssistantEraseTests {
             state.withLock { $0.continuation }?.yield(event)
         }
 
+        func finish() {
+            state.withLock { $0.continuation }?.finish()
+        }
+
         var starts: Int { state.withLock { $0.starts } }
         var authorization: EraseAuthorization? { state.withLock { $0.authorization } }
     }
@@ -49,18 +53,19 @@ struct AssistantEraseTests {
     /// 64 GB, fits the sample installer.
     private let stick = Drive(
         id: "UUID-OLD", bsdName: "disk4", name: "Stick", model: "Stick", kind: .usbDrive, capacity: 64_000_000_000,
-        usedSpace: .bytes(0))
+        volumeURL: URL(filePath: "/Volumes/Stick"), usedSpace: .bytes(0))
     /// The same drive after the format: same BSD name, new media UUID.
     private let formatted = Drive(
         id: "UUID-NEW", bsdName: "disk4", name: "MyVolume", model: "Stick", kind: .usbDrive,
         capacity: 64_000_000_000, usedSpace: .bytes(0))
 
     private func makeAssistant(
-        service: ControlledCreationService, authorizer: SampleEraseAuthorizer = SampleEraseAuthorizer()
+        service: ControlledCreationService, authorizer: SampleEraseAuthorizer = SampleEraseAuthorizer(),
+        helperClient: any HelperClient = SampleHelperClient()
     ) -> Assistant {
         let assistant = Assistant(
             installers: [installer], drives: [stick], helperService: SampleHelperService(status: .ready),
-            authorizer: authorizer, creationService: service)
+            helperClient: helperClient, authorizer: authorizer, creationService: service)
         assistant.continueToDrive()
         assistant.screenChangeDidEnd()
         assistant.selectDrive(stick.id)
@@ -79,6 +84,23 @@ struct AssistantEraseTests {
     }
 
     // MARK: - Before erasing
+
+    @Test func `an unexpected end of the creation stream reports failure`() async {
+        let service = ControlledCreationService(simulation: .afterFormat)
+        let assistant = makeAssistant(service: service)
+        await assistant.eraseAndCreate()
+        await waitUntil { service.starts == 1 }
+        service.finish()
+        await waitUntil {
+            if case .failed = assistant.creation { return true }
+            return false
+        }
+        guard case .failed(let failure) = assistant.creation else {
+            Issue.record("The creation remained running")
+            return
+        }
+        #expect(failure.reason == .helperUnavailable)
+    }
 
     @Test func `with the helper off, the alert is shown and nothing starts`() async throws {
         let service = ControlledCreationService(simulation: .afterFormat)
@@ -103,6 +125,18 @@ struct AssistantEraseTests {
         #expect(!assistant.isShowingHelperOffAlert)
     }
 
+    @Test func `a helper that fails the version check leaves Review recoverable`() async {
+        let service = ControlledCreationService(simulation: .afterFormat)
+        let assistant = makeAssistant(service: service, helperClient: SampleHelperClient(isCurrent: false))
+
+        await assistant.eraseAndCreate()
+
+        #expect(assistant.isShowingHelperOffAlert)
+        #expect(assistant.step == .review)
+        #expect(assistant.hasConfirmed)
+        #expect(service.starts == 0)
+    }
+
     @Test func `cancelling the authorization leaves Review as it was`() async {
         let service = ControlledCreationService(simulation: .afterFormat)
         let assistant = makeAssistant(service: service, authorizer: SampleEraseAuthorizer(error: .cancelled))
@@ -122,6 +156,19 @@ struct AssistantEraseTests {
         #expect(service.starts == 0)
     }
 
+    @Test func `a denied helper write check keeps Review and never creates`() async {
+        let service = ControlledCreationService(simulation: nil)
+        let assistant = makeAssistant(
+            service: service, helperClient: SampleHelperClient(writeAccessOutcome: .volumeAccessDenied))
+
+        await assistant.eraseAndCreate()
+
+        #expect(assistant.step == .review)
+        #expect(assistant.isShowingDiskAccessAlert)
+        #expect(!assistant.isAuthorizing)
+        #expect(service.starts == 0)
+    }
+
     @Test func `once authorized, the creation starts with the authorization`() async {
         let service = ControlledCreationService(simulation: .afterFormat)
         let assistant = makeAssistant(service: service)
@@ -131,6 +178,17 @@ struct AssistantEraseTests {
         #expect(assistant.step == .creating)
         #expect(service.starts == 1)
         #expect(service.authorization != nil)
+    }
+
+    @Test func `live creation starts with installer preparation before the USB phase`() async {
+        let service = ControlledCreationService(simulation: nil)
+        let assistant = makeAssistant(service: service)
+
+        await assistant.eraseAndCreate()
+
+        #expect(assistant.step == .creating)
+        #expect(assistant.creation?.progress.isPreparingInstaller == true)
+        #expect(assistant.creation?.progress.phase == .format)
     }
 
     @Test func `a full simulation asks for nothing`() async {

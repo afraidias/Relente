@@ -12,6 +12,8 @@ import Foundation
 nonisolated enum RemainingTime: Hashable, Sendable {
     /// There's nothing to estimate from yet (no speed, or the phase is at 0 %).
     case calculating
+    /// The live command doesn't report data that can support an estimate.
+    case unavailable
     /// Estimated time left in the current phase.
     case estimate(Duration)
     /// A phase after Copy that reports no percentage.
@@ -23,6 +25,9 @@ nonisolated enum RemainingTime: Hashable, Sendable {
         case .calculating:
             return LocalizedStringResource(
                 "Calculating…", comment: "Creating screen, REMAINING: not enough data yet to estimate the time left.")
+        case .unavailable:
+            return LocalizedStringResource(
+                "Unavailable", comment: "Creating screen, REMAINING: macOS doesn't report enough data for an estimate.")
         case .almostDone:
             return LocalizedStringResource(
                 "Almost done", comment: "Creating screen, REMAINING: a last phase that doesn't report its progress.")

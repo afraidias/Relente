@@ -104,6 +104,18 @@ struct AssistantView: View {
                 "Turn on Relente in System Settings › General › Login Items, then try again.",
                 comment: "Message of the alert when Erase and Create finds the helper off.")
         }
+        .alert(
+            Text("Relente Needs Disk Access", comment: "Title when the helper cannot write to the selected USB."),
+            isPresented: $assistant.isShowingDiskAccessAlert
+        ) {
+            Button("Open Full Disk Access Settings…", action: assistant.openFullDiskAccessSettings)
+            Button("Open Login Items Settings…", action: assistant.openHelperSettingsFromAlert)
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(
+                "Enable Full Disk Access for Relente in Privacy & Security and allow Relente under Login Items. Then return and try again. The helper could not write to the selected USB, so erasing has not started.",
+                comment: "Explains that the helper write check failed before any destructive operation.")
+        }
         .onChange(of: assistant.step) { oldStep, newStep in
             // First let the current screen learn how it will leave, then change it on the next
             // frame: a leaving screen keeps the transition it was last drawn with.
@@ -277,7 +289,10 @@ struct AssistantView: View {
             if let installer = assistant.creationInstaller, let drive = assistant.creationDrive,
                 let creation = assistant.creation
             {
-                CreatingView(installer: installer, drive: drive, state: creation, simulation: assistant.simulation)
+                CreatingView(
+                    installer: installer, drive: drive, state: creation, output: assistant.creationOutput,
+                    simulation: assistant.simulation,
+                    onOpenFullDiskAccessSettings: assistant.openFullDiskAccessSettings)
             }
         case .done:
             if let result = assistant.result {
@@ -313,6 +328,7 @@ struct AssistantView: View {
                 canCreate: assistant.canCreate,
                 authenticationMethod: authenticationMethod,
                 isAuthorizing: assistant.isAuthorizing,
+                isCheckingHelperDiskAccess: assistant.isCheckingHelperDiskAccess,
                 onBack: assistant.goBack,
                 onErase: { Task { await assistant.eraseAndCreate() } }
             )

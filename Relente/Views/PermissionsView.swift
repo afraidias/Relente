@@ -22,7 +22,7 @@ struct PermissionsView: View {
         VStack(spacing: 0) {
             ScreenHeader(
                 title: "Set Up Relente",
-                subtitle: "Relente needs a small system helper to erase drives. You only do this once."
+                subtitle: "The system helper prepares your chosen drive with administrator authorization."
             )
 
             Spacer(minLength: 8)
@@ -33,6 +33,18 @@ struct PermissionsView: View {
 
             AuthorizationCallout(method: authenticationMethod)
                 .frame(width: Theme.Sizes.contentWidth)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("macOS protects access to disks and removable drives.")
+                    .font(Theme.Fonts.footnote.weight(.semibold))
+                Text(
+                    "To create an installer, allow Relente in Full Disk Access and keep it enabled in Login Items so its helper can run. You can still choose an installer and USB before granting access; Relente checks the selected USB before it erases it."
+                )
+                .font(Theme.Fonts.footnote)
+                .foregroundStyle(Theme.Colors.secondary)
+            }
+            .frame(width: Theme.Sizes.contentWidth, alignment: .leading)
+            .padding(.top, 10)
 
             Spacer(minLength: 8)
         }

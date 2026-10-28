@@ -4,7 +4,7 @@
 //
 //  Accepts the app's XPC connections. The listener only lets in the Relente app signed by the
 //  team (helper rule 2, set in `main.swift`); each connection gets its own
-//  `HelperRequestHandler`, all sharing one `FormatPipeline`, so only one format runs at a time.
+//  `HelperRequestHandler`, sharing its format and creation pipelines across connections.
 //  With no connection for a minute, the helper quits; launchd starts it again on the next one.
 //  Spec: specs/008-system-helper/spec.md
 //
@@ -18,18 +18,22 @@ nonisolated final class HelperListener: NSObject, NSXPCListenerDelegate, Sendabl
     private static let idleTime = Duration.seconds(60)
 
     private let pipeline: FormatPipeline
+    private let creationPipeline: CreateInstallMediaPipeline
     /// Open connections, and the countdown to quitting while there are none.
     private let state = OSAllocatedUnfairLock<(connections: Int, quitting: Task<Void, Never>?)>(
         initialState: (0, nil))
 
-    init(pipeline: FormatPipeline) {
+    init(pipeline: FormatPipeline, creationPipeline: CreateInstallMediaPipeline) {
         self.pipeline = pipeline
+        self.creationPipeline = creationPipeline
         super.init()
         startIdleCountdown()
     }
 
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
-        let handler = HelperRequestHandler(pipeline: pipeline)
+        connection.remoteObjectInterface = NSXPCInterface(with: HelperProgressProtocol.self)
+        let progress = connection.remoteObjectProxy as? HelperProgressProtocol
+        let handler = HelperRequestHandler(pipeline: pipeline, creationPipeline: creationPipeline, progress: progress)
         connection.exportedInterface = NSXPCInterface(with: HelperProtocol.self)
         connection.exportedObject = handler
         connection.invalidationHandler = { [weak self] in

@@ -13,11 +13,12 @@ struct PhaseBar: View {
     let current: CreationPhase
     /// Progress within the current phase, from 0 to 1.
     let currentFraction: Double
+    /// Apple doesn't report a percentage for some live phases, such as copying essential files.
+    var isIndeterminate = false
     /// Whether it stopped: the current segment turns red and stays where it was.
     var isFailed = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
     private let phases = CreationPhase.allCases
 
     var body: some View {
@@ -38,12 +39,32 @@ struct PhaseBar: View {
 
         return VStack(alignment: .leading, spacing: 6) {
             GeometryReader { proxy in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(.quaternary)
-                    Capsule()
-                        .fill(isFailed && state == .current ? Theme.Colors.danger : Theme.Colors.accent)
-                        .frame(width: filledWidth(of: phase, in: proxy.size))
+                if state == .current, isIndeterminate {
+                    TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion)) { timeline in
+                        let indicatorWidth = max(proxy.size.width * 0.42, proxy.size.height)
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(.quaternary)
+                            Capsule()
+                                .fill(isFailed ? Theme.Colors.danger : Theme.Colors.accent)
+                                .frame(width: indicatorWidth)
+                                .offset(
+                                    x: indeterminateOffset(
+                                        at: timeline.date,
+                                        in: proxy.size.width,
+                                        indicatorWidth: indicatorWidth
+                                    ))
+                        }
+                        .clipped()
+                    }
+                } else {
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(.quaternary)
+                        Capsule()
+                            .fill(isFailed && state == .current ? Theme.Colors.danger : Theme.Colors.accent)
+                            .frame(width: filledWidth(of: phase, in: proxy.size))
+                    }
                 }
             }
             .frame(height: 6)
@@ -87,6 +108,13 @@ struct PhaseBar: View {
         return fill > 0 ? max(size.width * fill, size.height) : 0
     }
 
+    /// The visible segment sweeps across the active phase; Reduce Motion leaves it centered.
+    private func indeterminateOffset(at date: Date, in width: CGFloat, indicatorWidth: CGFloat) -> CGFloat {
+        guard !reduceMotion else { return (width - indicatorWidth) / 2 }
+        let cycle = date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 1.4) / 1.4
+        return (width + indicatorWidth) * cycle - indicatorWidth
+    }
+
     /// How much of the segment is filled, from 0 to 1.
     private func fill(of phase: CreationPhase) -> Double {
         switch state(of: phase) {
@@ -121,6 +149,7 @@ struct PhaseBar: View {
     VStack(spacing: 28) {
         PhaseBar(current: .format, currentFraction: 0.6)
         PhaseBar(current: .copy, currentFraction: 0.43)
+        PhaseBar(current: .copy, currentFraction: 0, isIndeterminate: true)
         PhaseBar(current: .makeBootable, currentFraction: 0)
         PhaseBar(current: .verify, currentFraction: 0.5)
         PhaseBar(current: .copy, currentFraction: 0.43, isFailed: true)

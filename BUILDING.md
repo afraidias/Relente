@@ -22,7 +22,13 @@ The app is not sandboxed (it needs a privileged helper to erase disks), so it ca
 
 ### Testing the live helper
 
-For a real helper run, build the Debug app with your development team selected for both `Relente` and `RelenteHelper`. Launch the app and choose **Install Helper**. When macOS asks for approval, open **System Settings → General → Login Items & Extensions**, enable Relente under **Allow in the Background**, then return to the app and wait for **System helper ready** before continuing. The live helper erases a real USB drive; use only a drive you have chosen to erase.
+For a real helper run, build the app with your development team selected for both `Relente` and `RelenteHelper`. Launch the app and choose **Install Helper**. When macOS asks for approval, open **System Settings → General → Login Items & Extensions**, enable Relente under **Allow in the Background**, then return to the app and wait for **System helper ready** before continuing. Choose an installer first; the app shows which connected USB drives have enough space. For an `InstallAssistant.pkg`, the helper verifies and expands a root-owned private copy without installing it or running its scripts. The live helper runs Apple's `createinstallmedia`, which erases the selected USB drive. Use only a drive you have chosen to erase.
+
+On the macOS 27 test Mac, live creation requires Relente under **System Settings → Privacy &
+Security → Full Disk Access** and the helper under **General → Login Items & Extensions → Allow in
+the Background**. Installer and drive selection remain available without Full Disk Access. Before
+erasing, the helper runs a harmless write check against the selected USB; if it fails, Review stays
+open and directs the user to these settings.
 
 If macOS will not approve a helper launched from Xcode's build products, copy the signed Debug app to `/Applications/Relente.app` and launch that copy before installing the helper. To walk the Permissions screen without registering a real helper, use `-sampleData YES -sampleHelper notInstalled` as described below.
 
@@ -37,7 +43,7 @@ For real testing, use a macOS 14 or 15 virtual machine, and Rosetta or an Intel 
 
 ## Simulated creation (Debug builds)
 
-Until `createinstallmedia` is wired up (roadmap step 7), Debug builds simulate creating the installer so the whole assistant can be walked: nothing is erased, and Creating, Error and Done show a "SIMULATION · Nothing is erased" label. Release builds have no simulation and keep "Erase and Create" disabled. Two Debug-only launch arguments (**Product → Scheme → Edit Scheme… → Run → Arguments**):
+In Debug builds, `-sampleData YES` keeps the whole flow safe to walk: its helper is a sample client, and no drive is erased. Creating, Error and Done show a "SIMULATION · Nothing is erased" label. Normal Debug and Release builds use the live helper for creation. Two Debug-only launch arguments (**Product → Scheme → Edit Scheme… → Run → Arguments**):
 
 - `-simulationSpeed fast`: the simulation lasts about 2 seconds instead of 15 (the UI tests use it).
 - `-simulateFailure driveDisconnected`: the simulation fails partway through Copy, to see the Error screen.

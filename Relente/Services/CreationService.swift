@@ -14,6 +14,7 @@ import Foundation
 /// What a creation reports, in order: progress snapshots, then `finished` or `failed`.
 nonisolated enum CreationEvent: Hashable, Sendable {
     case progress(CreationProgress)
+    case output(CreationOutputLine)
     case finished
     case failed(CreationFailure)
 }

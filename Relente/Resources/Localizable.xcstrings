@@ -179,17 +179,6 @@
         }
       }
     },
-    "%@/s" : {
-      "comment" : "Creating screen, SPEED. The value is an amount of data, e.g. 48 MB; the figure is per second.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@/s"
-          }
-        }
-      }
-    },
     "A window or an app may be using it. Close them and try again." : {
       "comment" : "Eject alert when macOS gives no reason.",
       "localizations" : {
@@ -208,6 +197,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unos %@"
+          }
+        }
+      }
+    },
+    "Activity" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actividad"
           }
         }
       }
@@ -311,6 +310,20 @@
         }
       }
     },
+    "Checking the bootable installer…" : {
+      "comment" : "Creating screen subtitle while Relente checks the completed USB installer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobando el instalador de arranque…"
+          }
+        }
+      }
+    },
+    "Checking USB Access…" : {
+
+    },
     "Choose a USB Drive" : {
       "comment" : "Title of the USB drive screen.",
       "localizations" : {
@@ -351,6 +364,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elige o suelta una app de instalación, una imagen de disco o InstallAssistant.pkg."
+          }
+        }
+      }
+    },
+    "Close" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
           }
         }
       }
@@ -421,6 +444,17 @@
         }
       }
     },
+    "Copying installer files to the USB drive…" : {
+      "comment" : "Creating screen subtitle while createinstallmedia copies installer files.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiando los archivos del instalador al USB…"
+          }
+        }
+      }
+    },
     "Couldn't Create the Installer" : {
       "comment" : "Title of the Error screen.",
       "localizations" : {
@@ -461,6 +495,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Creación"
+          }
+        }
+      }
+    },
+    "Creation Log" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registro de creación"
+          }
+        }
+      }
+    },
+    "Creation output" : {
+      "comment" : "VoiceOver label for the selectable output area from installer creation.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salida de la creación"
+          }
+        }
+      }
+    },
+    "Creation steps and progress reported by macOS." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fases y progreso comunicados por macOS durante la creación."
           }
         }
       }
@@ -553,6 +619,17 @@
         }
       }
     },
+    "ELAPSED" : {
+      "comment" : "Creating screen: elapsed time since creation started.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TRANSCURRIDO"
+          }
+        }
+      }
+    },
     "Empty · %@" : {
       "comment" : "Under an empty drive's usage bar. The value is its capacity.",
       "localizations" : {
@@ -564,6 +641,28 @@
         }
       }
     },
+    "Enable Full Disk Access for Relente in Privacy & Security and allow Relente under Login Items. Then return and try again. The helper could not write to the selected USB, so erasing has not started." : {
+      "comment" : "Explains that the helper write check failed before any destructive operation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa Acceso total al disco para Relente en Privacidad y seguridad y permite que Relente se ejecute en Ítems de inicio de sesión. Después, vuelve aquí e inténtalo de nuevo. El ayudante no ha podido escribir en el USB seleccionado, así que aún no ha empezado a borrarlo."
+          }
+        }
+      }
+    },
+    "Enable Full Disk Access for Relente in Privacy & Security, then try again. The drive may have been erased." : {
+      "comment" : "Error screen: recovery after Apple's tool fails to write to installer media.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa el Acceso total al disco para Relente en Privacidad y seguridad y vuelve a intentarlo. Puede que la unidad se haya borrado."
+          }
+        }
+      }
+    },
     "Erase and Create" : {
       "comment" : "Button that erases the drive and creates the installer.",
       "localizations" : {
@@ -571,6 +670,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Borrar y crear"
+          }
+        }
+      }
+    },
+    "Erasing and formatting the USB drive…" : {
+      "comment" : "Creating screen subtitle while createinstallmedia erases and formats the selected USB.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrando y formateando el USB…"
           }
         }
       }
@@ -619,6 +729,17 @@
         }
       }
     },
+    "Formatting the USB drive" : {
+      "comment" : "VoiceOver label of the single progress bar shown while the USB is being erased and formatted.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formateando la unidad USB"
+          }
+        }
+      }
+    },
     "Free" : {
       "comment" : "Usage bar legend: free space on the drive.",
       "localizations" : {
@@ -637,6 +758,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "LIBRE DESPUÉS"
+          }
+        }
+      }
+    },
+    "Full Creation Log" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registro completo de creación"
           }
         }
       }
@@ -696,6 +827,27 @@
         }
       }
     },
+    "In progress" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En curso"
+          }
+        }
+      }
+    },
+    "Install a signed copy of Relente in Applications, then try again." : {
+      "comment" : "Recovery hint when macOS couldn't register the system helper.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instala una copia firmada de Relente en Aplicaciones y vuelve a intentarlo."
+          }
+        }
+      }
+    },
     "Install Helper" : {
       "comment" : "Permissions: footer button that installs the system helper.",
       "localizations" : {
@@ -707,17 +859,6 @@
         }
       }
     },
-    "Installing Helper…" : {
-      "comment" : "Permissions: progress label shown while installing the system helper.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Instalando el ayudante…"
-          }
-        }
-      }
-    },
     "Installer" : {
       "comment" : "Name of the first assistant step, where the macOS installer is chosen.",
       "localizations" : {
@@ -725,6 +866,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instalador"
+          }
+        }
+      }
+    },
+    "Installer preparation stopped" : {
+      "comment" : "VoiceOver label for the progress indicator when installer validation or preparation fails.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se detuvo la preparación del instalador"
           }
         }
       }
@@ -746,6 +898,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instalador: %1$@ %2$@, %3$@"
+          }
+        }
+      }
+    },
+    "Installing Helper…" : {
+      "comment" : "Permissions: progress label shown while installing the system helper.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalando el ayudante…"
           }
         }
       }
@@ -796,6 +959,7 @@
     },
     "Keep the drive plugged in. This can take a while." : {
       "comment" : "Subtitle of the Creating screen.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -829,6 +993,7 @@
     },
     "macOS didn't install the system helper. Try again." : {
       "comment" : "Help tag of “Couldn't install” when macOS gives no reason.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -840,11 +1005,33 @@
     },
     "macOS didn't uninstall the system helper. Try again." : {
       "comment" : "Uninstall failure alert when macOS gives no reason.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "macOS no ha desinstalado el ayudante del sistema. Vuelve a intentarlo."
+          }
+        }
+      }
+    },
+    "macOS prevented writing to the drive." : {
+      "comment" : "Error screen: Apple's tool reported a permission error writing installer media.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS ha impedido escribir en la memoria."
+          }
+        }
+      }
+    },
+    "macOS protects access to disks and removable drives." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS protege el acceso a los discos y unidades extraíbles."
           }
         }
       }
@@ -870,6 +1057,31 @@
           }
         }
       }
+    },
+    "Making the USB drive bootable…" : {
+      "comment" : "Creating screen subtitle while createinstallmedia makes the USB bootable.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando el USB para que arranque…"
+          }
+        }
+      }
+    },
+    "Measuring installer image…" : {
+      "comment" : "Creating screen fallback while waiting for a measurable installer image size.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Midiendo la imagen del instalador…"
+          }
+        }
+      }
+    },
+    "Measuring…" : {
+
     },
     "Needs macOS Big Sur or later" : {
       "comment" : "Under an installer older than macOS Big Sur, which Relente can't use.",
@@ -904,6 +1116,17 @@
         }
       }
     },
+    "Not reported" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin datos"
+          }
+        }
+      }
+    },
     "Not supported" : {
       "comment" : "Status chip under an installer older than macOS Big Sur.",
       "localizations" : {
@@ -927,7 +1150,7 @@
       }
     },
     "of %@" : {
-      "comment" : "Creating screen, under COPIED. The value is the installer's size, e.g. 16.8 GB.",
+      "comment" : "Creating screen, under COPIED. The value is the primary installer image's size, e.g. 18.4 GB.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -948,6 +1171,48 @@
         }
       }
     },
+    "Open Full Creation Log…" : {
+      "comment" : "Activity popover button that opens the complete technical creation log in a larger window.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir registro completo de creación…"
+          }
+        }
+      }
+    },
+    "Open Full Disk Access Settings…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ajustes de Acceso total al disco…"
+          }
+        }
+      }
+    },
+    "Open Login Items Settings…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ajustes de Ítems de inicio…"
+          }
+        }
+      }
+    },
+    "Open Privacy & Security Settings…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Ajustes de Privacidad y seguridad…"
+          }
+        }
+      }
+    },
     "Open Settings…" : {
       "comment" : "Permissions: button that opens System Settings › General › Login Items.",
       "localizations" : {
@@ -955,6 +1220,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abrir Ajustes…"
+          }
+        }
+      }
+    },
+    "Open the complete technical log in a larger window." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre el registro técnico completo en una ventana más grande."
           }
         }
       }
@@ -1014,6 +1289,38 @@
         }
       }
     },
+    "Preparing the installer" : {
+      "comment" : "VoiceOver label for the indeterminate progress indicator while Relente validates and prepares the installer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando el instalador"
+          }
+        }
+      }
+    },
+    "Preparing the selected installer…" : {
+      "comment" : "Creating screen subtitle while the helper validates and prepares the installer.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando el instalador seleccionado…"
+          }
+        }
+      }
+    },
+    "Recent Activity" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actividad reciente"
+          }
+        }
+      }
+    },
     "Relente can only erase USB drives and SD cards." : {
       "comment" : "Error screen: the helper refused the drive.",
       "localizations" : {
@@ -1038,6 +1345,7 @@
     },
     "Relente needs a small system helper to erase drives. You only do this once." : {
       "comment" : "Permissions: subtitle.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1047,8 +1355,19 @@
         }
       }
     },
+    "Relente Needs Disk Access" : {
+      "comment" : "Title when the helper cannot write to the selected USB.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relente necesita acceso al disco"
+          }
+        }
+      }
+    },
     "Relente wants to erase a drive to make a macOS installer on it." : {
-      "comment" : "Shown in macOS's administrator-password authorization dialog before each erase.",
+      "comment" : "Shown in macOS's Touch ID or administrator-password authorization dialog before each erase.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1146,17 +1465,6 @@
         }
       }
     },
-    "SPEED" : {
-      "comment" : "Creating screen figure: how fast the installer is being copied.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "VELOCIDAD"
-          }
-        }
-      }
-    },
     "Start Over" : {
       "comment" : "Error screen button: go back to the first step.",
       "localizations" : {
@@ -1223,6 +1531,16 @@
         }
       }
     },
+    "Stopped" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detenido"
+          }
+        }
+      }
+    },
     "STOPPED AT" : {
       "comment" : "Error screen figure: overall progress when creating stopped.",
       "localizations" : {
@@ -1264,6 +1582,27 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ayudante del sistema listo."
+          }
+        }
+      }
+    },
+    "Technical messages reported by macOS while creating the installer." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensajes técnicos que comunica macOS al crear el instalador."
+          }
+        }
+      }
+    },
+    "The bootable installer couldn't be created." : {
+      "comment" : "Error screen: createinstallmedia failed while creating the installer on the drive.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido crear el instalador de arranque."
           }
         }
       }
@@ -1345,28 +1684,6 @@
         }
       }
     },
-    "Install a signed copy of Relente in Applications, then try again." : {
-      "comment" : "Recovery hint when macOS couldn't register the system helper.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Instala una copia firmada de Relente en Aplicaciones y vuelve a intentarlo."
-          }
-        }
-      }
-    },
-    "Try again. If the problem continues, restart your Mac." : {
-      "comment" : "Recovery hint when macOS couldn't unregister the system helper.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vuelve a intentarlo. Si el problema continúa, reinicia el Mac."
-          }
-        }
-      }
-    },
     "The System Helper Couldn't Be Uninstalled" : {
       "comment" : "Title of the alert when uninstalling fails.",
       "localizations" : {
@@ -1411,6 +1728,16 @@
         }
       }
     },
+    "The system helper prepares your chosen drive with administrator authorization." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ayudante prepara la memoria elegida con tu autorización de administrador."
+          }
+        }
+      }
+    },
     "The system helper was turned off." : {
       "comment" : "VoiceOver, when the helper is turned off in System Settings and the app goes back to Permissions.",
       "localizations" : {
@@ -1444,6 +1771,16 @@
         }
       }
     },
+    "To create an installer, allow Relente in Full Disk Access and keep it enabled in Login Items so its helper can run. You can still choose an installer and USB before granting access; Relente checks the selected USB before it erases it." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para crear un instalador, permite Relente en Acceso total al disco y mantenlo activado en Ítems de inicio para que funcione el ayudante. Puedes elegir un instalador y un USB antes de conceder el acceso; Relente comprueba el USB seleccionado antes de borrarlo."
+          }
+        }
+      }
+    },
     "Too small" : {
       "comment" : "Status chip under a drive smaller than the installer needs.",
       "localizations" : {
@@ -1462,17 +1799,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reintentar"
-          }
-        }
-      }
-    },
-    "Trying Again…" : {
-      "comment" : "Permissions: progress label shown while retrying system helper installation.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reintentando…"
           }
         }
       }
@@ -1521,6 +1847,28 @@
         }
       }
     },
+    "Try again. If the problem continues, restart your Mac." : {
+      "comment" : "Recovery hint when macOS couldn't unregister the system helper.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a intentarlo. Si el problema continúa, reinicia el Mac."
+          }
+        }
+      }
+    },
+    "Trying Again…" : {
+      "comment" : "Permissions: progress label shown while retrying system helper installation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentando…"
+          }
+        }
+      }
+    },
     "Turn on Relente in System Settings › General › Login Items, then try again." : {
       "comment" : "Message of the alert when Erase and Create finds the helper off.",
       "localizations" : {
@@ -1550,6 +1898,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Activa Relente en Ajustes del Sistema para terminar de instalar el ayudante del sistema."
+          }
+        }
+      }
+    },
+    "Unavailable" : {
+      "comment" : "Creating screen, REMAINING: macOS doesn't report enough data for an estimate.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No disponible"
           }
         }
       }
@@ -1653,6 +2012,16 @@
         }
       }
     },
+    "Waiting for activity…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando actividad…"
+          }
+        }
+      }
+    },
     "Waiting for an installer…" : {
       "comment" : "Shown while no macOS installer has been found.",
       "localizations" : {
@@ -1671,6 +2040,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esperando aprobación…"
+          }
+        }
+      }
+    },
+    "Waiting for installer image data…" : {
+      "comment" : "Creating screen caption when copy has started but no destination image measurement is available yet.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando los datos de la imagen del instalador…"
+          }
+        }
+      }
+    },
+    "Waiting for macOS activity…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando la actividad de macOS…"
+          }
+        }
+      }
+    },
+    "Whole device" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unidad completa"
           }
         }
       }

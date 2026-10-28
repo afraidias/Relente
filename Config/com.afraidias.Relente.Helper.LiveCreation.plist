@@ -3,17 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>com.afraidias.Relente.Helper</string>
+	<string>com.afraidias.Relente.Helper.LiveCreation</string>
 	<key>BundleProgram</key>
 	<string>Contents/MacOS/RelenteHelper</string>
 	<key>MachServices</key>
 	<dict>
-		<key>com.afraidias.Relente.Helper</key>
+		<key>com.afraidias.Relente.Helper.LiveCreation</key>
 		<true/>
 	</dict>
-	<key>AssociatedBundleIdentifiers</key>
-	<array>
-		<string>com.afraidias.Relente</string>
-	</array>
 </dict>
 </plist>

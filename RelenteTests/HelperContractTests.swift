@@ -68,6 +68,52 @@ struct HelperContractTests {
     // MARK: - Protocol
 
     @Test func `the protocol has a version the app checks`() {
-        #expect(HelperIdentity.protocolVersion >= 1)
+        #expect(HelperIdentity.protocolVersion == 5)
+        #expect(HelperIdentity.supports(HelperIdentity.protocolVersion))
+        #expect(!HelperIdentity.supports(HelperIdentity.protocolVersion - 1))
+        #expect(!HelperIdentity.supports(nil))
+    }
+
+    @Test func `package resource exception requires root-owned private extraction`() {
+        #expect(InstallerPackageOwnershipPolicy.isPrivateRootDirectory(owner: 0, mode: 0o40700))
+        #expect(!InstallerPackageOwnershipPolicy.isPrivateRootDirectory(owner: 501, mode: 0o40700))
+        #expect(!InstallerPackageOwnershipPolicy.isPrivateRootDirectory(owner: 0, mode: 0o40777))
+        #expect(InstallerPackageOwnershipPolicy.isRootOwnedEntry(owner: 0, mode: 0o100600))
+        #expect(!InstallerPackageOwnershipPolicy.isRootOwnedEntry(owner: 501, mode: 0o100600))
+    }
+
+    @Test func `helper operations cannot overlap and the gate releases`() async {
+        let gate = HelperOperationGate()
+        let owner = UUID()
+        let results = await withTaskGroup(of: Bool.self, returning: [Bool].self) { group in
+            for _ in 0..<32 { group.addTask { gate.begin(owner: owner) } }
+            var results: [Bool] = []
+            for await result in group { results.append(result) }
+            return results
+        }
+
+        #expect(results.filter { $0 }.count == 1)
+        #expect(gate.isActive)
+        #expect(gate.owns(owner))
+        let otherConnection = UUID()
+        #expect(!gate.owns(otherConnection))
+        gate.end(owner: otherConnection)
+        #expect(gate.owns(owner))
+        gate.end(owner: owner)
+        #expect(!gate.isActive)
+        #expect(gate.begin(owner: otherConnection))
+    }
+
+    @Test func `the daemon plist uses the current launchd label`() throws {
+        let repositoryURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let plistURL = repositoryURL.appending(path: "Config/com.afraidias.Relente.Helper.LiveCreation.plist")
+        let data = try Data(contentsOf: plistURL)
+        let plist = try #require(PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any])
+
+        #expect(plist["Label"] as? String == "com.afraidias.Relente.Helper.LiveCreation")
+        let machServices = try #require(plist["MachServices"] as? [String: Bool])
+        #expect(machServices[HelperIdentity.machServiceName] == true)
     }
 }

@@ -8,6 +8,7 @@
 //  Spec: specs/006-assistant-navigation/spec.md, specs/008-system-helper/spec.md
 //
 
+import AppKit
 import Foundation
 import Observation
 import os
@@ -32,6 +33,8 @@ final class Assistant {
 
     /// The run shown on Creating (and Error), or `nil` before the first one.
     private(set) var creation: CreationState?
+    /// Timestamped command output for the current Creating or Error screen, never persisted.
+    private(set) var creationOutput: [CreationOutputLine] = []
     /// What that run is making. Kept apart from the selection, which Start Over clears while
     /// Creating is still fading out.
     private(set) var creationInstaller: InstallerSource?
@@ -70,8 +73,12 @@ final class Assistant {
     var isConfirmingHelperUninstall = false
     /// "Erase and Create" found the helper off: the alert that says so is shown.
     var isShowingHelperOffAlert = false
+    /// The helper's selected-volume write probe failed; Review stays visible and creation does not start.
+    var isShowingDiskAccessAlert = false
     /// True while macOS's authorization dialog is open, so "Erase and Create" can't start twice.
     private(set) var isAuthorizing = false
+    /// True while the helper checks the selected volume before creation.
+    private(set) var isCheckingHelperDiskAccess = false
 
     private let installerService: any InstallerService
     private let driveService: any DriveService
@@ -84,7 +91,7 @@ final class Assistant {
     private var creationTask: Task<Void, Never>?
     private var hasStarted = false
 
-    /// Starts on Permissions when the system helper isn't ready, otherwise on Installer.
+    /// Starts on Permissions until the system helper is ready.
     init(
         installerService: any InstallerService, driveService: any DriveService,
         helperService: any HelperService = SampleHelperService(), helperClient: any HelperClient = SampleHelperClient(),
@@ -326,6 +333,14 @@ final class Assistant {
         helperService.openSettings()
     }
 
+    func openFullDiskAccessSettings() {
+        guard
+            let url = URL(
+                string: "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_AllFiles")
+        else { return }
+        NSWorkspace.shared.open(url)
+    }
+
     /// Permissions' "Continue", once the helper is ready.
     func continueFromPermissions() {
         guard step == .permissions, helperStatus == .ready else { return }
@@ -411,9 +426,8 @@ final class Assistant {
         creationService?.simulation
     }
 
-    /// "Erase and Create". When the creation really erases the drive, the helper must be ready
-    /// (otherwise the "System Helper Is Off" alert), and macOS asks for the administrator's
-    /// authorization first; if the user cancels it, nothing happens and Review stays as it was.
+    /// "Erase and Create". The helper must prove it can write the selected USB before creation;
+    /// any refusal leaves Review visible and the drive untouched.
     func eraseAndCreate() async {
         guard step == .review, hasConfirmed, !isChangingScreen, !isAuthorizing, let creationService,
             let installer = selectedInstaller, let drive = selectedDrive
@@ -425,25 +439,52 @@ final class Assistant {
                 isShowingHelperOffAlert = true
                 return
             }
-            isAuthorizing = true
-            defer { isAuthorizing = false }
+        }
+
+        if creationService.erasesDrive {
+            guard helperService.status == .ready else {
+                isShowingHelperOffAlert = true
+                return
+            }
             // Starts the helper, which adds the erase right before the app asks for it.
-            _ = await helperClient.connectsToCurrentHelper()
+            isAuthorizing = true
+            guard await helperClient.connectsToCurrentHelper() else {
+                isAuthorizing = false
+                isShowingHelperOffAlert = true
+                return
+            }
             do {
                 authorization = try await authorizer.authorize()
+                isAuthorizing = false
             } catch {
+                isAuthorizing = false
                 return
             }
             // The drive may have been unplugged, or the screen changed, while the dialog was open.
             guard step == .review, selectedDrive?.id == drive.id else { return }
         }
 
-        creation = .running(CreationProgress(phase: .format, phaseFraction: 0, installerSize: installer.size))
+        if creationService.simulation == nil, let authorization {
+            isCheckingHelperDiskAccess = true
+            defer { isCheckingHelperDiskAccess = false }
+            let outcome = await helperClient.checkVolumeWriteAccess(drive, authorization: authorization.externalForm)
+            guard step == .review, selectedDrive?.id == drive.id else { return }
+            guard outcome == .created else {
+                isShowingDiskAccessAlert = true
+                return
+            }
+        }
+
+        creation = .running(
+            CreationProgress(
+                phase: .format, phaseFraction: nil, installerSize: installer.size,
+                isLive: creationService.simulation == nil,
+                isPreparingInstaller: creationService.simulation == nil))
+        creationOutput = []
         creationInstaller = installer
         creationDrive = drive
         result = nil
         change(to: .creating, .forward, .slide)
-
         let start = ContinuousClock.now
         creationTask = Task { [weak self] in
             for await event in creationService.create(installer: installer, drive: drive, authorization: authorization)
@@ -452,10 +493,13 @@ final class Assistant {
                 switch event {
                 case .progress(let progress):
                     creation = .running(progress)
+                case .output(let line):
+                    creationOutput.append(line)
                 case .finished:
                     // The drive as it is now: the format gave it a new id.
                     result = CreationResult(
                         installer: installer, drive: creationDrive ?? drive, duration: start.duration(to: .now))
+                    creationOutput = []
                     creationTask = nil
                     change(to: .done, .forward, .crossfade, byUser: false)
                 case .failed(let failure):
@@ -463,6 +507,11 @@ final class Assistant {
                     creationTask = nil
                 }
             }
+            guard !Task.isCancelled, let self, self.creationTask != nil,
+                case .running(let progress) = self.creation
+            else { return }
+            self.creation = .failed(CreationFailure(reason: .helperUnavailable, progress: progress))
+            self.creationTask = nil
         }
     }
 
@@ -479,6 +528,7 @@ final class Assistant {
     /// again, even if it's connected again.
     func tryAgain() {
         guard step == .creating, let failure = creation?.failure else { return }
+        creationOutput = []
         if failure.reason.sendsBackToDriveScreen {
             selectedDriveID = nil
         }
@@ -536,6 +586,7 @@ final class Assistant {
     /// Back to the Installer screen, keeping the installer and forgetting the drive.
     private func restart() {
         guard !isChangingScreen else { return }
+        creationOutput = []
         selectedDriveID = nil
         change(to: .installer, .back, .crossfade)
     }

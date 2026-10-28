@@ -22,6 +22,10 @@ nonisolated struct CreationFailure: Hashable, Sendable {
         case driveNotAllowed
         /// `diskutil` couldn't erase the drive.
         case formatFailed
+        /// `createinstallmedia` failed after accepting the installer and volume.
+        case createFailed
+        /// Apple reported that writing the installer media was not permitted.
+        case volumeAccessDenied
         /// The helper didn't answer, or is an older one.
         case helperUnavailable
         case unknown
@@ -31,7 +35,9 @@ nonisolated struct CreationFailure: Hashable, Sendable {
         var sendsBackToDriveScreen: Bool {
             switch self {
             case .driveDisconnected, .driveChanged, .driveNotAllowed: true
-            case .cancelled, .installerDamaged, .verificationFailed, .formatFailed, .helperUnavailable, .unknown:
+            case .cancelled, .installerDamaged, .verificationFailed, .formatFailed, .createFailed, .volumeAccessDenied,
+                .helperUnavailable,
+                .unknown:
                 false
             }
         }
@@ -64,6 +70,14 @@ nonisolated struct CreationFailure: Hashable, Sendable {
             case .formatFailed:
                 LocalizedStringResource(
                     "The drive couldn't be erased.", comment: "Error screen: diskutil failed to erase the drive.")
+            case .createFailed:
+                LocalizedStringResource(
+                    "The bootable installer couldn't be created.",
+                    comment: "Error screen: createinstallmedia failed while creating the installer on the drive.")
+            case .volumeAccessDenied:
+                LocalizedStringResource(
+                    "macOS prevented writing to the drive.",
+                    comment: "Error screen: Apple's tool reported a permission error writing installer media.")
             case .helperUnavailable:
                 LocalizedStringResource(
                     "The system helper didn't respond.", comment: "Error screen: the helper didn't answer.")
@@ -101,10 +115,14 @@ nonisolated struct CreationFailure: Hashable, Sendable {
             case .driveNotAllowed:
                 LocalizedStringResource(
                     "Use a different drive.", comment: "Error screen: what to do when the helper refused the drive.")
-            case .formatFailed:
+            case .formatFailed, .createFailed:
                 LocalizedStringResource(
                     "Try again, or use a different drive.",
                     comment: "Error screen: what to do when the drive couldn't be erased.")
+            case .volumeAccessDenied:
+                LocalizedStringResource(
+                    "Enable Full Disk Access for Relente in Privacy & Security, then try again. The drive may have been erased.",
+                    comment: "Error screen: recovery after Apple's tool fails to write to installer media.")
             case .helperUnavailable:
                 LocalizedStringResource(
                     "Try again. If it keeps happening, quit and open Relente again.",

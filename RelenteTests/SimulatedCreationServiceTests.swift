@@ -58,6 +58,20 @@
             #expect(!events.contains(.finished))
         }
 
+        @Test func `measured live copy supplies bytes and rate only in the explicit sample path`() {
+            let events = SimulatedCreationService.timeline(
+                for: installer, failure: nil, liveFeedback: true, measuredCopy: true)
+            let copy = progresses(events).first { $0.phase == .copy }
+
+            #expect(copy?.isLive == true)
+            #expect(copy?.hasMeasuredCopyProgress == true)
+            #expect(copy?.phaseFraction != nil)
+            #expect(copy?.copiedBytes ?? 0 > 0)
+            #expect(copy?.bytesPerSecond == 0)
+            let laterCopy = progresses(events).last { $0.phase == .copy }
+            #expect(laterCopy?.bytesPerSecond == 40_000_000)
+        }
+
         // MARK: - Speed
 
         @Test func `the normal run lasts about 15 s and the fast one about 2 s`() {
