@@ -18,9 +18,16 @@ The project hasn't had a release yet. Once it does, only the latest release will
 
 The app itself runs without privileges. Only a small helper, registered with `SMAppService`, runs as root. These rules are part of the design:
 
-1. **Minimal, typed helper API.** In this release step, the helper only formats a drive and reports progress. Roadmap step 7 will add the fixed `createinstallmedia` operation. There is no "run this command" function and no shell: fixed executable paths and arguments passed as arrays.
+Live creation requires Full Disk Access for Relente and Background App Activity for its helper.
+Installer browsing, download and drive selection remain available without Full Disk Access. At
+Review, the helper validates the selected disk and makes a harmless temporary write check. If it
+cannot write, Relente blocks creation before erasing and explains how to enable the required system
+settings. Relente reports only progress observed from Apple's creation command; it does not present
+whole-device write counters as installer bytes copied.
+
+1. **Minimal, typed helper API.** The helper formats a drive and runs only the selected installer's Apple-signed `createinstallmedia`, with fixed arguments passed as an array. There is no "run this command" function and no shell.
 2. **Mutual code-signing checks over XPC.** The helper only accepts connections from the Relente app signed by the same team, and the app only talks to the genuine helper. Hardened Runtime and library validation are enabled.
 3. **The helper re-validates everything.** The disk identifier must be a whole disk (`diskN`) that is external, removable, and connected over USB or SD, and it can't be the startup disk. Before erasing, the helper compares the disk's fingerprint (media UUID, serial number and size) with the one the user confirmed, to prevent time-of-check/time-of-use attacks.
-4. **Installer verification before creation is planned.** Roadmap step 7 will require the installer app and its `createinstallmedia` tool to be signed by Apple, checked right before running them; it will reject symbolic links and mount disk images read-only. This step only formats the drive; installer copying is simulated.
-5. **Administrator authorization for every erase** through a dedicated Authorization Services right that the helper verifies. macOS offers Touch ID when available and falls back to the administrator password; the helper verifies the authorization independently before formatting.
+4. **Installer verification before creation.** The helper requires Apple's signature on the installer app and its `createinstallmedia` tool, checks them immediately before launch, rejects symbolic links and mounts disk images read-only. For `InstallAssistant.pkg`, the helper copies the selected package into a root-owned mode-0700 directory, verifies it with Apple's Software Update signer, and expands that copy without running package scripts. It uses only the helper-owned extraction, so the package signature authenticates the resources that `createinstallmedia` consumes and the logged-in user cannot replace them after validation. The helper may skip only legacy app bundle-resource validation for this extraction; the app code and `createinstallmedia` signatures are still checked.
+5. **Administrator authorization for every erase** through a dedicated Authorization Services right. macOS offers Touch ID when available and falls back to the administrator password; the helper verifies the authorization independently before running `createinstallmedia`.
 6. **No networking in the helper.** Activity is logged with the unified logging system (`os_log`), and the helper can be uninstalled from the app.

@@ -37,6 +37,7 @@ struct RemainingTimeTests {
 
     @Test func `calculating and almost done`() {
         #expect(englishText(.calculating) == "Calculating…")
+        #expect(englishText(.unavailable) == "Unavailable")
         #expect(englishText(.almostDone) == "Almost done")
     }
 }

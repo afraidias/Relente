@@ -47,6 +47,12 @@ struct CreationFailureTests {
                 "No se ha podido borrar la memoria.", "Inténtalo de nuevo o usa otra memoria."
             ),
             (
+                .volumeAccessDenied, "macOS prevented writing to the drive.",
+                "Enable Full Disk Access for Relente in Privacy & Security, then try again. The drive may have been erased.",
+                "macOS ha impedido escribir en la memoria.",
+                "Activa el Acceso total al disco para Relente en Privacidad y seguridad y vuelve a intentarlo. Puede que la unidad se haya borrado."
+            ),
+            (
                 .helperUnavailable, "The system helper didn't respond.",
                 "Try again. If it keeps happening, quit and open Relente again.",
                 "El ayudante del sistema no ha respondido.",

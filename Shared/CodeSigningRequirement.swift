@@ -17,7 +17,7 @@ nonisolated enum CodeSigningRequirement {
     /// What the helper requires of the app connecting to it.
     static let app = requirement(identifier: appIdentifier)
     /// What the app requires of the helper it connects to.
-    static let helper = requirement(identifier: HelperIdentity.machServiceName)
+    static let helper = requirement(identifier: HelperIdentity.bundleIdentifier)
 
     /// Signed with this identifier by a certificate Apple issued to the team.
     private static func requirement(identifier: String) -> String {

@@ -240,6 +240,8 @@ struct ReviewFooter: View {
     var authenticationMethod = AuthenticationMethod.password
     /// True while macOS's authorization dialog is open.
     var isAuthorizing = false
+    /// True while macOS asks for access to the selected USB and Relente verifies it.
+    var isCheckingHelperDiskAccess = false
     let onBack: () -> Void
     let onErase: () -> Void
 
@@ -248,16 +250,23 @@ struct ReviewFooter: View {
             BackButton(action: onBack)
 
             Button(role: .destructive, action: onErase) {
-                Label {
-                    Text("Erase and Create", comment: "Button that erases the drive and creates the installer.")
-                } icon: {
-                    // The current Authorization Services flow is password-only.
-                    Image(systemName: authenticationMethod.symbolName)
+                if isCheckingHelperDiskAccess {
+                    HStack(spacing: 8) {
+                        ProgressView().controlSize(.small)
+                        Text("Checking USB Access…")
+                    }
+                } else {
+                    Label {
+                        Text("Erase and Create", comment: "Button that erases the drive and creates the installer.")
+                    } icon: {
+                        // The current Authorization Services flow is password-only.
+                        Image(systemName: authenticationMethod.symbolName)
+                    }
                 }
             }
             .buttonStyle(.primary)
             .tint(Theme.Colors.danger)
-            .disabled(!hasConfirmed || !canCreate || isAuthorizing)
+            .disabled(!hasConfirmed || !canCreate || isAuthorizing || isCheckingHelperDiskAccess)
             .help(
                 canCreate
                     ? Text(verbatim: "")

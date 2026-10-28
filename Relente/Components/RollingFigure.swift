@@ -2,8 +2,8 @@
 //  RollingFigure.swift
 //  Relente
 //
-//  Figures that change while the user watches (the Creating screen's percentage, COPIED, SPEED,
-//  REMAINING) roll like a counter: digits roll up when the figure grows and down when it
+//  Figures that change while the user watches (the Creating screen's elapsed time, percentage,
+//  COPIED and REMAINING) roll like a counter: digits roll up when the figure grows and down when it
 //  shrinks. With Reduce Motion they just change.
 //  Spec: specs/006-assistant-navigation/spec.md
 //

@@ -400,6 +400,23 @@ struct AssistantTests {
         #expect(assistant.selectedDriveID == big.id)
     }
 
+    @Test func `try again clears output from the failed creation`() async {
+        let output = CreationOutputLine(timestamp: Date(timeIntervalSince1970: 123), text: "Copying files…")
+        let failure = CreationFailure(reason: .cancelled, progress: copying)
+        let assistant = makeAssistant(
+            service: StubCreationService(events: [.output(output), .failed(failure)]))
+        await startCreating(assistant)
+        await waitUntil { assistant.creation?.failure != nil }
+        settle(assistant)
+
+        #expect(assistant.creationOutput == [output])
+
+        assistant.tryAgain()
+
+        #expect(assistant.step == .review)
+        #expect(assistant.creationOutput.isEmpty)
+    }
+
     @Test(arguments: [CreationFailure.Reason.driveChanged, .driveNotAllowed, .driveDisconnected])
     func `try again goes to USB Drive when the drive must be picked again`(reason: CreationFailure.Reason) async {
         let failure = CreationFailure(reason: reason, progress: copying)

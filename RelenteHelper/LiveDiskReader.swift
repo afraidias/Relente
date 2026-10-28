@@ -10,13 +10,20 @@
 import DiskArbitration
 import Foundation
 
-nonisolated struct LiveDiskReader: DiskReading {
+nonisolated struct LiveDiskReader: DiskReading, VolumeReading {
 
     func describe(_ bsdName: String) async -> DiskDescription? {
         guard let session = DASessionCreate(kCFAllocatorDefault),
             let disk = DADiskCreateFromBSDName(kCFAllocatorDefault, session, bsdName)
         else { return nil }
         // A disk that isn't connected has no description.
+        return DiskDescriber.describe(disk)
+    }
+
+    func describeVolume(at path: URL) async -> DiskDescription? {
+        guard let session = DASessionCreate(kCFAllocatorDefault),
+            let disk = DADiskCreateFromVolumePath(kCFAllocatorDefault, session, path as CFURL)
+        else { return nil }
         return DiskDescriber.describe(disk)
     }
 

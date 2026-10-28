@@ -29,6 +29,11 @@ struct RelenteApp: App {
         .commands {
             AssistantCommands(assistant: assistant)
         }
+
+        Window("Creation Log", id: "creation-output") {
+            CreationOutputWindow(lines: assistant.creationOutput)
+        }
+        .defaultSize(width: 800, height: 520)
     }
 
     // MARK: - Services
@@ -94,22 +99,22 @@ struct RelenteApp: App {
         usesSampleData ? SampleEraseAuthorizer() : LiveEraseAuthorizer()
     }
 
-    /// How the installer is made. Until roadmap step 7 only Debug builds have one: with real
-    /// drives, the helper really formats the drive and the rest is simulated (spec 008); with
-    /// sample data, everything is simulated and nothing is erased. `-simulationSpeed fast` makes
-    /// the full simulation last about 2 s and `-simulateFailure driveDisconnected` makes it fail
-    /// during Copy. Release builds have none, so "Erase and Create" stays disabled (spec 006).
+    /// How the installer is made. Real drives use the helper in every build; sample data keeps
+    /// the deterministic simulation for previews and UI tests.
     private static var creationService: (any CreationService)? {
         #if DEBUG
-            guard usesSampleData else { return HelperCreationService(client: liveHelperClient) }
-            let defaults = UserDefaults.standard
-            return SimulatedCreationService(
-                speed: .init(launchArgument: defaults.string(forKey: "simulationSpeed")),
-                failure: SimulatedCreationService.failure(launchArgument: defaults.string(forKey: "simulateFailure"))
-            )
-        #else
-            return nil
+            if usesSampleData {
+                let defaults = UserDefaults.standard
+                return SimulatedCreationService(
+                    speed: .init(launchArgument: defaults.string(forKey: "simulationSpeed")),
+                    failure: SimulatedCreationService.failure(
+                        launchArgument: defaults.string(forKey: "simulateFailure")),
+                    simulatesLiveFeedback: defaults.bool(forKey: "simulateLiveFeedback"),
+                    simulatesMeasuredCopy: defaults.bool(forKey: "simulateMeasuredCopy")
+                )
+            }
         #endif
+        return HelperCreationService(client: liveHelperClient)
     }
 
     /// In Debug builds, launching with `-classicControls YES` shows the

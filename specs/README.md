@@ -35,6 +35,22 @@ once in [AGENTS.md](../AGENTS.md), and the screen flow and design system in
 | [007 · Real disk and installer detection](007-real-detection/spec.md) | 5 | Done |
 | [008 · System helper, XPC and security checks](008-system-helper/spec.md) | 6 | Done |
 | [009 · App icon](009-app-icon/spec.md) | 8 | Done |
+| [010 · Live installer creation](010-live-creation/spec.md) | 7 | Done |
+
+## Capability map
+
+The complete bootable-media workflow has two capabilities that can be built and tested
+independently:
+
+| Capability | Roadmap step | Scope |
+| --- | --- | --- |
+| Live creation | 7 | Use a selected local installer, let Apple's `createinstallmedia` prepare and erase the confirmed USB/SD card, and show real progress, output, cancellation and recovery. Review the affected screens so the user always knows what is happening. |
+| Installer acquisition | 9 | Show Apple-compatible installer versions alongside local installers, avoid downloading a version already present, download with progress and retain it for reuse. Feed the resulting installer into the existing installer-selection flow. |
+
+Build order: live creation, then installer acquisition. In the eventual user flow, installer
+selection or download happens before USB selection so the app can compare installer size with
+available drives. Verify the full end-to-end flow after both capabilities are complete. Deleting a
+retained download is tracked separately in [issue #39](https://github.com/afraidias/Relente/issues/39).
 
 ## Templates
 

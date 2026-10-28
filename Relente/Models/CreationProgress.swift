@@ -20,8 +20,14 @@ nonisolated struct CreationProgress: Hashable, Sendable {
     let copiedBytes: Int64
     /// Size of the installer being copied, in bytes.
     let installerSize: Int64
-    /// Current copy speed in bytes per second; 0 while it's still unknown.
+    /// Simulated copy speed used to estimate remaining time in the sample flow.
     let bytesPerSecond: Int64
+    /// The live Apple tool reports phase percentages, not measured installer bytes or overall progress.
+    let isLive: Bool
+    /// The helper measured the primary SharedSupport image's destination bytes against its source size.
+    let hasMeasuredCopyProgress: Bool
+    /// The helper is validating and preparing the selected source before `createinstallmedia` reports a phase.
+    let isPreparingInstaller: Bool
 
     init(
         phase: CreationPhase,
@@ -29,7 +35,10 @@ nonisolated struct CreationProgress: Hashable, Sendable {
         phaseElapsed: Duration = .zero,
         copiedBytes: Int64 = 0,
         installerSize: Int64 = 0,
-        bytesPerSecond: Int64 = 0
+        bytesPerSecond: Int64 = 0,
+        isLive: Bool = false,
+        hasMeasuredCopyProgress: Bool = false,
+        isPreparingInstaller: Bool = false
     ) {
         self.phase = phase
         self.phaseFraction = phaseFraction
@@ -37,6 +46,9 @@ nonisolated struct CreationProgress: Hashable, Sendable {
         self.copiedBytes = copiedBytes
         self.installerSize = installerSize
         self.bytesPerSecond = bytesPerSecond
+        self.isLive = isLive
+        self.hasMeasuredCopyProgress = hasMeasuredCopyProgress
+        self.isPreparingInstaller = isPreparingInstaller
     }
 
     // MARK: - Overall progress
@@ -82,13 +94,14 @@ nonisolated struct CreationProgress: Hashable, Sendable {
         }
     }
 
-    /// SPEED: only during Copy and once it's known; `nil` shows "—".
-    var displayedBytesPerSecond: Int64? {
-        phase == .copy && bytesPerSecond > 0 ? bytesPerSecond : nil
-    }
-
     /// REMAINING: an estimate of the time left in the current phase.
     var remaining: RemainingTime {
+        if isLive {
+            guard phase == .copy else { return isPastCopy ? .almostDone : .calculating }
+            guard hasMeasuredCopyProgress, bytesPerSecond > 0 else { return .calculating }
+            let bytesLeft = max(installerSize - copiedBytes, 0)
+            return .estimate(.seconds(Double(bytesLeft) / Double(bytesPerSecond)))
+        }
         if phase == .copy {
             guard bytesPerSecond > 0 else { return .calculating }
             let bytesLeft = max(installerSize - copiedBytes, 0)
@@ -96,7 +109,7 @@ nonisolated struct CreationProgress: Hashable, Sendable {
         }
         guard phaseFraction != nil else { return isPastCopy ? .almostDone : .calculating }
         let done = clampedPhaseFraction
-        guard done > 0 else { return .calculating }
+        guard done > 0, phaseElapsed > .zero else { return .calculating }
         return .estimate(phaseElapsed * ((1 - done) / done))
     }
 }
@@ -133,6 +146,18 @@ nonisolated extension CreationProgress {
         copiedBytes: 7_200_000_000,
         installerSize: sampleInstallerSize,
         bytesPerSecond: 40_000_000
+    )
+
+    /// Live Copy after the helper has measured stable `SharedSupport.dmg` growth.
+    static let sampleMeasuredCopy = CreationProgress(
+        phase: .copy,
+        phaseFraction: 7.2 / 16.8,
+        phaseElapsed: .seconds(180),
+        copiedBytes: 7_200_000_000,
+        installerSize: sampleInstallerSize,
+        bytesPerSecond: 40_000_000,
+        isLive: true,
+        hasMeasuredCopyProgress: true
     )
 
     /// Making the drive bootable, which reports no percentage.

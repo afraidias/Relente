@@ -45,14 +45,25 @@ final class AssistantFlowUITests: XCTestCase {
     }
 
     @MainActor
+    func testTheWholeFlowWithClassicControls() {
+        app = .relente(simulationSpeed: "fast", extraArguments: ["-classicControls", "YES"])
+        app.goToDone()
+
+        app.press(.return)
+        expectScreen("Choose an Installer")
+    }
+
+    @MainActor
     func testPermissionsThenTheWholeFlow() {
         app = .relente(extraArguments: ["-sampleHelper", "notInstalled"])
         expectScreen("Set Up Relente")
         XCTAssertTrue(app.element("The system helper isn't installed.").exists)
         XCTAssertTrue(app.buttons["Install Helper"].exists)
+        XCTAssertTrue(app.element("macOS protects access to disks and removable drives.").exists)
 
         app.buttons["Install Helper"].click()
         XCTAssertTrue(app.element("System helper ready.").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Continue"].isEnabled)
         app.buttons["Continue"].click()
         expectScreen("Choose an Installer")
 

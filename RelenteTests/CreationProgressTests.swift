@@ -62,6 +62,16 @@ struct CreationProgressTests {
         #expect(progress.percent == 100)
     }
 
+    @Test func `live startup is identified as installer preparation`() {
+        let progress = CreationProgress(
+            phase: .format, phaseFraction: nil, installerSize: installerSize, isLive: true,
+            isPreparingInstaller: true)
+
+        #expect(progress.isPreparingInstaller)
+        #expect(progress.remaining == .calculating)
+        #expect(progress.displayedCopiedBytes == 0)
+    }
+
     @Test(arguments: zip(CreationPhase.allCases, CreationPhase.allCases.dropFirst()))
     func `moving to the next phase never goes back`(phase: CreationPhase, next: CreationPhase) {
         let endOfPhase = CreationProgress(phase: phase, phaseFraction: 1)
@@ -69,7 +79,7 @@ struct CreationProgressTests {
         #expect(startOfNext.overallFraction >= endOfPhase.overallFraction)
     }
 
-    // MARK: - COPIED and SPEED
+    // MARK: - COPIED
 
     /// A snapshot of the sample installer being made.
     private func progress(
@@ -89,20 +99,14 @@ struct CreationProgressTests {
         )
     }
 
-    @Test func `before Copy nothing is copied and there's no speed`() {
-        let format = progress(.format, fraction: 0.5, copied: 123, speed: 99)
+    @Test func `before Copy nothing is copied`() {
+        let format = progress(.format, fraction: 0.5, copied: 123)
         #expect(format.displayedCopiedBytes == 0)
-        #expect(format.displayedBytesPerSecond == nil)
     }
 
-    @Test func `during Copy the real bytes and speed are shown`() {
-        let copy = progress(.copy, fraction: 0.43, copied: 7_200_000_000, speed: 40_000_000)
+    @Test func `during Copy the real bytes are shown`() {
+        let copy = progress(.copy, fraction: 0.43, copied: 7_200_000_000)
         #expect(copy.displayedCopiedBytes == 7_200_000_000)
-        #expect(copy.displayedBytesPerSecond == 40_000_000)
-    }
-
-    @Test func `during Copy an unknown speed is not shown`() {
-        #expect(progress(.copy, fraction: 0.01, copied: 150_000_000).displayedBytesPerSecond == nil)
     }
 
     @Test func `during Copy more bytes than the installer still shows the real bytes`() {
@@ -112,13 +116,38 @@ struct CreationProgressTests {
     }
 
     @Test(arguments: [CreationPhase.makeBootable, .verify])
-    func `after Copy the whole installer is copied and there's no speed`(phase: CreationPhase) {
-        let after = progress(phase, copied: 0, speed: 40_000_000)
+    func `after Copy the whole installer is copied`(phase: CreationPhase) {
+        let after = progress(phase, copied: 0)
         #expect(after.displayedCopiedBytes == installerSize)
-        #expect(after.displayedBytesPerSecond == nil)
     }
 
     // MARK: - REMAINING
+
+    @Test func `live phase percentages do not invent remaining time`() {
+        let progress = CreationProgress(phase: .format, phaseFraction: 1, installerSize: installerSize, isLive: true)
+        #expect(progress.remaining == .calculating)
+    }
+
+    @Test func `live Copy reports calculating until measured bytes support an estimate`() {
+        let progress = CreationProgress(phase: .copy, phaseFraction: nil, installerSize: installerSize, isLive: true)
+        #expect(progress.remaining == .calculating)
+    }
+
+    @Test func `live Copy estimates remaining from measured image bytes and stable rate`() {
+        let progress = CreationProgress(
+            phase: .copy, phaseFraction: 0.6, copiedBytes: 600, installerSize: 1_000,
+            bytesPerSecond: 100, isLive: true, hasMeasuredCopyProgress: true)
+
+        #expect(progress.displayedCopiedBytes == 600)
+        #expect(progress.remaining == .estimate(.seconds(4)))
+    }
+
+    @Test func `measured Copy preview represents a live byte based estimate`() {
+        #expect(CreationProgress.sampleMeasuredCopy.isLive)
+        #expect(CreationProgress.sampleMeasuredCopy.hasMeasuredCopyProgress)
+        #expect(CreationProgress.sampleMeasuredCopy.displayedCopiedBytes == 7_200_000_000)
+        #expect(CreationProgress.sampleMeasuredCopy.remaining == .estimate(.seconds(240)))
+    }
 
     @Test func `during Copy remaining is bytes left divided by speed`() {
         // 9.6 GB left at 40 MB/s = 240 s

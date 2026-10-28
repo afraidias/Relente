@@ -44,7 +44,10 @@ the step indicator animates (the pill stretches to the new step and the number r
 0. **Permissions** (while the system helper is not ready): app icon and status badge, a status
    line with an approval indicator when macOS is waiting, a blue callout with the Touch ID symbol
    when available or a lock for password fallback, and one footer button for the next action: Install Helper,
-   Open Settings…, Continue, or Try Again.
+   Open Settings…, Continue, or Try Again. A short explanation links to Full Disk Access settings
+   and explains Full Disk Access and Background App Activity. Users can choose an installer and
+   drive before enabling Full Disk Access; the helper checks the selected USB at Review and blocks
+   before erasing if it cannot write.
 1. **Installer:** the `Install macOS *.app` in `/Applications`, found live, as Finder-style
    options with the real file icon (`NSWorkspace.shared.icon(forFile:)`), newest first, the newest
    supported one selected; the selected one has a gray plate behind it and its name in a blue
@@ -78,8 +81,17 @@ the step indicator animates (the pill stretches to the new step and the number r
    available or a lock for password fallback. If the
    drive is unplugged, the assistant goes back to step 2 and VoiceOver says so; if the installer
    disappears, on steps 2 or 3, back to step 1.
-4. **Creating:** progress ring around the drive; COPIED / SPEED / REMAINING; a 4-phase bar
-   (Format, Copy, Make bootable, Verify). The percentage and the three figures roll like a counter
+4. **Creating:** while the helper validates and prepares the selected source, the screen says so
+   without claiming the USB is already formatting. It shows a progress ring around the drive and
+   ELAPSED; after `createinstallmedia` reports erasure, it shows ELAPSED with one focused progress
+   bar, then ELAPSED / COPIED / REMAINING and a 4-phase bar (Prepare and erase, Copy, Make bootable,
+   Verify). Progress comes from Apple's signed
+   `createinstallmedia` running in the helper; the command prepares and erases the selected volume.
+   Activity opens a compact popover with recent phase updates and selectable technical output; a
+   separate window is available for longer output. Output remains in memory for the current run.
+   Missing measurements show an unknown state; the screen does not show approximate whole-device
+   write throughput. The app only shows Done after Apple's completion marker and the expected
+   installer app on the resulting volume are verified. The percentage and figures roll like a counter
    as they change. "Cancel" (also Esc) asks for confirmation in a sheet that
    looks like a macOS alert: "Keep Going" answers Return and Esc; "Stop", which leaves the drive
    unusable until it's erased again, only a click.
@@ -112,9 +124,9 @@ Create"). "Back" answers Esc and is in the menu bar as **Go › Back** (⌘[, wh
 same key position on other keyboard layouts). Left and right arrows move the selection on steps 1
 and 2, skipping drives that can't be used.
 
-Until roadmap step 7, Debug builds simulate the creation (about 15 s, nothing is erased) and say so
-with an orange "SIMULATION · Nothing is erased" label on Creating, Error and Done; Release builds
-keep "Erase and Create" disabled with the help tag "Available in a later version."
+Debug builds launched with sample data simulate creation (about 15 s, nothing is erased) and say so
+with an orange "SIMULATION · Nothing is erased" label on Creating, Error and Done. Normal Debug and
+Release builds use the live helper for creation.
 
 Debug builds launched with `-sampleData YES` show sample installers and drives instead of the
 Mac's (add `-sampleEmpty installers` or `-sampleEmpty drives` to see an empty state); tests and

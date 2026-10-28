@@ -16,8 +16,11 @@ struct CreatingView: View {
     let drive: Drive
     /// Running, or stopped with a reason. Both share this layout, so the screen doesn't jump.
     let state: CreationState
+    let output: [CreationOutputLine]
     /// What the creation only pretended (Debug builds), or `nil`: a label then says so.
     var simulation: CreationSimulation?
+    var onOpenFullDiskAccessSettings: () -> Void = {}
+    @State private var creationStarted = ContinuousClock.now
 
     var body: some View {
         let progress = state.progress
@@ -25,10 +28,19 @@ struct CreatingView: View {
         VStack(spacing: 0) {
             if let failure = state.failure {
                 ScreenHeader(title: "Couldn't Create the Installer", subtitle: Self.subtitle(for: failure.reason))
+                if failure.reason == .volumeAccessDenied {
+                    Button("Open Full Disk Access Settings…", action: onOpenFullDiskAccessSettings)
+                        .buttonStyle(.link)
+                        .padding(.top, 6)
+                }
             } else {
                 ScreenHeader(
                     title: "Creating Installer",
-                    subtitle: "Keep the drive plugged in. This can take a while."
+                    subtitle: progress.isPreparingInstaller
+                        ? LocalizedStringResource(
+                            "Preparing the selected installer…",
+                            comment: "Creating screen subtitle while the helper validates and prepares the installer.")
+                        : Self.subtitle(for: progress.phase)
                 )
             }
 
@@ -43,7 +55,7 @@ struct CreatingView: View {
 
             Spacer(minLength: 8)
 
-            VStack(spacing: 24) {
+            VStack(spacing: 32) {
                 if let failure = state.failure {
                     // Keeps the height of the three figures (which have a caption), so nothing moves.
                     CreatingStats(progress: progress)
@@ -52,14 +64,64 @@ struct CreatingView: View {
                             FailureStats(failure: failure)
                         }
                 } else {
-                    CreatingStats(progress: progress)
+                    TimelineView(.periodic(from: .now, by: 1)) { _ in
+                        CreatingStats(progress: progress, elapsed: creationStarted.duration(to: .now))
+                    }
                 }
 
-                PhaseBar(
-                    current: progress.phase,
-                    currentFraction: progress.phaseFraction ?? 0,
-                    isFailed: state.failure != nil
-                )
+                if progress.isPreparingInstaller {
+                    Group {
+                        if state.failure == nil {
+                            ProgressView()
+                        } else {
+                            ProgressView(value: 0)
+                                .tint(Theme.Colors.danger)
+                        }
+                    }
+                    .accessibilityLabel(
+                        Text(state.failure == nil ? "Preparing the installer" : "Installer preparation stopped")
+                    )
+                    .accessibilityValue(Text(state.failure == nil ? "In progress" : "Stopped"))
+                    .frame(height: 28)
+                    .accessibilityIdentifier("creation.preparingInstaller")
+                } else if state.failure == nil, progress.phase == .format {
+                    // During erasure, one real progress bar is clearer than showing the
+                    // later creation phases as if they were already underway.
+                    Group {
+                        if let fraction = progress.phaseFraction {
+                            ProgressView(value: fraction)
+                        } else {
+                            ProgressView()
+                        }
+                    }
+                    .accessibilityLabel(Text("Formatting the USB drive"))
+                    .accessibilityValue(
+                        Text(
+                            verbatim: progress.phaseFraction.map { $0.formatted(.percent) }
+                                ?? String(localized: "In progress")
+                        )
+                    )
+                    .frame(height: 28)
+                } else if state.failure == nil, progress.isLive, progress.phaseFraction == nil {
+                    VStack(spacing: 8) {
+                        ProgressView()
+                        Text(progress.phase == .copy ? "Measuring installer image…" : "In progress")
+                            .font(Theme.Fonts.footnote)
+                            .foregroundStyle(Theme.Colors.secondary)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(Text(progress.phase.name))
+                    .accessibilityValue(Text("In progress"))
+                    .frame(height: 44)
+                    .accessibilityIdentifier("creation.indeterminateProgress")
+                } else {
+                    PhaseBar(
+                        current: progress.phase,
+                        currentFraction: progress.phaseFraction ?? 0,
+                        isIndeterminate: state.failure == nil && progress.isLive && progress.phaseFraction == nil,
+                        isFailed: state.failure != nil
+                    )
+                }
             }
             .frame(width: Theme.Sizes.contentWidth)
 
@@ -68,6 +130,11 @@ struct CreatingView: View {
             Spacer(minLength: 8)
         }
         .padding(.top, Theme.Sizes.headerTopPadding)
+        .overlay(alignment: .topTrailing) {
+            CreationOutputDetails(lines: output, failure: state.failure?.reason)
+                .padding(.top, 8)
+                .padding(.trailing, 24)
+        }
     }
 
     /// The Error screen's subtitle: why it stopped, in the primary color, then what to do.
@@ -76,6 +143,28 @@ struct CreatingView: View {
             "\(Text(reason.title).foregroundStyle(.primary)) \(Text(reason.recovery))",
             comment: "Error screen subtitle. First value: why it stopped; second: what to do. Both are full sentences."
         )
+    }
+
+    /// Names the operation macOS is currently performing, even when it reports no percentage.
+    private static func subtitle(for phase: CreationPhase) -> LocalizedStringResource {
+        switch phase {
+        case .format:
+            LocalizedStringResource(
+                "Erasing and formatting the USB drive…",
+                comment: "Creating screen subtitle while createinstallmedia erases and formats the selected USB.")
+        case .copy:
+            LocalizedStringResource(
+                "Copying installer files to the USB drive…",
+                comment: "Creating screen subtitle while createinstallmedia copies installer files.")
+        case .makeBootable:
+            LocalizedStringResource(
+                "Making the USB drive bootable…",
+                comment: "Creating screen subtitle while createinstallmedia makes the USB bootable.")
+        case .verify:
+            LocalizedStringResource(
+                "Checking the bootable installer…",
+                comment: "Creating screen subtitle while Relente checks the completed USB installer.")
+        }
     }
 }
 
@@ -116,11 +205,24 @@ struct CreatingHero: View {
                 // where. The ring's space is kept, so nothing moves (spec 005).
                 artwork
                     .frame(width: Self.ringDiameter, height: Self.ringDiameter)
+            } else if progress.isLive
+                && (progress.phaseFraction == nil || (progress.phaseFraction == 1 && !progress.hasMeasuredCopyProgress))
+            {
+                ZStack(alignment: .bottomTrailing) {
+                    artwork
+                    ProgressView()
+                        .controlSize(.small)
+                }
+                .frame(width: Self.ringDiameter, height: Self.ringDiameter)
+                .accessibilityElement(children: .combine)
             } else {
                 ProgressRing(
-                    fraction: progress.overallFraction,
-                    label: Text("Creating installer", comment: "VoiceOver label of the progress ring."),
-                    value: Text(progress.percent, format: .percent),
+                    fraction: progress.isLive ? (progress.phaseFraction ?? 0) : progress.overallFraction,
+                    label: progress.isLive
+                        ? Text(progress.phase.name)
+                        : Text("Creating installer", comment: "VoiceOver label of the progress ring."),
+                    value: Text(
+                        progress.isLive ? Int((progress.phaseFraction ?? 0) * 100) : progress.percent, format: .percent),
                     diameter: Self.ringDiameter,
                     tint: tint
                 ) {
@@ -144,11 +246,22 @@ struct CreatingHero: View {
     }
 
     private var percentage: some View {
-        Text(progress.percent, format: .percent)
-            .font(Theme.Fonts.figure)
-            .rollingFigure(Double(progress.percent))
-            // The ring already reads the percentage.
-            .accessibilityHidden(true)
+        Group {
+            if progress.isLive
+                && (progress.phaseFraction == nil || (progress.phaseFraction == 1 && !progress.hasMeasuredCopyProgress))
+            {
+                Text("In progress")
+            } else {
+                let percent = progress.isLive ? Int((progress.phaseFraction ?? 0) * 100) : progress.percent
+                HStack(spacing: 6) {
+                    if progress.isLive { Text(progress.phase.name) }
+                    Text(percent, format: .percent)
+                        .rollingFigure(Double(percent))
+                }
+            }
+        }
+        .font(Theme.Fonts.figure)
+        .accessibilityHidden(true)
     }
 
     private var driveName: some View {
@@ -164,60 +277,72 @@ struct CreatingHero: View {
 
 // MARK: - Figures
 
-/// COPIED / SPEED / REMAINING.
+/// ELAPSED / COPIED / REMAINING.
 struct CreatingStats: View {
     let progress: CreationProgress
+    var elapsed: Duration = .zero
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             BigStat(
                 label: LocalizedStringResource(
-                    "COPIED", comment: "Creating screen figure: bytes of the installer copied to the drive so far."),
-                value: Text(verbatim: Self.bytes(progress.displayedCopiedBytes)),
-                caption: Text(
-                    "of \(Self.bytes(progress.installerSize))",
-                    comment: "Creating screen, under COPIED. The value is the installer's size, e.g. 16.8 GB."
-                ),
-                rollingValue: Double(progress.displayedCopiedBytes)
+                    "ELAPSED", comment: "Creating screen: elapsed time since creation started."),
+                value: Text(verbatim: Self.elapsedText(elapsed)),
+                rollingValue: Double(max(elapsed.components.seconds, 0))
             )
             .frame(maxWidth: .infinity)
+            .accessibilityLabel(Text("ELAPSED"))
+            .accessibilityValue(Text(verbatim: Self.elapsedText(elapsed)))
+            .accessibilityIdentifier("creation.elapsed")
 
-            BigStat(
-                label: LocalizedStringResource(
-                    "SPEED", comment: "Creating screen figure: how fast the installer is being copied."),
-                value: speed,
-                rollingValue: Double(progress.displayedBytesPerSecond ?? 0)
-            )
-            .frame(maxWidth: .infinity)
+            if progress.phase != .format {
+                BigStat(
+                    label: LocalizedStringResource(
+                        "COPIED", comment: "Creating screen figure: bytes of the installer copied to the drive so far."),
+                    value: Text(
+                        verbatim: progress.isLive && !progress.hasMeasuredCopyProgress
+                            ? String(localized: "Measuring…") : Self.bytes(progress.displayedCopiedBytes)),
+                    caption: progress.isLive && !progress.hasMeasuredCopyProgress
+                        ? Text("Waiting for installer image data…")
+                        : Text(
+                            "of \(Self.bytes(progress.installerSize))",
+                            comment:
+                                "Creating screen, under COPIED. The value is the primary installer image's size, e.g. 18.4 GB."
+                        ),
+                    rollingValue: progress.isLive && !progress.hasMeasuredCopyProgress
+                        ? nil : Double(progress.displayedCopiedBytes)
+                )
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier("creation.copied")
+            }
 
-            BigStat(
-                label: LocalizedStringResource(
-                    "REMAINING", comment: "Creating screen figure: estimated time left."),
-                value: Text(progress.remaining.text),
-                rollingValue: remainingSeconds
-            )
-            .frame(maxWidth: .infinity)
+            if progress.phase != .format {
+                BigStat(
+                    label: LocalizedStringResource(
+                        "REMAINING", comment: "Creating screen figure: estimated time left."),
+                    value: Text(progress.remaining.text),
+                    rollingValue: remainingSeconds
+                )
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier("creation.remaining")
+            }
         }
     }
 
     /// REMAINING in seconds, so it rolls downwards as it shrinks; 0 when there's no estimate.
-    private var remainingSeconds: Double {
-        guard case .estimate(let duration) = progress.remaining else { return 0 }
+    private var remainingSeconds: Double? {
+        guard case .estimate(let duration) = progress.remaining else { return nil }
         return Double(duration.components.seconds)
-    }
-
-    /// "48 MB/s", or a dash while there's no speed to show.
-    private var speed: Text {
-        guard let bytesPerSecond = progress.displayedBytesPerSecond else { return Text(verbatim: "—") }
-        return Text(
-            "\(Self.bytes(bytesPerSecond))/s",
-            comment: "Creating screen, SPEED. The value is an amount of data, e.g. 48 MB; the figure is per second."
-        )
     }
 
     /// Bytes formatted for people, writing zero as "0 bytes" rather than "Zero KB".
     private static func bytes(_ count: Int64) -> String {
         count.formatted(.byteCount(style: .file, spellsOutZero: false))
+    }
+
+    private static func elapsedText(_ duration: Duration) -> String {
+        let seconds = max(duration.components.seconds, 0)
+        return String(format: "%lld:%02lld", seconds / 60, seconds % 60)
     }
 }
 
@@ -230,7 +355,8 @@ struct FailureStats: View {
         BigStat(
             label: LocalizedStringResource(
                 "STOPPED AT", comment: "Error screen figure: overall progress when creating stopped."),
-            value: Text(failure.stoppedPercent, format: .percent),
+            value: failure.progress.isLive
+                ? Text(failure.progress.phase.name) : Text(failure.stoppedPercent, format: .percent),
             tint: Theme.Colors.danger
         )
         .frame(maxWidth: .infinity)
@@ -341,7 +467,8 @@ struct CreatingScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             CreatingView(
-                installer: InstallerSource.samples[0], drive: Drive.samples[0], state: state, simulation: simulation
+                installer: InstallerSource.samples[0], drive: Drive.samples[0], state: state, output: [],
+                simulation: simulation
             )
             .padding(.horizontal, 32)
             .padding(.bottom, 24)
@@ -363,12 +490,24 @@ struct CreatingScreen: View {
     CreatingScreen(state: .running(.sampleFormat))
 }
 
-#Preview("Copy, speed unknown") {
+#Preview("Preparing installer") {
+    CreatingScreen(
+        state: .running(
+            CreationProgress(
+                phase: .format, phaseFraction: nil, installerSize: InstallerSource.samples[0].size,
+                isLive: true, isPreparingInstaller: true)))
+}
+
+#Preview("Copy, no reported bytes") {
     CreatingScreen(state: .running(.sampleEarlyCopy))
 }
 
 #Preview("Copy") {
     CreatingScreen(state: .running(.sampleMidCopy))
+}
+
+#Preview("Copy, measured bytes") {
+    CreatingScreen(state: .running(.sampleMeasuredCopy))
 }
 
 #Preview("Make bootable") {
@@ -400,7 +539,7 @@ struct CreatingScreen: View {
 }
 
 #Preview("Classic (macOS 14–15)") {
-    CreatingScreen(state: .running(.sampleMidCopy))
+    CreatingScreen(state: .running(.sampleMeasuredCopy))
         .environment(\.usesClassicControls, true)
 }
 
@@ -410,7 +549,7 @@ struct CreatingScreen: View {
 }
 
 #Preview("Dark") {
-    CreatingScreen(state: .running(.sampleMidCopy))
+    CreatingScreen(state: .running(.sampleMeasuredCopy))
         .preferredColorScheme(.dark)
 }
 

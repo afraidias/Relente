@@ -18,7 +18,10 @@ LiveAuthorizationChecker.installRight()
 
 let delegate = HelperListener(
     pipeline: FormatPipeline(
-        authorization: LiveAuthorizationChecker(), disks: LiveDiskReader(), formatter: LiveDiskFormatter()))
+        authorization: LiveAuthorizationChecker(), disks: LiveDiskReader(), formatter: LiveDiskFormatter()),
+    creationPipeline: CreateInstallMediaPipeline(
+        authorization: LiveAuthorizationChecker(), disks: LiveDiskReader(), volumes: LiveDiskReader(),
+        runner: LiveCreateInstallMediaRunner(), volumeWriteChecker: LiveVolumeWriteChecker()))
 let listener = NSXPCListener(machServiceName: HelperIdentity.machServiceName)
 // Only the Relente app signed by the team may connect (helper rule 2).
 listener.setConnectionCodeSigningRequirement(CodeSigningRequirement.app)
