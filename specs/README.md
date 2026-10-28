@@ -36,6 +36,7 @@ once in [AGENTS.md](../AGENTS.md), and the screen flow and design system in
 | [008 · System helper, XPC and security checks](008-system-helper/spec.md) | 6 | Done |
 | [009 · App icon](009-app-icon/spec.md) | 8 | Done |
 | [010 · Live installer creation](010-live-creation/spec.md) | 7 | Done |
+| [011 · Installer acquisition](011-installer-acquisition/spec.md) | 9 | Draft |
 
 ## Capability map
 
