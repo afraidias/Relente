@@ -96,6 +96,15 @@ struct InstallerMetadataTests {
             </plist>
             """.utf8)
         #expect(try InstallerMetadata.version(fromCatalog: catalog) == "15.6")
+        #expect(try InstallerMetadata.catalogInfo(fromCatalog: catalog) == .init(version: "15.6", build: "24G84"))
+    }
+
+    @Test func `a catalog without a build keeps it unknown`() throws {
+        let catalog = Data(
+            #"<plist version="1.0"><dict><key>Assets</key><array><dict><key>OSVersion</key><string>15.6</string></dict></array></dict></plist>"#
+                .utf8)
+
+        #expect(try InstallerMetadata.catalogInfo(fromCatalog: catalog).build == nil)
     }
 
     @Test func `a catalog without a version is rejected`() {
@@ -125,7 +134,7 @@ struct InstallerMetadataTests {
             </installer-gui-script>
             """.utf8)
         let info = try InstallerMetadata.packageInfo(fromDistribution: distribution)
-        #expect(info == InstallerMetadata.PackageInfo(version: "15.6", installedSize: 15_360_000_000))
+        #expect(info == InstallerMetadata.PackageInfo(version: "15.6", build: "24G84", installedSize: 15_360_000_000))
     }
 
     @Test func `a package without a version is rejected`() {

@@ -23,6 +23,8 @@ struct AssistantView: View {
     /// The footer's screen. It changes at once, outside the animation: only the screen above it
     /// slides or fades.
     @State private var footerStep: AssistantStep
+    @State private var shownDownload: Bool
+    @State private var footerDownload: Bool
     /// How the change to `shownStep` moves.
     @State private var change = ScreenChange(direction: .forward, style: .crossfade)
     /// While the screen changes, the step it changes from.
@@ -41,12 +43,14 @@ struct AssistantView: View {
         self.thisMac = thisMac
         _shownStep = State(initialValue: assistant.step)
         _footerStep = State(initialValue: assistant.step)
+        _shownDownload = State(initialValue: assistant.isShowingDownload)
+        _footerDownload = State(initialValue: assistant.isShowingDownload)
     }
 
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                screen(for: shownStep)
+                screen(for: shownStep, showingDownload: shownDownload)
                     .padding(.horizontal, 32)
                     .padding(.bottom, 24)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -56,7 +60,9 @@ struct AssistantView: View {
                     // Whatever changes inside a screen while it slides (e.g. the phase bar
                     // filling up) moves with the screen instead of jumping to its final place.
                     .geometryGroup()
-                    .id(shownStep)
+                    // Download and Installer are substates of the same flow step. Give them
+                    // distinct identities so SwiftUI performs their configured screen transition.
+                    .id(screenIdentity)
                     .transition(screenTransition)
             }
             .overlayPreferenceValue(SharedArtworkAnchors.self) { anchors in
@@ -64,7 +70,7 @@ struct AssistantView: View {
             }
             .clipped()
 
-            footer(for: footerStep)
+            footer(for: footerStep, showingDownload: footerDownload)
                 .environment(\.assistantScreen, footerStep)
         }
         .overlayPreferenceValue(SharedArtworkAnchors.self) { anchors in
@@ -137,6 +143,21 @@ struct AssistantView: View {
                 }
             }
         }
+        .onChange(of: assistant.isShowingDownload) { _, showing in
+            change = assistant.lastChange
+            changingFrom = .installer
+            footerDownload = showing
+            Task {
+                try? await Task.sleep(for: .milliseconds(16))
+                withAnimation(animation) {
+                    shownDownload = showing
+                } completion: {
+                    changingFrom = nil
+                    assistant.screenChangeDidEnd()
+                    AccessibilityNotification.ScreenChanged().post()
+                }
+            }
+        }
     }
 
     // MARK: - Announcements
@@ -184,6 +205,10 @@ struct AssistantView: View {
         case .forward: .asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
         case .back: .asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing))
         }
+    }
+
+    private var screenIdentity: String {
+        "\(String(describing: shownStep))-\(shownStep == .installer ? shownDownload : false)"
     }
 
     // MARK: - Travelling artwork
@@ -265,16 +290,44 @@ struct AssistantView: View {
     // MARK: - Screens
 
     @ViewBuilder
-    private func screen(for step: AssistantStep) -> some View {
+    private func screen(for step: AssistantStep, showingDownload: Bool) -> some View {
         switch step {
         case .permissions:
             PermissionsView(helperStatus: assistant.helperStatus, authenticationMethod: authenticationMethod)
         case .installer:
-            InstallerView(
-                installers: assistant.installers, selectedID: installerSelection,
-                onMoveSelection: assistant.moveSelection,
-                onChooseFile: { url in Task { await assistant.chooseInstaller(at: url) } },
-                error: assistant.installerError, onDismissError: assistant.dismissInstallerError)
+            if showingDownload {
+                DownloadView(
+                    installers: assistant.availableInstallers,
+                    localInstallers: assistant.installers,
+                    selectedID: assistant.selectedAvailableInstallerID,
+                    isLoading: assistant.isLoadingAvailableInstallers,
+                    hasLoadedInstallers: assistant.catalogLoadedSuccessfully,
+                    isDownloading: assistant.isDownloadingInstaller,
+                    isCancelling: assistant.isCancellingInstallerDownload,
+                    wasCancelled: assistant.isShowingDownloadCancelled,
+                    downloadingID: assistant.downloadingInstallerID,
+                    progress: assistant.downloadProgress,
+                    output: assistant.downloadOutput,
+                    error: assistant.acquisitionError,
+                    block: assistant.acquisitionBlock,
+                    incompleteInstallers: assistant.incompleteInstallerCandidates,
+                    incompleteInstallerError: assistant.incompleteInstallerError,
+                    onRetry: assistant.retryAvailableInstallers,
+                    onDownload: assistant.downloadAvailableInstaller,
+                    onUse: assistant.useAvailableInstaller,
+                    onCancel: assistant.cancelAvailableInstallerDownload,
+                    onMoveToTrash: assistant.moveIncompleteInstallerToTrash,
+                    onDismissIncompleteInstallerError: assistant.dismissIncompleteInstallerError,
+                    onMoveSelection: assistant.moveSelection
+                )
+            } else {
+                InstallerView(
+                    installers: assistant.installers, selectedID: installerSelection,
+                    onMoveSelection: assistant.moveSelection,
+                    onChooseFile: { url in Task { await assistant.chooseInstaller(at: url) } },
+                    onDownload: assistant.showDownload,
+                    error: assistant.installerError, onDismissError: assistant.dismissInstallerError)
+            }
         case .drive:
             if let installer = assistant.selectedInstaller {
                 DriveView(
@@ -305,7 +358,7 @@ struct AssistantView: View {
 
     /// The footer swaps without moving: only the screen above it slides or fades.
     @ViewBuilder
-    private func footer(for step: AssistantStep) -> some View {
+    private func footer(for step: AssistantStep, showingDownload: Bool) -> some View {
         switch step {
         case .permissions:
             PermissionsFooter(
@@ -315,7 +368,12 @@ struct AssistantView: View {
                 onOpenSettings: assistant.openHelperSettings,
                 onContinue: assistant.continueFromPermissions)
         case .installer:
-            InstallerFooter(canContinue: assistant.selectedInstaller != nil, onContinue: assistant.continueToDrive)
+            InstallerFooter(
+                showingDownload: showingDownload,
+                canGoBack: !assistant.isDownloadingInstaller,
+                canContinue: assistant.canContinueToDrive,
+                onBack: assistant.backToInstaller,
+                onContinue: assistant.continueToDrive)
         case .drive:
             DriveFooter(
                 canContinue: assistant.canContinueToReview,

@@ -7,8 +7,10 @@
 //  Spec: specs/008-system-helper/spec.md
 //
 
+import Darwin
 import Foundation
 import os
+
 #if RELENTE_TESTS
     @testable import Relente
 #endif
@@ -21,14 +23,16 @@ nonisolated final class HelperRequestHandler: NSObject, HelperProtocol, Sendable
     private let pipeline: FormatPipeline
     private let creationPipeline: CreateInstallMediaPipeline
     private let progress: OSAllocatedUnfairLock<ProgressProxy?>
+    private let callerUID: UInt32
 
     init(
         pipeline: FormatPipeline, creationPipeline: CreateInstallMediaPipeline,
-        progress: HelperProgressProtocol?
+        progress: HelperProgressProtocol?, callerUID: UInt32 = 0
     ) {
         self.pipeline = pipeline
         self.creationPipeline = creationPipeline
         self.progress = OSAllocatedUnfairLock(initialState: progress.map(ProgressProxy.init))
+        self.callerUID = callerUID
     }
 
     func protocolVersion(reply: @escaping @Sendable (Int) -> Void) {
@@ -112,6 +116,82 @@ nonisolated final class HelperRequestHandler: NSObject, HelperProtocol, Sendable
             Self.logger.info("Volume access preflight ended: \(outcome.rawValue, privacy: .public)")
             reply(outcome.rawValue)
         }
+    }
+
+    func moveIncompleteInstallerToTrash(
+        installerPath: String, snapshot: String, reply: @escaping @Sendable (Int) -> Void
+    ) {
+        let requestID = connectionID
+        guard Self.operationGate.begin(owner: requestID) else {
+            reply(IncompleteInstallerTrashOutcome.failed.rawValue)
+            return
+        }
+        Task {
+            let outcome = Self.moveIncompleteInstaller(
+                at: URL(filePath: installerPath), snapshot: snapshot, callerUID: callerUID)
+            Self.operationGate.end(owner: requestID)
+            reply(outcome.rawValue)
+        }
+    }
+
+    private static func moveIncompleteInstaller(
+        at url: URL, snapshot: String, callerUID: UInt32
+    ) -> IncompleteInstallerTrashOutcome {
+        let applications = URL(filePath: "/Applications", directoryHint: .isDirectory)
+        let item = url.standardizedFileURL
+        guard callerUID != 0, item.deletingLastPathComponent() == applications,
+            item.pathExtension == "app", item.lastPathComponent.hasPrefix("Install macOS "),
+            InstallerPathSafety.isSafe(item),
+            let current = InstallerBundleSnapshot.capture(at: item), current.value == snapshot,
+            isIncompleteInstaller(item), let home = getpwuid(callerUID).map({ String(cString: $0.pointee.pw_dir) })
+        else { return .changed }
+
+        let trash = URL(filePath: home).appending(path: ".Trash", directoryHint: .isDirectory)
+        guard !isSymbolicLink(trash),
+            let attributes = try? FileManager.default.attributesOfItem(atPath: trash.path(percentEncoded: false)),
+            (attributes[.ownerAccountID] as? NSNumber)?.uint32Value == callerUID,
+            let destination = uniqueTrashDestination(for: item, in: trash)
+        else { return .refused }
+
+        do {
+            try FileManager.default.moveItem(at: item, to: destination)
+            return .moved
+        } catch {
+            Self.logger.error("Move incomplete installer failed: \(String(describing: error), privacy: .private)")
+            return .failed
+        }
+    }
+
+    private static func isIncompleteInstaller(_ url: URL) -> Bool {
+        let infoURL = url.appending(path: "Contents/Info.plist")
+        let createInstallMedia = url.appending(path: "Contents/Resources/createinstallmedia")
+        let sharedSupport = url.appending(path: "Contents/SharedSupport/SharedSupport.dmg")
+        guard InstallerPathSafety.isSafe(url), InstallerPathSafety.isSafe(infoURL),
+            let data = try? Data(contentsOf: infoURL),
+            let info = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+            let identifier = info["CFBundleIdentifier"] as? String,
+            identifier.hasPrefix("com.apple.InstallAssistant."),
+            let version = info["CFBundleShortVersionString"] as? String,
+            Int(version.split(separator: ".").first ?? "") ?? 0 >= 16
+        else { return false }
+        return !isNonemptyRegularFile(createInstallMedia) || !isNonemptyRegularFile(sharedSupport)
+    }
+
+    private static func isNonemptyRegularFile(_ url: URL) -> Bool {
+        guard InstallerPathSafety.isSafe(url),
+            let values = try? url.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])
+        else { return false }
+        return values.isRegularFile == true && (values.fileSize ?? 0) > 0
+    }
+
+    private static func isSymbolicLink(_ url: URL) -> Bool {
+        (try? url.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) == true
+    }
+
+    private static func uniqueTrashDestination(for item: URL, in trash: URL) -> URL? {
+        let destination = trash.appending(path: item.lastPathComponent)
+        guard !FileManager.default.fileExists(atPath: destination.path(percentEncoded: false)) else { return nil }
+        return destination
     }
 
     func cancel() {

@@ -93,6 +93,16 @@ actor LiveHelperClient: HelperClient {
         helper.cancel()
     }
 
+    func moveIncompleteInstallerToTrash(_ installer: IncompleteInstaller) async -> IncompleteInstallerTrashOutcome? {
+        guard await connectsToCurrentHelper() else { return nil }
+        let raw: Int? = await call(timeout: Self.formatTimeout, operation: "incomplete installer recovery") {
+            helper, reply in
+            helper.moveIncompleteInstallerToTrash(
+                installerPath: installer.url.path(percentEncoded: false), snapshot: installer.snapshot, reply: reply)
+        }
+        return raw.flatMap(IncompleteInstallerTrashOutcome.init(rawValue:))
+    }
+
     // MARK: - Connection
 
     private func protocolVersion() async -> Int? {

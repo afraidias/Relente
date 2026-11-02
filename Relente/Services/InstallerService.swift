@@ -17,6 +17,9 @@ nonisolated protocol InstallerService: Sendable {
     /// Reads an installer the user chose (an app, a disk image or an InstallAssistant.pkg) and
     /// keeps it in the list while its file exists.
     func add(_ url: URL) async throws(InstallerError) -> InstallerSource
+
+    /// Keeps an installer being acquired from appearing selectable until it can be read completely.
+    func setAcquisitionInProgress(_ url: URL?) async
 }
 
 /// Why a file can't be used as an installer.

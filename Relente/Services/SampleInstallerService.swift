@@ -33,6 +33,8 @@ nonisolated final class SampleInstallerService: InstallerService {
         return installer
     }
 
+    func setAcquisitionInProgress(_ url: URL?) async {}
+
     /// Replaces the list, as if installers appeared or disappeared.
     func send(_ installers: [InstallerSource]) {
         continuation.yield(installers)

@@ -7,7 +7,7 @@
 //  read-only and hidden, and always detached again; packages are never installed or expanded,
 //  only their Distribution file is extracted to a temporary folder. External tools run with
 //  fixed paths and argument arrays, never through a shell.
-//  Spec: specs/007-real-detection/spec.md
+//  Specs: specs/007-real-detection/spec.md, specs/011-installer-acquisition/spec.md
 //
 
 import Foundation
@@ -33,33 +33,86 @@ nonisolated enum InstallerReader {
         }
     }
 
+    /// Reads an acquired installer only when its essential download contents are complete.
+    @concurrent
+    static func readAcquiredApp(at url: URL) async throws -> InstallerSource {
+        let createInstallMedia = url.appending(path: "Contents/Resources/createinstallmedia")
+        let sharedSupport = url.appending(path: "Contents/SharedSupport/SharedSupport.dmg")
+        guard InstallerPathSafety.isSafe(url),
+            InstallerPathSafety.isSafe(createInstallMedia),
+            ((try? createInstallMedia.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey]).fileSize) ?? 0) > 0,
+            InstallerPathSafety.isSafe(sharedSupport),
+            (try? createInstallMedia.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true,
+            (try? sharedSupport.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true,
+            ((try? sharedSupport.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0) > 0
+        else { throw ReadError(reason: "The downloaded installer is incomplete") }
+        return try await readApp(at: url, requiresCatalog: true)
+    }
+
+    /// Returns only recognizable Apple installer apps whose required downloaded files are
+    /// missing or empty. Other read failures are ambiguous and are not cleanup candidates.
+    @concurrent
+    static func incompleteAcquiredApp(at url: URL) async -> IncompleteInstaller? {
+        let applications = URL(filePath: "/Applications", directoryHint: .isDirectory)
+        let url = url.standardizedFileURL
+        let infoURL = url.appending(path: "Contents/Info.plist")
+        guard url.deletingLastPathComponent() == applications,
+            url.pathExtension == "app",
+            url.lastPathComponent.hasPrefix("Install macOS "),
+            InstallerPathSafety.isSafe(url),
+            InstallerPathSafety.isSafe(infoURL),
+            let infoData = try? Data(contentsOf: infoURL),
+            let info = try? InstallerMetadata.appInfo(fromInfoPlist: infoData),
+            info.version >= .bigSur
+        else { return nil }
+
+        let createInstallMedia = url.appending(path: "Contents/Resources/createinstallmedia")
+        let sharedSupport = url.appending(path: "Contents/SharedSupport/SharedSupport.dmg")
+        guard !isNonemptyRegularFile(createInstallMedia) || !isNonemptyRegularFile(sharedSupport),
+            let snapshot = InstallerBundleSnapshot.capture(at: url)
+        else { return nil }
+
+        return IncompleteInstaller(
+            url: url, name: info.name, version: info.version, sizeInBytes: snapshot.size, snapshot: snapshot.value)
+    }
+
     // MARK: - Installer app
 
     /// An `Install macOS *.app`. Its full version is in the software update catalog inside
     /// `Contents/SharedSupport/SharedSupport.dmg` (Big Sur and later); when that can't be read,
     /// the version its own version number points to is used.
     @concurrent
-    static func readApp(at url: URL, as source: URL? = nil, kind: InstallerSource.Kind = .app) async throws
+    static func readApp(
+        at url: URL, as source: URL? = nil, kind: InstallerSource.Kind = .app, requiresCatalog: Bool = false
+    ) async throws
         -> InstallerSource
     {
         let info = try InstallerMetadata.appInfo(
             fromInfoPlist: Data(contentsOf: url.appending(path: "Contents/Info.plist")))
         var version = info.version
+        var build: String?
         if version >= .bigSur {
             let sharedSupport = url.appending(path: "Contents/SharedSupport/SharedSupport.dmg")
             do {
-                version = try await withAttachedImage(sharedSupport) { mountPoint in
-                    try InstallerMetadata.version(
+                if requiresCatalog && !InstallerPathSafety.isSafe(sharedSupport) {
+                    throw ReadError(reason: "The downloaded installer catalog is incomplete")
+                }
+                let catalogInfo = try await withAttachedImage(sharedSupport) { mountPoint in
+                    try InstallerMetadata.catalogInfo(
                         fromCatalog: Data(contentsOf: mountPoint.appending(path: InstallerMetadata.catalogPath)))
                 }
+                version = catalogInfo.version
+                build = catalogInfo.build
             } catch {
+                if requiresCatalog { throw ReadError(reason: "The downloaded installer catalog is incomplete") }
                 logger.error(
                     "No full version for \(url.lastPathComponent, privacy: .public): \(String(describing: error), privacy: .public)"
                 )
             }
         }
         return InstallerSource(
-            url: source ?? url, name: info.name, version: version, kind: kind, size: allocatedSize(of: url))
+            url: source ?? url, name: info.name, version: version, kind: kind, size: allocatedSize(of: url),
+            build: build)
     }
 
     // MARK: - Disk image
@@ -94,7 +147,7 @@ nonisolated enum InstallerReader {
             fromDistribution: Data(contentsOf: folder.appending(path: "Distribution")))
         return InstallerSource(
             url: url, name: InstallerMetadata.name(for: info.version), version: info.version, kind: .package,
-            size: info.installedSize)
+            size: info.installedSize, build: info.build)
     }
 
     // MARK: - Disk images
@@ -172,4 +225,12 @@ nonisolated enum InstallerReader {
         }
         return total
     }
+
+    private static func isNonemptyRegularFile(_ url: URL) -> Bool {
+        guard InstallerPathSafety.isSafe(url),
+            let values = try? url.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])
+        else { return false }
+        return values.isRegularFile == true && (values.fileSize ?? 0) > 0
+    }
+
 }

@@ -48,4 +48,39 @@ struct InstallerSourceTests {
         #expect(InstallerSource.defaultSelection(in: [installer("macOS Catalina", "10.15.7")]) == nil)
         #expect(InstallerSource.defaultSelection(in: []) == nil)
     }
+
+    @Test func `local installer build is optional`() {
+        #expect(installer("macOS Sequoia", "15.6").build == nil)
+    }
+
+    @Test func `an exact version and build returns one local match`() {
+        let local = InstallerSource(
+            url: URL(filePath: "/Applications/Install macOS Sequoia.app"), name: "macOS Sequoia",
+            version: "15.6", kind: .app, size: 1, build: "24G84")
+        let available = AvailableInstaller(title: "macOS Sequoia", version: "15.6", build: "24G84")
+
+        #expect(available.localMatch(in: [local]) == .unique(local))
+    }
+
+    @Test func `different known builds do not match`() {
+        let local = InstallerSource(
+            url: URL(filePath: "/Applications/Install macOS Sequoia.app"), name: "macOS Sequoia",
+            version: "15.6", kind: .app, size: 1, build: "24G91")
+        let available = AvailableInstaller(title: "macOS Sequoia", version: "15.6", build: "24G84")
+
+        #expect(available.localMatch(in: [local]) == .none)
+    }
+
+    @Test func `a missing build matches by version but multiple local matches are ambiguous`() {
+        let first = InstallerSource(
+            url: URL(filePath: "/Applications/First.app"), name: "macOS Sequoia", version: "15.6",
+            kind: .app, size: 1)
+        let second = InstallerSource(
+            url: URL(filePath: "/Users/Shared/Second.app"), name: "macOS Sequoia", version: "15.6",
+            kind: .app, size: 1, build: "24G84")
+        let available = AvailableInstaller(title: "macOS Sequoia", version: "15.6", build: "24G84")
+
+        #expect(available.localMatch(in: [first]) == .unique(first))
+        #expect(available.localMatch(in: [first, second]) == .ambiguous)
+    }
 }

@@ -19,7 +19,7 @@ nonisolated enum HelperIdentity {
     /// The launchd plist inside the app, in `Contents/Library/LaunchDaemons/`.
     static let plistName = "com.afraidias.Relente.Helper.LiveCreation.plist"
     /// Changes whenever `HelperProtocol` changes, so the app can tell an outdated helper apart.
-    static let protocolVersion = 5
+    static let protocolVersion = 6
 
     static func supports(_ version: Int?) -> Bool { version == protocolVersion }
 }
@@ -61,6 +61,10 @@ nonisolated enum HelperIdentity {
     func checkVolumeWriteAccess(
         bsdName: String, mediaUUID: String?, serialNumber: String?, size: Int64,
         volumePath: String, authorization: Data, reply: @escaping @Sendable (Int) -> Void)
+
+    /// Moves one revalidated incomplete Apple installer app from /Applications into the caller's Trash.
+    func moveIncompleteInstallerToTrash(
+        installerPath: String, snapshot: String, reply: @escaping @Sendable (Int) -> Void)
 
     /// Stops the active format or creation operation, if there is one.
     func cancel()

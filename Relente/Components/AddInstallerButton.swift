@@ -35,6 +35,7 @@ struct AddInstallerButton: View {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+        .pointingCursor()
         .help(Text(Self.hint))
         .accessibilityLabel(Text("Add Installer…", comment: "VoiceOver name of the dashed square with a plus."))
         .accessibilityHint(Text(Self.hint))

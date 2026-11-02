@@ -151,6 +151,170 @@ struct AssistantTests {
         #expect(assistant.canGoBack)
     }
 
+    @Test func `catalog prefetch starts on the permissions screen`() async {
+        let available = AvailableInstaller(title: "macOS Tahoe", version: "26.0", build: "25A354")
+        let assistant = Assistant(
+            installers: [], drives: [], helperService: SampleHelperService(status: .notInstalled),
+            acquisitionService: SampleInstallerAcquisitionService(installers: [available]))
+        let startup = Task { await assistant.start() }
+        defer { startup.cancel() }
+
+        for _ in 0..<200 where assistant.availableInstallers.isEmpty {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+        #expect(assistant.step == .permissions)
+        #expect(assistant.availableInstallers == [available])
+    }
+
+    @Test func `Download opens and returns to Installer without changing the selected source`() {
+        let assistant = makeAssistant()
+        let selected = assistant.selectedInstallerID
+
+        assistant.showDownload()
+        #expect(assistant.isShowingDownload)
+        #expect(assistant.step == .installer)
+        settle(assistant)
+        assistant.backToInstaller()
+
+        #expect(!assistant.isShowingDownload)
+        #expect(assistant.selectedInstallerID == selected)
+        #expect(assistant.lastChange == ScreenChange(direction: .back, style: .slide))
+    }
+
+    @Test func `Download opens from an empty Installer but cannot continue without a selection`() {
+        let assistant = makeAssistant(installers: [])
+
+        assistant.showDownload()
+        #expect(assistant.isShowingDownload)
+        assistant.continueToDrive()
+
+        #expect(assistant.step == .installer)
+    }
+
+    @Test func `Use selects a unique matching local installer and returns to Installer`() {
+        let assistant = makeAssistant()
+        let available = AvailableInstaller(title: "macOS Tahoe", version: "26.0", build: "25A354")
+        assistant.showDownload()
+        settle(assistant)
+
+        assistant.useAvailableInstaller(available)
+
+        #expect(assistant.selectedInstallerID == tahoe.id)
+        #expect(!assistant.isShowingDownload)
+        settle(assistant)
+        assistant.continueToDrive()
+        #expect(assistant.step == .drive)
+    }
+
+    @Test func `a completed sample download becomes the selected source before USB Drive`() async {
+        let available = AvailableInstaller(title: "macOS Tahoe", version: "26.0", build: "25A354")
+        let assistant = Assistant(
+            installers: [], drives: [big],
+            acquisitionService: SampleInstallerAcquisitionService(installers: [available]))
+        assistant.showDownload()
+        settle(assistant)
+
+        for _ in 0..<200 where assistant.availableInstallers.isEmpty {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+        assistant.downloadAvailableInstaller(available)
+        for _ in 0..<200 where assistant.isDownloadingInstaller {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+
+        #expect(assistant.selectedInstaller?.version == available.version)
+        #expect(assistant.selectedInstaller?.build == available.build)
+        #expect(assistant.isPickable(big))
+        assistant.continueToDrive()
+        #expect(assistant.step == .drive)
+    }
+
+    @Test func `termination waits for the active acquisition to report cancellation`() async {
+        let available = AvailableInstaller(title: "macOS Tahoe", version: "26.0", build: "25A354")
+        let service = SampleInstallerAcquisitionService(installers: [available], downloadDelay: .seconds(5))
+        let assistant = Assistant(installers: [], drives: [], acquisitionService: service)
+        assistant.showDownload()
+        settle(assistant)
+        for _ in 0..<200 where assistant.availableInstallers.isEmpty {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+        assistant.downloadAvailableInstaller(available)
+        for _ in 0..<200 where assistant.downloadProgress == nil {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+
+        #expect(assistant.isDownloadingInstaller)
+        await assistant.cancelAcquisitionBeforeTermination()
+
+        #expect(!assistant.isDownloadingInstaller)
+        #expect(assistant.downloadProgress == nil)
+    }
+
+    @Test func `cancelling a download stays on Download and reports cancellation`() async {
+        let available = AvailableInstaller(title: "macOS Tahoe", version: "26.0", build: "25A354")
+        let service = SampleInstallerAcquisitionService(installers: [available], downloadDelay: .seconds(5))
+        let assistant = Assistant(installers: [], drives: [], acquisitionService: service)
+        assistant.showDownload()
+        settle(assistant)
+        for _ in 0..<200 where assistant.availableInstallers.isEmpty {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+        assistant.downloadAvailableInstaller(available)
+        for _ in 0..<200 where assistant.downloadProgress == nil {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+
+        assistant.cancelAvailableInstallerDownload()
+        for _ in 0..<200 where assistant.isDownloadingInstaller {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+
+        #expect(assistant.isShowingDownload)
+        #expect(assistant.isShowingDownloadCancelled)
+        #expect(!assistant.isDownloadingInstaller)
+    }
+
+    @Test func `Back during a download neither cancels nor leaves Download`() async {
+        let available = AvailableInstaller(title: "macOS Tahoe", version: "26.0", build: "25A354")
+        let service = SampleInstallerAcquisitionService(installers: [available], downloadDelay: .seconds(5))
+        let assistant = Assistant(installers: [], drives: [], acquisitionService: service)
+        assistant.showDownload()
+        settle(assistant)
+        for _ in 0..<200 where assistant.availableInstallers.isEmpty {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+        assistant.downloadAvailableInstaller(available)
+        for _ in 0..<200 where !assistant.isDownloadingInstaller {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+
+        assistant.backToInstaller()
+
+        #expect(assistant.isShowingDownload)
+        #expect(assistant.isDownloadingInstaller)
+        #expect(!assistant.isCancellingInstallerDownload)
+    }
+
+    @Test func `arrow selection moves across the four-column catalog grid`() async {
+        let assistant = makeAssistant(installers: [])
+        assistant.showDownload()
+        settle(assistant)
+        for _ in 0..<200 where assistant.availableInstallers.isEmpty {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+        guard assistant.availableInstallers.count > 1 else {
+            Issue.record("The sample catalog didn't load")
+            return
+        }
+        let newest = assistant.availableInstallers[0]
+        let next = assistant.availableInstallers[1]
+        #expect(assistant.selectedAvailableInstallerID == newest.id)
+
+        assistant.moveSelection(by: 1)
+
+        #expect(assistant.selectedAvailableInstallerID == next.id)
+    }
+
     @Test func `back does nothing on the installer screen`() {
         let assistant = makeAssistant()
         assistant.goBack()

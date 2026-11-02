@@ -31,6 +31,7 @@ struct CreatingView: View {
                 if failure.reason == .volumeAccessDenied {
                     Button("Open Full Disk Access Settings…", action: onOpenFullDiskAccessSettings)
                         .buttonStyle(.link)
+                        .pointingCursor()
                         .padding(.top, 6)
                 }
             } else {

@@ -4,7 +4,7 @@
 //
 //  The whole assistant in the running app, with sample data and the Debug-only simulation.
 //  Specs: specs/006-assistant-navigation/spec.md, specs/007-real-detection/spec.md,
-//  specs/008-system-helper/spec.md
+//  specs/008-system-helper/spec.md, specs/011-installer-acquisition/spec.md
 //
 
 import XCTest
@@ -129,6 +129,70 @@ final class AssistantFlowUITests: XCTestCase {
 
         app.press(.return)
         XCTAssertTrue(app.element("Choose an Installer").exists, "Return must not leave the screen")
+    }
+
+    @MainActor
+    func testDownloadFromEmptyInstallerAndUseTheCompletedSample() {
+        app = .relente(simulationSpeed: "fast", extraArguments: ["-sampleEmpty", "installers"])
+        expectScreen("Choose an Installer")
+
+        app.buttons["Download from Apple…"].click()
+        expectScreen("Download macOS")
+        XCTAssertTrue(app.buttons["Download macOS Tahoe 26.1"].exists)
+        let olderVersions = app.buttons["Other Tahoe versions"]
+        XCTAssertTrue(olderVersions.waitForExistence(timeout: 5))
+        olderVersions.click()
+        XCTAssertTrue(app.staticTexts["Older Tahoe versions"].waitForExistence(timeout: 5))
+        let olderDownload = app.buttons["Download macOS Tahoe 26.0"]
+        XCTAssertTrue(olderDownload.waitForExistence(timeout: 5))
+        olderDownload.click()
+        XCTAssertTrue(app.staticTexts["Older Tahoe versions"].exists)
+        XCTAssertTrue(app.buttons["Done"].exists)
+        app.buttons["Done"].click()
+        XCTAssertTrue(app.buttons["Back"].exists)
+
+        app.buttons["Back"].click()
+        expectScreen("Choose an Installer")
+        app.buttons["Download from Apple…"].click()
+        expectScreen("Download macOS")
+
+        let useButton = app.buttons["Use macOS Tahoe 26.0"]
+        XCTAssertTrue(useButton.waitForExistence(timeout: 5))
+        useButton.click()
+        expectScreen("Choose an Installer")
+        XCTAssertTrue(app.buttons["Continue"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Continue"].isEnabled)
+        app.buttons["Continue"].click()
+        expectScreen("Choose a USB Drive")
+        XCTAssertTrue(app.element("Installer: macOS Tahoe 26.0, 16.8 GB").exists)
+    }
+
+    @MainActor
+    func testCancellingADownloadRequiresConfirmationAndDefaultsToKeepingIt() {
+        app = .relente(
+            extraArguments: ["-sampleEmpty", "installers", "-sampleDownloadDelayMilliseconds", "10000"])
+        expectScreen("Choose an Installer")
+        app.buttons["Download from Apple…"].click()
+        expectScreen("Download macOS")
+
+        app.buttons["Download macOS Tahoe 26.1"].click()
+        let cancelButton = app.buttons["Cancel Download"]
+        XCTAssertTrue(cancelButton.waitForExistence(timeout: 5))
+        cancelButton.click()
+
+        let alert = app.alerts["Cancel this download?"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        XCTAssertTrue(alert.buttons["Keep Downloading"].exists)
+        XCTAssertTrue(alert.buttons["Cancel Download"].exists)
+        alert.buttons["Keep Downloading"].click()
+        XCTAssertFalse(alert.exists)
+        XCTAssertTrue(cancelButton.exists)
+
+        cancelButton.click()
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        alert.buttons["Cancel Download"].click()
+        XCTAssertFalse(cancelButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Back"].exists, "Cancelling must leave the user on Download")
     }
 
     @MainActor

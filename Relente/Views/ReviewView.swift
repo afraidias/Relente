@@ -224,6 +224,7 @@ struct EraseWarning: View {
                 )
             }
             .toggleStyle(.checkbox)
+            .pointingCursor()
         }
     }
 }

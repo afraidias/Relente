@@ -21,7 +21,7 @@ and badge. The app's blue system accent and disk/installer illustrations are ind
 ## Scope
 
 macOS installers only, from Big Sur (11) onwards: a local `Install macOS *.app`, a
-`.dmg` or an `InstallAssistant.pkg`, and later a downloader using Apple's catalog. Destinations are
+`.dmg` or an `InstallAssistant.pkg`, or a complete installer downloaded from Apple's catalog. Destinations are
 USB drives and SD cards only; external SSDs and hard drives are hidden by default. No Windows or
 Linux.
 
@@ -57,8 +57,24 @@ the step indicator animates (the pill stretches to the new step and the number r
    to choose an installer app, `.dmg` or `InstallAssistant.pkg` anywhere, or drop one on it; any
    other file shows "Isn't a macOS Installer". With 5 or more items (the add square counts), they
    become a grid of 5 columns of smaller items, which scrolls when even those don't fit; Up and
-   Down then move a row (the same on step 2). "Download from Apple…".
-   1b. **Download:** grid of 4 versions, with a progress ring on the one downloading.
+   Down then move a row (the same on step 2). "Download from Apple…" opens the Download substate.
+   Relente preloads Apple's full-installer catalog as the app starts, then reuses the successful
+   in-memory list when Download opens. Download shows the newest version in each macOS release
+   family first and shows Apple's reported download size beside the version, keeping the release
+   name and version/size to two lines. Its layout follows
+   Installer: up to four options use regular items in one row;
+   five or more use the compact five-column grid, which scrolls only when it exceeds the available
+   height. A history control opens a native sheet with older versions in the same grid. The artwork
+   and version name are the action to download or use. While downloading, a progress ring
+   surrounds the artwork and shows the percentage only when Apple reports it. A cancel control
+   appears beside the active version, replacing its history control. The grid does not scroll during
+   a download, Back is disabled, and a history sheet stays open if its download is active. Each idle
+   option uses version artwork until a complete local installer is available, then its Finder icon.
+   One complete local match can be used instead of downloaded. Before acquisition, Relente refreshes
+   Apple's catalog once and rechecks local installers and the destination. A completed installer is
+   retained in `/Applications` and selected for the next step. Normal quit requests cancellation and
+   waits for the CLI operation to finish; whether that also stops Apple's system-owned transaction
+   remains under validation.
    1c. **No installers:** the same empty state as 2b, with the add square as its symbol (it also
    takes drops), "No Installers Found", "Download from Apple…" and "Waiting for an installer…";
    the list replaces it as soon as an installer appears.

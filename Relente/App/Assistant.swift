@@ -62,6 +62,22 @@ final class Assistant {
     private(set) var ejectFailure: EjectError?
     /// Why the file the user chose can't be used, shown as an alert on Installer.
     private(set) var installerError: InstallerError?
+    /// The Download substate within Installer.
+    private(set) var isShowingDownload = false
+    private(set) var availableInstallers: [AvailableInstaller] = []
+    private(set) var selectedAvailableInstallerID: AvailableInstaller.ID?
+    private(set) var isLoadingAvailableInstallers = false
+    private(set) var isShowingDownloadCancelled = false
+    private(set) var downloadFailureID: UUID?
+    private(set) var downloadOutput: [CreationOutputLine] = []
+    private(set) var isDownloadingInstaller = false
+    private(set) var isCancellingInstallerDownload = false
+    private(set) var downloadingInstallerID: AvailableInstaller.ID?
+    private(set) var downloadProgress: Double?
+    private(set) var acquisitionError: InstallerAcquisitionError?
+    private(set) var acquisitionBlock: InstallerAcquisitionPolicy.Reason?
+    private(set) var incompleteInstallerCandidates: [IncompleteInstaller] = []
+    private(set) var incompleteInstallerError: IncompleteInstallerError?
 
     /// Where the system helper stands, shown on Permissions.
     private(set) var helperStatus: HelperStatus
@@ -81,6 +97,7 @@ final class Assistant {
     private(set) var isCheckingHelperDiskAccess = false
 
     private let installerService: any InstallerService
+    private let acquisitionService: any InstallerAcquisitionService
     private let driveService: any DriveService
     private let helperService: any HelperService
     private let helperClient: any HelperClient
@@ -89,15 +106,22 @@ final class Assistant {
     /// `nil` in Release builds until roadmap step 7: "Erase and Create" is then disabled.
     private let creationService: (any CreationService)?
     private var creationTask: Task<Void, Never>?
+    private var catalogTask: Task<Void, Never>?
+    private(set) var catalogLoadedSuccessfully = false
+    private var downloadStartTask: Task<AsyncStream<InstallerAcquisitionEvent>, Never>?
+    private var downloadTask: Task<Void, Never>?
     private var hasStarted = false
 
     /// Starts on Permissions until the system helper is ready.
     init(
         installerService: any InstallerService, driveService: any DriveService,
         helperService: any HelperService = SampleHelperService(), helperClient: any HelperClient = SampleHelperClient(),
-        authorizer: any EraseAuthorizer = SampleEraseAuthorizer(), creationService: (any CreationService)? = nil
+        authorizer: any EraseAuthorizer = SampleEraseAuthorizer(), creationService: (any CreationService)? = nil,
+        acquisitionService: (any InstallerAcquisitionService)? = nil
     ) {
         self.installerService = installerService
+        self.acquisitionService =
+            acquisitionService ?? LiveInstallerAcquisitionService(installerService: installerService)
         self.driveService = driveService
         self.helperService = helperService
         self.helperClient = helperClient
@@ -113,12 +137,14 @@ final class Assistant {
         installers: [InstallerSource], drives: [Drive], helperService: any HelperService = SampleHelperService(),
         helperClient: any HelperClient = SampleHelperClient(),
         authorizer: any EraseAuthorizer = SampleEraseAuthorizer(),
-        creationService: (any CreationService)? = nil
+        creationService: (any CreationService)? = nil,
+        acquisitionService: (any InstallerAcquisitionService)? = nil
     ) {
         self.init(
             installerService: SampleInstallerService(installers: installers),
             driveService: SampleDriveService(drives: drives), helperService: helperService,
-            helperClient: helperClient, authorizer: authorizer, creationService: creationService)
+            helperClient: helperClient, authorizer: authorizer, creationService: creationService,
+            acquisitionService: acquisitionService ?? SampleInstallerAcquisitionService())
         updateInstallers(installers)
         updateDrives(drives)
     }
@@ -130,6 +156,7 @@ final class Assistant {
     func start() async {
         guard !hasStarted else { return }
         hasStarted = true
+        prefetchAvailableInstallers()
         async let installers: Void = followInstallers()
         async let drives: Void = followDrives()
         async let helper: Void = followHelper()
@@ -264,14 +291,199 @@ final class Assistant {
         installerError = nil
     }
 
+    /// Opens Download from either populated or empty Installer and requests Apple's list.
+    func showDownload() {
+        guard step == .installer, !isShowingDownload, !isChangingScreen else { return }
+        changeDownload(to: true)
+        acquisitionError = nil
+        acquisitionBlock = nil
+        isShowingDownloadCancelled = false
+        refreshIncompleteInstallerCandidates()
+        if !catalogLoadedSuccessfully || availableInstallers.isEmpty { startCatalogRefresh() }
+    }
+
+    private func refreshIncompleteInstallerCandidates() {
+        incompleteInstallerCandidates = []
+        Task {
+            incompleteInstallerCandidates = await acquisitionService.incompleteInstallers()
+        }
+    }
+
+    func moveIncompleteInstallerToTrash(_ installer: IncompleteInstaller) {
+        guard step == .installer, isShowingDownload else { return }
+        guard !isDownloadingInstaller else {
+            incompleteInstallerError = .downloadActive
+            return
+        }
+        Task {
+            do {
+                try await acquisitionService.moveToTrash(installer)
+                await installerService.setAcquisitionInProgress(nil)
+                incompleteInstallerCandidates = await acquisitionService.incompleteInstallers()
+            } catch let error as IncompleteInstallerError {
+                incompleteInstallerError = error
+                incompleteInstallerCandidates = await acquisitionService.incompleteInstallers()
+            } catch {
+                incompleteInstallerError = .moveFailed
+                incompleteInstallerCandidates = await acquisitionService.incompleteInstallers()
+            }
+        }
+    }
+
+    func dismissIncompleteInstallerError() {
+        incompleteInstallerError = nil
+    }
+
+    /// Starts the Apple list request at startup, so opening Download can show it
+    /// immediately. Local installer selection never depends on the catalog.
+    private func prefetchAvailableInstallers() {
+        guard !catalogLoadedSuccessfully else { return }
+        startCatalogRefresh()
+    }
+
+    private func startCatalogRefresh() {
+        guard catalogTask == nil else { return }
+        acquisitionError = nil
+        catalogTask = Task {
+            await loadAvailableInstallers()
+            catalogTask = nil
+        }
+    }
+
+    /// Back from Download returns to Installer and keeps the user's local installer selection.
+    func backToInstaller() {
+        guard step == .installer, isShowingDownload, !isChangingScreen else { return }
+        guard !isDownloadingInstaller else { return }
+        changeDownload(to: false)
+    }
+
+    /// Cancels the current transfer without leaving Download.
+    func cancelAvailableInstallerDownload() {
+        guard step == .installer, isShowingDownload, isDownloadingInstaller else { return }
+        guard !isCancellingInstallerDownload else { return }
+        isCancellingInstallerDownload = true
+        Task { await cancelAcquisitionBeforeTermination() }
+    }
+
+    /// Requests download cancellation and waits for its stream to finish before normal app quit.
+    func cancelAcquisitionBeforeTermination() async {
+        guard isDownloadingInstaller else { return }
+        isCancellingInstallerDownload = true
+        defer { isCancellingInstallerDownload = false }
+        _ = await downloadStartTask?.value
+        await acquisitionService.cancelDownload()
+        await downloadTask?.value
+    }
+
+    func retryAvailableInstallers() {
+        guard step == .installer, isShowingDownload, !isLoadingAvailableInstallers else { return }
+        acquisitionBlock = nil
+        catalogLoadedSuccessfully = false
+        startCatalogRefresh()
+    }
+
+    private func changeDownload(to showing: Bool) {
+        lastChange = ScreenChange(direction: .back, style: .slide)
+        if showing { lastChange = ScreenChange(direction: .forward, style: .slide) }
+        isShowingDownload = showing
+        isChangingScreen = true
+    }
+
+    private func loadAvailableInstallers() async {
+        isLoadingAvailableInstallers = true
+        defer { isLoadingAvailableInstallers = false }
+        do {
+            availableInstallers = try await acquisitionService.availableInstallers()
+            catalogLoadedSuccessfully = true
+            if !availableInstallers.contains(where: { $0.id == selectedAvailableInstallerID }) {
+                selectedAvailableInstallerID = availableInstallers.first(where: \.isSupported)?.id
+            }
+        } catch {
+            availableInstallers = []
+            catalogLoadedSuccessfully = false
+            selectedAvailableInstallerID = nil
+            acquisitionError = error
+        }
+    }
+
+    /// Uses one matching local installer; ambiguous matches return to Installer for manual choice.
+    func useAvailableInstaller(_ available: AvailableInstaller) {
+        guard step == .installer, isShowingDownload, !isChangingScreen else { return }
+        switch available.localMatch(in: installers) {
+        case .unique(let installer):
+            selectedAvailableInstallerID = available.id
+            selectInstaller(installer.id)
+            acquisitionBlock = nil
+        case .ambiguous:
+            acquisitionBlock = .multipleLocalMatches
+            backToInstaller()
+        case .none:
+            break
+        }
+    }
+
+    func downloadAvailableInstaller(_ available: AvailableInstaller) {
+        guard step == .installer, isShowingDownload, !isDownloadingInstaller,
+            availableInstallers.contains(available)
+        else { return }
+
+        isDownloadingInstaller = true
+        isCancellingInstallerDownload = false
+        selectedAvailableInstallerID = available.id
+        downloadingInstallerID = available.id
+        downloadProgress = nil
+        downloadOutput = []
+        isShowingDownloadCancelled = false
+        acquisitionError = nil
+        acquisitionBlock = nil
+        let startTask = Task { await acquisitionService.download(available) }
+        downloadStartTask = startTask
+        downloadTask = Task {
+            let stream = await startTask.value
+            downloadStartTask = nil
+            for await event in stream {
+                switch event {
+                case .output(let line):
+                    downloadOutput.append(line)
+                    if downloadOutput.count > 100 { downloadOutput.removeFirst(downloadOutput.count - 100) }
+                case .progress(let progress): downloadProgress = progress
+                case .completed(let installer):
+                    if !installers.contains(where: { $0.id == installer.id }) {
+                        installers = InstallerSource.sorted(installers + [installer])
+                    }
+                    selectedInstallerID = installer.id
+                    downloadProgress = 1
+                case .failed(let error):
+                    acquisitionError = error
+                    downloadFailureID = UUID()
+                case .blocked(let reason): acquisitionBlock = reason
+                case .cancelled:
+                    downloadProgress = nil
+                    isShowingDownloadCancelled = true
+                }
+            }
+            isDownloadingInstaller = false
+            isCancellingInstallerDownload = false
+            downloadingInstallerID = nil
+            downloadTask = nil
+            incompleteInstallerCandidates = await acquisitionService.incompleteInstallers()
+        }
+    }
+
     /// Left and right arrows: the previous or next supported installer, or pickable drive, without
     /// wrapping.
     func moveSelection(by offset: Int) {
         switch step {
         case .installer:
-            let supported = installers.filter(\.isSupported)
-            guard let index = supported.firstIndex(where: { $0.id == selectedInstallerID }) else { return }
-            selectInstaller(supported[min(max(index + offset, 0), supported.count - 1)].id)
+            if isShowingDownload {
+                let supported = availableInstallers.filter(\.isSupported)
+                guard let index = supported.firstIndex(where: { $0.id == selectedAvailableInstallerID }) else { return }
+                selectedAvailableInstallerID = supported[min(max(index + offset, 0), supported.count - 1)].id
+            } else {
+                let supported = installers.filter(\.isSupported)
+                guard let index = supported.firstIndex(where: { $0.id == selectedInstallerID }) else { return }
+                selectInstaller(supported[min(max(index + offset, 0), supported.count - 1)].id)
+            }
         case .drive:
             let pickable = drives.filter(isPickable)
             guard !pickable.isEmpty else { return }
@@ -387,8 +599,18 @@ final class Assistant {
     // MARK: - Moving between screens
 
     func continueToDrive() {
-        guard step == .installer, selectedInstaller != nil else { return }
+        guard step == .installer, canContinueToDrive else { return }
         change(to: .drive, .forward, .slide)
+    }
+
+    var canContinueToDrive: Bool {
+        guard !isDownloadingInstaller else { return false }
+        guard isShowingDownload else { return selectedInstaller != nil }
+        guard let selectedAvailableInstallerID,
+            let available = availableInstallers.first(where: { $0.id == selectedAvailableInstallerID }),
+            case .unique(let localInstaller) = available.localMatch(in: installers)
+        else { return false }
+        return localInstaller.id == selectedInstallerID
     }
 
     var canContinueToReview: Bool {
@@ -610,6 +832,7 @@ final class Assistant {
         }
         lastChange = ScreenChange(direction: direction, style: style)
         step = newStep
+        if newStep == .installer { prefetchAvailableInstallers() }
         isChangingScreen = true
     }
 }

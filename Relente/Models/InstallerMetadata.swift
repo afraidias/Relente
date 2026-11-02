@@ -6,7 +6,7 @@
 //  Info.plist, the software update catalog in its SharedSupport disk image, and an
 //  InstallAssistant.pkg's Distribution file. Pure functions on the files' contents; reading the
 //  files themselves is the installer service's job.
-//  Spec: specs/007-real-detection/spec.md
+//  Specs: specs/007-real-detection/spec.md, specs/011-installer-acquisition/spec.md
 //
 
 import Foundation
@@ -61,14 +61,29 @@ nonisolated enum InstallerMetadata {
     /// Where the catalog lives inside `Contents/SharedSupport/SharedSupport.dmg`, once mounted.
     static let catalogPath = "com_apple_MobileAsset_MacSoftwareUpdate/com_apple_MobileAsset_MacSoftwareUpdate.xml"
 
-    /// The full macOS version, e.g. 15.6, from the software update catalog.
-    static func version(fromCatalog data: Data) throws(ParseError) -> MacOSVersion {
+    struct CatalogInfo: Hashable, Sendable {
+        let version: MacOSVersion
+        let build: String?
+    }
+
+    /// The full macOS version and optional build from the software update catalog.
+    static func catalogInfo(fromCatalog data: Data) throws(ParseError) -> CatalogInfo {
         guard
             let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
             let assets = plist["Assets"] as? [[String: Any]],
-            let version = assets.lazy.compactMap({ ($0["OSVersion"] as? String).flatMap(MacOSVersion.init) }).first
+            let asset = assets.first(where: {
+                ($0["OSVersion"] as? String).flatMap(MacOSVersion.init) != nil
+            }),
+            let versionText = asset["OSVersion"] as? String,
+            let version = MacOSVersion(versionText)
         else { throw ParseError() }
-        return version
+        let build = (asset["Build"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return CatalogInfo(version: version, build: build?.isEmpty == false ? build : nil)
+    }
+
+    /// The full macOS version, e.g. 15.6, from the software update catalog.
+    static func version(fromCatalog data: Data) throws(ParseError) -> MacOSVersion {
+        try catalogInfo(fromCatalog: data).version
     }
 
     // MARK: - InstallAssistant.pkg
@@ -76,6 +91,7 @@ nonisolated enum InstallerMetadata {
     /// What an InstallAssistant.pkg's Distribution file says.
     struct PackageInfo: Hashable, Sendable {
         let version: MacOSVersion
+        let build: String?
         /// What it installs, in bytes.
         let installedSize: Int64
     }
@@ -93,7 +109,11 @@ nonisolated enum InstallerMetadata {
         else { throw ParseError() }
         let kilobytes = sizes.compactMap { $0.stringValue.flatMap { Int64($0) } }.reduce(0, +)
         guard kilobytes > 0 else { throw ParseError() }
-        return PackageInfo(version: version, installedSize: kilobytes * 1024)
+        let buildNodes = try? document.nodes(
+            forXPath: "/installer-gui-script/auxinfo/dict/key[.='BUILD']/following-sibling::string[1]")
+        let build = buildNodes?.first?.stringValue?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return PackageInfo(
+            version: version, build: build?.isEmpty == false ? build : nil, installedSize: kilobytes * 1024)
     }
 
     // MARK: - Names

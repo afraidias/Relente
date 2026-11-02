@@ -33,7 +33,9 @@ nonisolated final class HelperListener: NSObject, NSXPCListenerDelegate, Sendabl
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
         connection.remoteObjectInterface = NSXPCInterface(with: HelperProgressProtocol.self)
         let progress = connection.remoteObjectProxy as? HelperProgressProtocol
-        let handler = HelperRequestHandler(pipeline: pipeline, creationPipeline: creationPipeline, progress: progress)
+        let handler = HelperRequestHandler(
+            pipeline: pipeline, creationPipeline: creationPipeline, progress: progress,
+            callerUID: connection.effectiveUserIdentifier)
         connection.exportedInterface = NSXPCInterface(with: HelperProtocol.self)
         connection.exportedObject = handler
         connection.invalidationHandler = { [weak self] in

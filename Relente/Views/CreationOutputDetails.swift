@@ -12,6 +12,7 @@ struct CreationOutputDetails: View {
         Button("Activity", systemImage: "list.bullet") {
             isShowingActivity.toggle()
         }
+        .pointingCursor()
         .popover(isPresented: $isShowingActivity, arrowEdge: .trailing) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .top) {
@@ -26,6 +27,7 @@ struct CreationOutputDetails: View {
                     Button("Close", systemImage: "xmark") { isShowingActivity = false }
                         .labelStyle(.iconOnly)
                         .buttonStyle(.borderless)
+                        .pointingCursor()
                 }
 
                 Divider()
@@ -79,6 +81,7 @@ struct CreationOutputDetails: View {
                     isShowingActivity = false
                     openWindow(id: "creation-output")
                 }
+                .pointingCursor()
                 .help("Open the complete technical log in a larger window.")
             }
             .padding(16)

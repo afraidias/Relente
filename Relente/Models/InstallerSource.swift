@@ -36,9 +36,20 @@ nonisolated struct InstallerSource: Identifiable, Hashable, Sendable {
     let name: String
     /// macOS version, e.g. 26.0.
     let version: MacOSVersion
+    /// Apple build identifier, when readable from the installer.
+    let build: String?
     let kind: Kind
     /// Size in bytes.
     let size: Int64
+
+    init(url: URL, name: String, version: MacOSVersion, kind: Kind, size: Int64, build: String? = nil) {
+        self.url = url
+        self.name = name
+        self.version = version
+        self.build = build
+        self.kind = kind
+        self.size = size
+    }
 
     var id: URL { url }
 

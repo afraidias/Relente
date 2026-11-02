@@ -3,7 +3,7 @@ import Testing
 
 @testable import Relente
 
-@Suite(.timeLimit(.minutes(1)))
+@Suite(.serialized, .timeLimit(.minutes(1)))
 struct HelperRequestHandlerTests {
     private nonisolated static let disk = DiskDescription(
         bsdName: "disk4", isWhole: true, isRemovable: true, deviceProtocol: "USB", mediaUUID: "uuid",
@@ -100,6 +100,25 @@ struct HelperRequestHandlerTests {
             authorization: Authorization(), disks: Disks(),
             volumes: Volumes(), runner: runner, volumeWriteChecker: WriteChecker())
         return HelperRequestHandler(pipeline: format, creationPipeline: create, progress: nil)
+    }
+
+    @Test func `helper refuses trash requests outside Applications`() async {
+        let runner = BlockingRunner()
+        let format = FormatPipeline(authorization: Authorization(), disks: Disks(), formatter: Formatter())
+        let create = CreateInstallMediaPipeline(
+            authorization: Authorization(), disks: Disks(), volumes: Volumes(), runner: runner,
+            volumeWriteChecker: WriteChecker())
+        let handler = HelperRequestHandler(pipeline: format, creationPipeline: create, progress: nil, callerUID: 501)
+
+        let outcome = await withCheckedContinuation { continuation in
+            handler.moveIncompleteInstallerToTrash(
+                installerPath: "/tmp/Install macOS Test.app", snapshot: "stale"
+            ) {
+                continuation.resume(returning: IncompleteInstallerTrashOutcome(rawValue: $0))
+            }
+        }
+
+        #expect(outcome == .changed)
     }
 
     @Test func `connection loss cancels active creation and releases the operation gate`() async {

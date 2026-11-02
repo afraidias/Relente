@@ -23,7 +23,9 @@ actor LiveInstallerService: InstallerService {
     private let logger = Logger(subsystem: "com.afraidias.Relente", category: "installer")
 
     private var cache: [URL: (stamp: Stamp, installer: InstallerSource?)] = [:]
+    private var completeCache: [URL: (stamp: Stamp, installer: InstallerSource?)] = [:]
     private var chosen: [URL] = []
+    private var acquisitionInProgress: URL?
     private var installers: [InstallerSource]?
     private var listeners: [UUID: AsyncStream<[InstallerSource]>.Continuation] = [:]
     private var watching: Task<Void, Never>?
@@ -47,6 +49,11 @@ actor LiveInstallerService: InstallerService {
         }
         await scan()
         return installer
+    }
+
+    func setAcquisitionInProgress(_ url: URL?) async {
+        acquisitionInProgress = url?.standardizedFileURL
+        await scan()
     }
 
     // MARK: - Watching
@@ -74,16 +81,26 @@ actor LiveInstallerService: InstallerService {
         let found =
             (try? FileManager.default.contentsOfDirectory(
                 at: Self.applications, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)) ?? []
-        let candidates = found.filter { $0.pathExtension == "app" && $0.lastPathComponent.hasPrefix("Install ") }
+        let candidates = found.filter {
+            $0.pathExtension == "app" && $0.lastPathComponent.hasPrefix("Install ")
+                && $0.standardizedFileURL != acquisitionInProgress
+        }
         chosen.removeAll { !FileManager.default.fileExists(atPath: $0.path(percentEncoded: false)) }
 
         var list: [InstallerSource] = []
-        for url in candidates.map(\.standardizedFileURL) + chosen {
+        for url in candidates.map(\.standardizedFileURL) {
+            guard let installer = await completeInstaller(at: url) else { continue }
+            if !list.contains(where: { $0.id == installer.id }) {
+                list.append(installer)
+            }
+        }
+        for url in chosen where !candidates.contains(url) {
             if let installer = await installer(at: url), !list.contains(where: { $0.id == installer.id }) {
                 list.append(installer)
             }
         }
         cache = cache.filter { url, _ in list.contains { $0.url == url } || candidates.contains(url) }
+        completeCache = completeCache.filter { url, _ in candidates.contains(url) }
 
         guard list != installers else { return }
         logger.info("Installers: \(list.map(\.url.lastPathComponent).joined(separator: ", "), privacy: .public)")
@@ -107,6 +124,22 @@ actor LiveInstallerService: InstallerService {
             installer = nil
         }
         cache[url] = (stamp, installer)
+        return installer
+    }
+
+    /// Candidate apps in /Applications must pass the stricter completeness check used for
+    /// downloaded installers; keep its result separate from manually chosen-file reads.
+    private func completeInstaller(at url: URL) async -> InstallerSource? {
+        let stamp = Self.stamp(of: url)
+        if let cached = completeCache[url], cached.stamp == stamp { return cached.installer }
+        let installer: InstallerSource?
+        do {
+            let basic = try await InstallerReader.read(url)
+            installer = basic.version < .bigSur ? basic : try await InstallerReader.readAcquiredApp(at: url)
+        } catch {
+            installer = nil
+        }
+        completeCache[url] = (stamp, installer)
         return installer
     }
 

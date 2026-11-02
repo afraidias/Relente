@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		722280B7306FFCEF00C4D635 /* RelenteHelper in Embed Helper */ = {isa = PBXBuildFile; fileRef = 722280A5306FF8B000C4D635 /* RelenteHelper */; };
 		722280BA306FFD9500C4D635 /* com.afraidias.Relente.Helper.LiveCreation.plist in Embed Launch Daemon */ = {isa = PBXBuildFile; fileRef = 722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.LiveCreation.plist */; };
+		72A000000000000000000001 /* com.afraidias.Relente.Helper.LiveCreation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 722280B9306FFD9500C4D635 /* com.afraidias.Relente.Helper.LiveCreation.plist */; };
 		A01000000000000000000001 /* RelenteHelper/LiveCreateInstallMediaRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01000000000000000000002 /* RelenteHelper/LiveCreateInstallMediaRunner.swift */; };
 		A01000000000000000000003 /* RelenteHelper/HelperRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01000000000000000000004 /* RelenteHelper/HelperRequestHandler.swift */; };
 /* End PBXBuildFile section */
@@ -151,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				A01000000000000000000002 /* RelenteHelper/LiveCreateInstallMediaRunner.swift */,
+				A01000000000000000000004 /* RelenteHelper/HelperRequestHandler.swift */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -308,6 +310,7 @@
 		72314898306D07870090943B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				72A000000000000000000001 /* com.afraidias.Relente.Helper.LiveCreation.plist in Resources */,
 			);
 		};
 		723148A2306D07870090943B /* Resources */ = {

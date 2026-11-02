@@ -12,6 +12,8 @@ import Testing
 
 @testable import Relente
 
+private final class HelperContractTestsBundleToken: NSObject {}
+
 struct HelperContractTests {
 
     // MARK: - Code signing (rule 2)
@@ -68,7 +70,7 @@ struct HelperContractTests {
     // MARK: - Protocol
 
     @Test func `the protocol has a version the app checks`() {
-        #expect(HelperIdentity.protocolVersion == 5)
+        #expect(HelperIdentity.protocolVersion == 6)
         #expect(HelperIdentity.supports(HelperIdentity.protocolVersion))
         #expect(!HelperIdentity.supports(HelperIdentity.protocolVersion - 1))
         #expect(!HelperIdentity.supports(nil))
@@ -105,10 +107,9 @@ struct HelperContractTests {
     }
 
     @Test func `the daemon plist uses the current launchd label`() throws {
-        let repositoryURL = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let plistURL = repositoryURL.appending(path: "Config/com.afraidias.Relente.Helper.LiveCreation.plist")
+        let bundle = Bundle(for: HelperContractTestsBundleToken.self)
+        let plistURL = try #require(
+            bundle.url(forResource: "com.afraidias.Relente.Helper.LiveCreation", withExtension: "plist"))
         let data = try Data(contentsOf: plistURL)
         let plist = try #require(PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any])
 

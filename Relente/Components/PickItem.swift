@@ -80,6 +80,7 @@ struct PickItem<Icon: View, Detail: View>: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .pointingCursor()
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 

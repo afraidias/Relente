@@ -16,6 +16,7 @@ struct InstallerView: View {
     var onMoveSelection: (Int) -> Void = { _ in }
     /// A file picked with "Choose Installer…".
     var onChooseFile: (URL) -> Void = { _ in }
+    var onDownload: () -> Void = {}
     /// Why the chosen file can't be used, shown as an alert.
     var error: InstallerError?
     var onDismissError: () -> Void = {}
@@ -30,7 +31,7 @@ struct InstallerView: View {
             )
 
             if installers.isEmpty {
-                NoInstallerView(onDownload: downloadFromApple, onChoose: { isChoosingFile = true }, onDrop: drop)
+                NoInstallerView(onDownload: onDownload, onChoose: { isChoosingFile = true }, onDrop: drop)
                     .frame(maxHeight: .infinity)
                     .contentShape(.rect)
                     .dropDestination(for: URL.self) { urls, _ in
@@ -50,7 +51,7 @@ struct InstallerView: View {
                     AddInstallerButton(onChoose: { isChoosingFile = true }, onDrop: drop)
                 }
 
-                Button(action: downloadFromApple) {
+                Button(action: onDownload) {
                     Label("Download from Apple…", systemImage: "arrow.down.circle")
                 }
                 .buttonStyle(.secondary)
@@ -85,9 +86,6 @@ struct InstallerView: View {
         return true
     }
 
-    private func downloadFromApple() {
-        // TODO: open the download screen (1b), roadmap step 9.
-    }
 }
 
 // MARK: - Installer item
@@ -133,11 +131,21 @@ struct InstallerItem: View {
 
 /// "Continue", the default action, enabled once an installer is chosen.
 struct InstallerFooter: View {
+    let showingDownload: Bool
+    let canGoBack: Bool
     let canContinue: Bool
+    let onBack: () -> Void
     let onContinue: () -> Void
 
     var body: some View {
         AssistantFooter(for: .installer) {
+            if showingDownload {
+                Button("Back", action: onBack)
+                    .buttonStyle(.secondary)
+                    .keyboardShortcut(.cancelAction)
+                    .disabled(!canGoBack)
+            }
+
             Button("Continue", action: onContinue)
                 .buttonStyle(.primary)
                 .keyboardShortcut(.defaultAction)
@@ -213,6 +221,6 @@ struct InstallerFooter: View {
 }
 
 #Preview("Footer") {
-    InstallerFooter(canContinue: true, onContinue: {})
+    InstallerFooter(showingDownload: false, canGoBack: true, canContinue: true, onBack: {}, onContinue: {})
         .frame(width: 800)
 }

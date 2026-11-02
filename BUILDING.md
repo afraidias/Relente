@@ -52,7 +52,7 @@ In Debug builds, `-sampleData YES` keeps the whole flow safe to walk: its helper
 
 The app shows the installers in `/Applications` and the USB drives and SD cards plugged in. To walk the assistant without them, run a Debug build with these launch arguments:
 
-- `-sampleData YES`: sample installers and drives instead of the Mac's (the UI tests use it), with every state: an unsupported installer (Catalina), and drives with data, empty and too small. Ejecting does nothing.
+- `-sampleData YES`: sample installers, Apple installer catalog and downloads, and drives instead of the Mac's (the UI tests use it), with every state: an unsupported installer (Catalina), and drives with data, empty and too small. Downloads are simulated; they never contact Apple or run `softwareupdate`. Ejecting does nothing.
 - `-sampleEmpty installers` or `-sampleEmpty drives`, together with `-sampleData YES`: starts with that list empty, to see its empty state.
 - `-sampleHelper notInstalled`, together with `-sampleData YES`: starts on Permissions with a simulated missing helper. Install Helper moves through approval to Ready automatically; it does not register a real system helper.
 
