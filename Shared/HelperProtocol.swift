@@ -5,7 +5,6 @@
 //  What the app and the system helper share to talk over XPC. Compiled into both targets. The
 //  helper's whole API (helper rule 1): typed format/create/progress/cancel operations, no
 //  "run this command" function or shell.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

@@ -3,7 +3,6 @@
 //  RelenteTests
 //
 //  The Debug-only simulation that stands in for `createinstallmedia` until roadmap step 7.
-//  Spec: specs/006-assistant-navigation/spec.md
 //
 
 #if DEBUG

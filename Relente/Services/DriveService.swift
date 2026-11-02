@@ -4,7 +4,6 @@
 //
 //  Follows the USB drives and SD cards plugged into the Mac, and ejects them. The live service
 //  uses DiskArbitration; the sample one serves fixed data for previews, tests and `-sampleData`.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

@@ -7,7 +7,6 @@
 //  them behind. Over the names, the row draws a white copy of every name, masked by the capsule,
 //  so each letter turns white exactly while the capsule is under it, as in a segmented control. `matchedGeometryEffect` isn't used: each item is a button, drawn on its own, so
 //  shapes in different items can't be matched. With Reduce Motion the shapes crossfade.
-//  Spec: specs/006-assistant-navigation/spec.md
 //
 
 import SwiftUI

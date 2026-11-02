@@ -3,7 +3,6 @@
 //  Relente
 //
 //  Why making the bootable installer stopped, and where: shown on the Error screen.
-//  Spec: specs/004-creating-screen/spec.md, specs/008-system-helper/spec.md
 //
 
 import Foundation
@@ -31,7 +30,7 @@ nonisolated struct CreationFailure: Hashable, Sendable {
         case unknown
 
         /// Whether "Try Again" goes back to USB Drive, to pick the drive again, instead of Review:
-        /// after a disconnection or when the drive isn't the one confirmed (spec 007 Decision 13).
+        /// after a disconnection or when the drive isn't the one confirmed.
         var sendsBackToDriveScreen: Bool {
             switch self {
             case .driveDisconnected, .driveChanged, .driveNotAllowed: true

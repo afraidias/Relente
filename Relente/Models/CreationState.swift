@@ -4,7 +4,6 @@
 //
 //  What the Creating screen shows: the process running, or where and why it stopped.
 //  Both share one layout, so the screen doesn't jump when it fails.
-//  Spec: specs/004-creating-screen/spec.md
 //
 
 import Foundation

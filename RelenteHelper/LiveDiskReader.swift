@@ -4,7 +4,6 @@
 //
 //  Reads a disk from DiskArbitration as it is right now, on the helper's own, never trusting
 //  what the app says about it (helper rule 3).
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import DiskArbitration

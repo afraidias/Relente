@@ -2,10 +2,7 @@
 //  SimulationLabel.swift
 //  Relente
 //
-//  Says, under the header of Creating, Error and Done, that the creation is only simulated, so
-//  it can't be mistaken for the real thing: nothing at all is erased, or only the format is real
-//  (spec 008). Debug builds only use it, until roadmap step 7.
-//  Spec: specs/006-assistant-navigation/spec.md
+//  Labels sample-data creation in Debug so it cannot be mistaken for the live helper flow.
 //
 
 import SwiftUI

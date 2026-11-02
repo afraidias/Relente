@@ -7,7 +7,6 @@
 //  read-only and hidden, and always detached again; packages are never installed or expanded,
 //  only their Distribution file is extracted to a temporary folder. External tools run with
 //  fixed paths and argument arrays, never through a shell.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

@@ -4,7 +4,6 @@
 //
 //  Drives for previews, tests and `-sampleData YES`: never touches a disk. Tests plug and unplug
 //  drives with `send(_:)` and choose what ejecting does.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

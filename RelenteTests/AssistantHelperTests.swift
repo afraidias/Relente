@@ -4,7 +4,6 @@
 //
 //  The assistant installing and uninstalling the system helper, with the sample helper service:
 //  nothing is registered with macOS.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

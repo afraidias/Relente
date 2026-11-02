@@ -4,8 +4,8 @@
 //
 //  The badge that says how something ended: a green check or a red cross. An opaque circle with
 //  a white symbol, inside a ring that sets it apart from the artwork under it: white in light
-//  mode, the window's background in dark mode. Done's installer icon (spec 005), Error (spec 004)
-//  and Permissions (spec 008) use it, so it looks the same everywhere.
+//  mode, the window's background in dark mode. Done's installer icon, Error
+//  and Permissions use it, so it looks the same everywhere.
 //
 
 import AppKit

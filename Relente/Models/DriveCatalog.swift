@@ -4,7 +4,6 @@
 //
 //  Turns what DiskArbitration reports into the drives Relente shows: the USB drives and SD cards
 //  (`DiskRules`), their names, identity and the space in use. Pure rules, tested case by case.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

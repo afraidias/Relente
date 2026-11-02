@@ -5,7 +5,6 @@
 //  What the helper checks on its own before erasing (helper rule 3): a whole disk's identifier,
 //  a USB drive or SD card of a reasonable size that isn't the boot disk, and the same fingerprint
 //  as the drive the user confirmed. Pure rules on what DiskArbitration reports, tested case by case.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

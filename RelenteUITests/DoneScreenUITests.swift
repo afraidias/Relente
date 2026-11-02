@@ -4,7 +4,6 @@
 //
 //  What VoiceOver reads on the Done screen, in the running app. Done is reached by walking the
 //  assistant with the Debug-only fast simulation (Tahoe on the SanDisk Ultra).
-//  Specs: specs/005-done-screen/spec.md, specs/006-assistant-navigation/spec.md
 //
 
 import XCTest

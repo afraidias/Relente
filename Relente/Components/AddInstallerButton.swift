@@ -5,7 +5,6 @@
 //  A dashed square with a plus: click it to choose an installer saved anywhere, or drop one on
 //  it from the Finder. The last item of the Installer screen's row, and the empty state's
 //  symbol. No text: the plus says "add"; the help tag and VoiceOver say what it takes.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import SwiftUI

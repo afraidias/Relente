@@ -26,7 +26,7 @@ struct StepIndicator: View {
                         .frame(width: step == current ? 16 : 6, height: 6)
                 }
             }
-            // The pill stretches to the new step (spec 006). With Reduce Motion, a new set of dots
+            // The pill stretches to the new step. With Reduce Motion, a new set of dots
             // for each step, so it crossfades instead.
             .id(reduceMotion ? current : 0)
             .transition(.opacity)
@@ -47,7 +47,7 @@ struct StepIndicator: View {
 
     private func color(of step: Int) -> Color {
         // Always the accent color, also when a step fails or the assistant is done: the screen
-        // already says so, and another color would clash with the other pills (spec 005).
+        // already says so, and another color would clash with the other pills.
         step <= current ? Theme.Colors.accent : Color.secondary.opacity(0.3)
     }
 }

@@ -5,7 +5,6 @@
 //  The installers or drives to pick from, laid out by `PickLayout`: a row of large items, or a grid
 //  of small ones that scrolls when it doesn't fit. The selection slides between the items and
 //  follows the arrow keys in both.
-//  Spec: specs/007-real-detection/spec.md ("Many installers or drives")
 //
 
 import SwiftUI

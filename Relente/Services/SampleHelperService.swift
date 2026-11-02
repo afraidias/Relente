@@ -5,7 +5,6 @@
 //  A pretend system helper for previews, tests and `-sampleData YES`: nothing is registered with
 //  macOS. Registering waits for approval, which comes by itself after a moment (or when a test
 //  calls `approve()`), so the whole Permissions screen can be walked.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

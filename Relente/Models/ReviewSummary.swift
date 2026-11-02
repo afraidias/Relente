@@ -4,7 +4,6 @@
 //
 //  The figures shown on the Review screen: what will be erased, what will be
 //  installed and what will be left free on the drive.
-//  Spec: specs/003-review-screen/spec.md
 //
 
 import Foundation

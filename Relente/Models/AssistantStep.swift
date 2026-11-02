@@ -3,14 +3,13 @@
 //  Relente
 //
 //  The assistant's screens, and how a change from one to another is animated.
-//  Spec: specs/006-assistant-navigation/spec.md, specs/008-system-helper/spec.md
 //
 
 import Foundation
 
-/// One screen of the assistant. Error is the `creating` step with a failed creation (spec 004).
+/// One screen of the assistant. Error is the `creating` step with a failed creation.
 nonisolated enum AssistantStep: Hashable, Sendable {
-    /// Installs the system helper; shown before Installer only while it's missing (spec 008).
+    /// Installs the system helper; shown before Installer only while it's missing.
     case permissions
     case installer
     case drive

@@ -3,7 +3,6 @@
 //  Relente
 //
 //  Step 1: pick the macOS installer to copy to the USB drive.
-//  Spec: specs/001-installer-screen/spec.md
 //
 
 import SwiftUI

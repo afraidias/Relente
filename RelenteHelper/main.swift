@@ -5,7 +5,6 @@
 //  The system helper: runs as root, started by launchd when the app connects to its Mach service.
 //  It only erases USB drives and SD cards the user confirmed, after its own checks; no shell, no
 //  networking, logging through `os_log` (helper rules 1–6).
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

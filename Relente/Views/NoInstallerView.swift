@@ -4,7 +4,6 @@
 //
 //  Step 1, no installers: shown under the screen's header until an installer appears in
 //  /Applications or the user adds one with the dashed square, which takes the symbol's place.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import SwiftUI

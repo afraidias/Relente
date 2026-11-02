@@ -16,13 +16,13 @@ Bug reports and ideas are welcome. Before opening an issue, please search the ex
 
 ## Conventions
 
-These are the rules the project follows, for reference. The full set lives in [AGENTS.md](AGENTS.md).
+These contribution conventions complement the project rules in [AGENTS.md](AGENTS.md).
 
-- **Specs:** spec-driven development. Every feature starts as a spec in [`specs/`](specs) (`spec.md`, then `plan.md` and `tasks.md`), is approved, and only then implemented.
+- **Lifecycle:** [Plan, Design, Build, Test, Deploy and Maintain](docs/development.md), with accepted intent, design and implementation plan in `docs/changes/<short-name>/`. Commits, branch pushes and PR creation may proceed within approved scope; merge requires owner review and approval, and release publication requires separate authorization.
 - **Branches:** GitHub Flow. `main` always builds; every change lands through a pull request from a short-lived branch (`feature/…`, `fix/…`, `chore/…`, `docs/…`) with *squash merge*.
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/), in English. For example: `feat(installer): add installer picker`.
+- **Privacy and attribution:** use **Afraidias** as Relente's copyright holder. Do not include the maintainer's real name in repository content or commit attribution; use the configured private Git identity. Preserve third-party license notices.
 - **Code:** Swift 6 with strict concurrency, SwiftUI, and everything in English (names, comments, docs). UI strings are localized through the String Catalog.
-- **Architecture:** views only present data; models are value types; every service sits behind a protocol with a live and a sample implementation, so previews and tests never touch real disks. No third-party dependencies.
 - **Formatting:** [swift-format](https://github.com/swiftlang/swift-format), bundled with Xcode, using the repository's `.swift-format` (4 spaces, 120 columns). `xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteTests RelenteUITests` must pass.
 - **Warnings:** none allowed. Release builds treat warnings as errors.
 - **Tests:** [Swift Testing](https://developer.apple.com/documentation/testing) for unit tests, XCTest only for UI tests. Logic and every security check must have tests.

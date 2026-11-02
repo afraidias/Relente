@@ -4,7 +4,6 @@
 //
 //  Who may be at the other end of the XPC connection (helper rule 2): the helper accepts only the
 //  Relente app, and the app talks only to the Relente helper, both signed by the same team.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

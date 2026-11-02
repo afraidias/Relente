@@ -3,7 +3,6 @@
 //  Relente
 //
 //  A macOS version number such as "15.6" or "10.15.7", compared part by part.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

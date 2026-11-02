@@ -5,7 +5,6 @@
 //  What identifies the drive the user confirmed on Review. The helper compares it with the disk
 //  it's about to erase, right before erasing, so a drive swapped in the meantime is refused
 //  (helper rule 3).
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

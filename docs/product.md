@@ -1,8 +1,8 @@
 # Product and design
 
-What Relente is, the assistant's screen flow and the design system. Specs refer to this document
-for the overall picture; each spec defines its own screen in detail. The rules for building it are
-in [AGENTS.md](../AGENTS.md).
+Current product behavior, assistant flow and design system. New changes are designed through
+[the lifecycle](development.md); this document is updated with the resulting behavior. Project
+rules are in [AGENTS.md](../AGENTS.md).
 
 ## Name
 
@@ -20,19 +20,42 @@ and badge. The app's blue system accent and disk/installer illustrations are ind
 
 ## Scope
 
-macOS installers only, from Big Sur (11) onwards: a local `Install macOS *.app`, a
-`.dmg` or an `InstallAssistant.pkg`, and later a downloader using Apple's catalog. Destinations are
-USB drives and SD cards only; external SSDs and hard drives are hidden by default. No Windows or
-Linux.
+Relente creates macOS installation media, not Windows or Linux media. Destinations are USB
+drives and SD cards; external SSDs and hard drives are hidden by default.
+
+Local installer selection is implemented for `Install macOS *.app`, `.dmg` and
+`InstallAssistant.pkg` sources. Big Sur (11) and later is the candidate installer-version scope,
+not a guarantee that every version can be obtained, prepared or used successfully on every Mac.
+Availability and compatibility must be established for the relevant source and operation. The
+minimum macOS version for running Relente does not establish installer compatibility.
+
+### Download status
+
+The installer-acquisition branch contains download UI and a `softwareupdate`-based implementation.
+That acquisition approach was closed without verified cancellation and is not a completed download
+capability on this migration baseline. Preserve useful reviewed UI and behavior when reconciling
+that branch; do not treat its incomplete verification as passed.
+
+Direct downloading from Apple through a Relente-owned transfer is proposed in the pending 012
+change, currently a draft rather than an accepted or implemented capability. Catalog identity,
+compatibility mapping and safe installer preparation remain unresolved. Offer a version only when
+its availability and compatibility can be verified; do not infer compatibility from a catalog entry.
+The draft must be reconciled into the new lifecycle artifacts before its design and implementation
+are accepted. Download-screen descriptions below record the existing design direction, not proof
+that direct acquisition is implemented or verified.
 
 ## Supported Macs
 
-Relente supports macOS 14 Sonoma and later, on Apple silicon and Intel (Release builds are
-universal). `@Observable` needs macOS 14 and `SMAppService` macOS 13. Target users often have older
-Macs: macOS 14 is the last version for several Intel Macs (e.g. MacBook Air 2018–2019), and
-macOS 26, the last release for Intel, supports only four Intel models. Every year, when a new macOS
-ships, review whether to drop the oldest version; drop it only if keeping it is costly (e.g. whole
-screens duplicated for it) or almost nobody uses it.
+The supported platform target is macOS Tahoe 26.0 and later on Apple silicon Macs (owner
+decision, 2026-11-02). Running Relente on Intel Macs or macOS versions earlier than 26.0 is outside
+the supported scope. This reduces compatibility and validation work for the MVP, at the cost of
+requiring users on earlier systems to upgrade before running Relente.
+
+The existing project still targets macOS 14, and the project and CI still produce universal
+builds. Aligning deployment targets, build architecture, compatibility code and release checks
+with this decision is pending a separate implementation change; this documentation decision
+does not modify project or CI settings. The architecture of a Mac
+that will start from a created installer is a separate compatibility question.
 
 ## Screen flow
 
@@ -111,7 +134,7 @@ the step indicator animates (the pill stretches to the new step and the number r
 Step pills are always blue, whatever the screen's state. Step names in the footer are nouns: Installer, USB Drive, Review, Creation, Done (Spanish:
 Instalador, Memoria USB, Revisión, Creación, Listo). Spanish text is Spanish from Spain.
 
-Moving between screens (chosen on a design canvas, spec 006): going forward, the new screen slides
+Moving between screens: going forward, the new screen slides
 in from the trailing edge; going back, from the leading edge. Creating → Done, "Start Over" and
 "Eject" crossfade instead, since they're an ending or a restart. The chosen drive flies from its
 place in the USB drive list to the hero of Review, Creating and Done; the installer's icon flies
@@ -150,7 +173,7 @@ previews always use them.
   (download, Touch ID, start over, try again, eject), shown before the title; "Continue", "Back",
   "Cancel" and alert buttons stay text only. Help is the standard round "?" button.
 - Every screen follows Apple's Human Interface Guidelines for macOS; an exception is recorded in
-  its spec's Decisions. Help buttons go in the bottom-leading corner; Esc always cancels.
+  the change design's Decisions. Help buttons go in the bottom-leading corner; Esc always cancels.
 - Progress rings only while something is in progress: a finished or stopped screen uses the halo
   and badge colors instead.
 - Window: fixed 800×560 content under a hidden title bar. Every screen's header sits

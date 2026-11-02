@@ -3,7 +3,6 @@
 //  Relente
 //
 //  The method shown in the UI for the current Authorization Services erase flow.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

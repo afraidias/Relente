@@ -5,7 +5,6 @@
 //  Finds the installers in /Applications and keeps the ones the user chose. The folder is
 //  listed every two seconds (macOS's folder notifications need a dispatch queue, which the
 //  project doesn't use); only installers that are new or changed are read again.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

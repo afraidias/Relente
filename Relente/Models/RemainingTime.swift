@@ -4,7 +4,6 @@
 //
 //  The REMAINING figure on the Creating screen: an estimate of the time left in the
 //  current phase, or why there isn't one.
-//  Spec: specs/004-creating-screen/spec.md
 //
 
 import Foundation

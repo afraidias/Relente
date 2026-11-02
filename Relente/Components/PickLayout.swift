@@ -4,7 +4,6 @@
 //
 //  How the installers or drives to pick from are laid out: up to 4 large items in a row, which is
 //  all that fits in the window; from 5, a grid of smaller items that scrolls when it doesn't fit.
-//  Spec: specs/007-real-detection/spec.md ("Many installers or drives")
 //
 
 import Foundation

@@ -5,7 +5,6 @@
 //  Helper rule 5 with Authorization Services: adds the erase right to the authorization database
 //  (the helper runs as root, so nobody is asked), and checks that the authorization the app sends
 //  grants it, without showing any dialog.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

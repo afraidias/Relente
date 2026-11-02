@@ -10,7 +10,6 @@
 //
 //  `matchedGeometryEffect` isn't used: when screens slide, the slide's offset adds to the flight
 //  and the artwork starts outside the window.
-//  Spec: specs/006-assistant-navigation/spec.md
 //
 
 import SwiftUI

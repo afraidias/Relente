@@ -3,7 +3,6 @@
 //  RelenteTests
 //
 //  The assistant following the installers and drives on the Mac, with sample services.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

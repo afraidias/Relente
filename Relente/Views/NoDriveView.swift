@@ -4,7 +4,6 @@
 //
 //  Step 2b: no USB drive or SD card is connected yet. Shown under the screen's header and the
 //  installer label; it switches to the drives by itself when one is plugged in.
-//  Specs: specs/002-drive-screen/spec.md, specs/007-real-detection/spec.md
 //
 
 import SwiftUI

@@ -5,7 +5,6 @@
 //  Asks for `EraseRight` with Authorization Services: macOS shows its dialog, with Relente's own
 //  prompt, and offers Touch ID where it can. The right is never shared or kept, so every erase
 //  asks again. The helper creates the right; the app connects to the helper before asking.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

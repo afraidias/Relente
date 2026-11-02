@@ -4,7 +4,6 @@
 //
 //  A snapshot of the bootable installer being made: which phase it's in, how far along,
 //  and the figures shown on the Creating screen.
-//  Spec: specs/004-creating-screen/spec.md
 //
 
 import Foundation

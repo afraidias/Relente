@@ -4,7 +4,10 @@
 
 - Xcode 27, which runs on macOS 26.6 or later.
 
-The app itself runs on **macOS 14 Sonoma and later**, on Apple silicon and Intel Macs (Release builds are universal).
+The approved support target is **macOS 26.0 and later on Apple silicon**; see the
+[product support policy](docs/product.md#supported-macs). The existing Xcode project still targets
+macOS 14 and produces universal builds, as does CI. Aligning those settings is pending a separate
+implementation change; current build settings do not define the new support commitment.
 
 ## Build and run in Xcode
 
@@ -30,16 +33,21 @@ the Background**. Installer and drive selection remain available without Full Di
 erasing, the helper runs a harmless write check against the selected USB; if it fails, Review stays
 open and directs the user to these settings.
 
-If macOS will not approve a helper launched from Xcode's build products, copy the signed Debug app to `/Applications/Relente.app` and launch that copy before installing the helper. To walk the Permissions screen without registering a real helper, use `-sampleData YES -sampleHelper notInstalled` as described below.
+If helper registration or connection fails, diagnose the existing signed Xcode build and its
+registration state. Do not copy the app to `/Applications`, create a temporary project variant,
+re-sign it or disable signing as a routine workaround. Any necessary experiment must have a
+specific purpose and stay within the owner's approved scope. To walk the Permissions screen
+without registering a real helper, use `-sampleData YES -sampleHelper notInstalled` as described below.
 
-## Checking older macOS versions
+## Platform verification
 
-On macOS 26 and later the app uses Liquid Glass; on macOS 14 and 15 it falls back to the classic control styles. To see the classic look on a newer Mac:
+Validate the app on supported macOS versions starting at 26.0, on Apple silicon. A successful run
+on a newer system does not establish behavior on the minimum supported version.
 
-- In Xcode's canvas, pick the **Classic (macOS 14–15)** preview.
-- Or run a Debug build with the `-classicControls YES` launch argument (**Product → Scheme → Edit Scheme… → Run → Arguments**).
-
-For real testing, use a macOS 14 or 15 virtual machine, and Rosetta or an Intel Mac for the Intel build.
+The existing code still includes classic macOS 14–15 control fallbacks, Classic previews and the
+Debug `-classicControls YES` launch argument. These are implementation remnants pending review,
+not a requirement to support or validate macOS 14–15 or Intel hosts. A classic-control preview
+is not a substitute for a runtime check on a supported macOS version.
 
 ## Simulated creation (Debug builds)
 
@@ -88,11 +96,19 @@ If `xcode-select` points to the Command Line Tools instead of Xcode, set `DEVELO
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Relente -configuration Debug build
 ```
 
-Run the tests:
+For local tests, prefer the existing project in Xcode: select the **Relente** scheme and
+**My Mac**, then choose **Product → Test** (⌘U). Use the Test navigator for focused tests.
+Keep the project's automatic signing for the app, helper and test targets; diagnose failures
+without changing their identities or bypassing signing. UI tests continue to use sample services.
+
+The equivalent command-line unit-test invocation preserves those project settings:
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Relente test
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild test -scheme Relente -configuration Debug -destination 'platform=macOS' -only-testing:RelenteTests
 ```
+
+Unsigned CI builds check compilation and test logic; they do not establish that development or
+release signatures, privileged-helper registration or genuine XPC connections work.
 
 ## Project layout
 
@@ -107,7 +123,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -scheme Rele
 | `RelenteHelper` | The system helper: a command-line tool that runs as root, embedded in the app (`Contents/MacOS/RelenteHelper`) and registered with `SMAppService`. |
 | `Shared` | Code compiled into both the app and the helper: the XPC protocol and the security checks. |
 | `Config` | Build settings (`Version.xcconfig`) and the helper's launchd plist, copied to `Contents/Library/LaunchDaemons/`. |
-| `specs` | One folder per feature (`NNN-short-name/`) with its `spec.md`, and `plan.md` and `tasks.md` from feature 004 on. See [`specs/README.md`](specs/README.md). |
+| `docs/changes` | Intent, requirements/design and implementation plans for each change. See [`docs/development.md`](docs/development.md). |
 | `docs` | Product and design overview ([`docs/product.md`](docs/product.md)): scope, supported Macs, screen flow and design system. |
 
 ## App icon
@@ -131,8 +147,9 @@ Default export with the installed Xcode's Icon Composer:
   --platform macOS --rendition Default --width 512 --height 512 --scale 1 --design-generation 26
 ```
 
-Check the exported PNG and the compiled bundle icon after changing the artwork. A classic-control
-preview on a newer macOS does not replace testing the compiled fallback on macOS 14–15.
+Check the exported PNG and the compiled bundle icon after changing the artwork. Verify actual
+icon rendering on supported macOS versions; Icon Composer and SwiftUI previews alone do not
+establish runtime appearance.
 
 ## Localization
 
@@ -140,13 +157,45 @@ UI strings are written in English and translated in `Relente/Resources/Localizab
 
 ## Agent skills (optional)
 
-The repository includes skills for AI coding agents in `.claude/skills/`, each with its own `LICENSE` (MIT). The project's rules for agents are in [AGENTS.md](AGENTS.md).
+Pinned upstream revision, licenses and local adaptations are recorded in [`.claude/UPSTREAM.md`](.claude/UPSTREAM.md).
+
+The repository includes third-party skills for AI coding agents in `.claude/skills/`. Addy’s MIT license is retained in [`.claude/ADDY-LICENSE`](.claude/ADDY-LICENSE); `write-swift` retains its own license. The project’s rules for agents are in [AGENTS.md](AGENTS.md).
 
 - [`write-swift`](.claude/skills/write-swift), by Emil Kowalski.
-- Twelve skills from [Addy Osmani's agent-skills](https://github.com/addyosmani/agent-skills), copied as plain Markdown (no scripts): `spec-driven-development`, `planning-and-task-breakdown`, `incremental-implementation`, `interview-me`, `test-driven-development`, `code-review-and-quality`, `debugging-and-error-recovery`, `source-driven-development`, `api-and-interface-design`, `security-and-hardening`, `doubt-driven-development` and `documentation-and-adrs`. Where they differ from AGENTS.md (for example, committing after every task, or saving specs as `SPEC.md`), AGENTS.md wins.
+- Nineteen skills from [Addy Osmani's agent-skills](https://github.com/addyosmani/agent-skills), copied without modification from the pinned upstream revision: `planning-and-task-breakdown`, `incremental-implementation`, `interview-me`, `test-driven-development`, `code-review-and-quality`, `debugging-and-error-recovery`, `source-driven-development`, `api-and-interface-design`, `security-and-hardening`, `doubt-driven-development`, `documentation-and-adrs`, `context-engineering`, `deprecation-and-migration`, `observability-and-instrumentation`, `shipping-and-launch`, `ci-cd-and-automation`, `git-workflow-and-versioning`, `constraint-driven-development` and `idea-refine`. The selected skills and shared references are unmodified upstream copies. Relente-specific decisions remain in AGENTS.md and project documentation; flag conflicts instead of adapting third-party files. AGENTS.md takes precedence over skill defaults.
 
-Apple's skills that ship with Xcode 27 are not included (they can't be redistributed). To add them locally:
+Codex discovers the same project skills through `.agents/skills/` symlinks; Claude Code uses `.claude/skills/`. Both read AGENTS.md (Claude through the versioned CLAUDE.md import). No global skill installation is needed. Personal instructions belong in ignored CLAUDE.local.md.
+
+### Selected Apple skill (local)
+
+`swiftui-specialist`, exported from Xcode, complements `write-swift` with SwiftUI guidance.
+Its Apple content and the local discovery symlink are ignored by Git; they are not part of the
+MIT-licensed vendored skills above. No redistribution license was identified in the export.
+To recreate this local setup, run Xcode and export to a temporary directory, then copy only the
+selected skill (do not overwrite an existing installation without reviewing the update):
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcrun agent skills export .claude/skills
+relente_apple_export=$(mktemp -d /tmp/relente-apple-skills.XXXXXX)
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcrun agent skills export "$relente_apple_export"
+cp -R "$relente_apple_export/swiftui-specialist" .claude/skills/swiftui-specialist
+ln -s ../../.claude/skills/swiftui-specialist .agents/skills/swiftui-specialist
 ```
+
+Claude Code and Codex access the same local content. New sessions may be needed for skill
+discovery; verify loading in each agent, or read its SKILL.md directly if discovery is unavailable.
+The export includes SDK 27 references: check API availability against Relente's macOS 26.0 minimum
+and the installed SDK before applying recommendations. Skills do not override AGENTS.md or
+approve broad refactors. `audit-xcode-security-settings` is also selected for local installation. It audits compiler
+warnings, static analysis and Enhanced Security settings; it does not audit signing, notarization,
+privacy or network security. To recreate it, use the same export directory and copy/link pattern:
+
+```bash
+cp -R "$relente_apple_export/audit-xcode-security-settings" .claude/skills/audit-xcode-security-settings
+ln -s ../../.claude/skills/audit-xcode-security-settings .agents/skills/audit-xcode-security-settings
+```
+
+Installing the skill does not authorize an audit execution or configuration changes. Its workflow
+expects Xcode integration tools: inspect available tools before use and report missing capabilities
+rather than inventing tool calls or claiming a completed audit. Any proposed hardening must fit the
+accepted design, helper requirements and supported platforms, with appropriate verification.
+Other Apple skills are not installed by this setup.

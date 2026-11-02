@@ -4,7 +4,6 @@
 //
 //  Installers for previews, tests and `-sampleData YES`: never reads the Mac's files. Tests
 //  change the list with `send(_:)`.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

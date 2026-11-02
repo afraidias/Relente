@@ -5,8 +5,6 @@
 //  The Creating screen in the running app, reached by navigating, with the Debug-only
 //  simulation: Esc presses "Cancel"; in the confirmation Return and Esc keep going and only a
 //  click stops; stopping shows Error, whose buttons go to Review or back to the start.
-//  Specs: specs/004-creating-screen/spec.md, specs/005-done-screen/spec.md,
-//  specs/006-assistant-navigation/spec.md
 //
 
 import XCTest

@@ -4,7 +4,7 @@
 //
 //  A confirmation that looks like a macOS alert but is a sheet, so that Return *and* Esc answer
 //  the safe choice (a native alert gives each button one key); the other action only answers a
-//  click. Used to stop a creation (spec 004) and to uninstall the helper (spec 008).
+//  click. Used to stop a creation and to uninstall the helper.
 //
 
 import AppKit

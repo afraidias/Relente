@@ -6,7 +6,6 @@
 //  step 7 only Debug builds have one: `HelperCreationService` really formats the drive through the
 //  helper and pretends the rest; `SimulatedCreationService` pretends everything, for sample data
 //  and the UI test. Release builds have none, so "Erase and Create" stays disabled.
-//  Spec: specs/006-assistant-navigation/spec.md, specs/008-system-helper/spec.md
 //
 
 import Foundation

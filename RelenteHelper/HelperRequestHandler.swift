@@ -4,7 +4,6 @@
 //
 //  The object the app talks to over one XPC connection. It handles typed erase/create requests,
 //  and stops the active operation if the app goes away.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

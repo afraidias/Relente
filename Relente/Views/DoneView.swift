@@ -4,7 +4,6 @@
 //
 //  Step 5: the bootable installer is ready. The drive with its new name, and how to
 //  start up a Mac from it, shown on a strip of each kind of Mac's keyboard.
-//  Spec: specs/005-done-screen/spec.md
 //
 
 import SwiftUI

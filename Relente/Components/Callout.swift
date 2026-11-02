@@ -3,7 +3,7 @@
 //  Relente
 //
 //  A box at the content width with a symbol, a title and a message: orange to warn about
-//  something that can't be undone (Review), blue to inform (Permissions, spec 008). It can hold
+//  something that can't be undone (Review), blue to inform (Permissions). It can hold
 //  extra content under the message, such as a confirmation checkbox.
 //
 

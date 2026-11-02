@@ -4,7 +4,6 @@
 //
 //  Which artwork flies between two screens, and which stays with its screen because the other one
 //  has no place for it.
-//  Spec: specs/007-real-detection/spec.md ("Many installers or drives")
 //
 
 import Testing

@@ -5,7 +5,6 @@
 //  How to start up one kind of Mac from the drive: a strip of its keyboard with the
 //  key to hold highlighted, the kind of Mac with when to press it, and one or two lines
 //  of text. The card of the Mac in use is marked "This Mac".
-//  Spec: specs/005-done-screen/spec.md
 //
 
 import SwiftUI

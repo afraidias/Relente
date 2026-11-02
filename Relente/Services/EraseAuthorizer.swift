@@ -5,7 +5,6 @@
 //  Asks an administrator to authorize an erase (helper rule 5): macOS's own dialog, with Touch ID
 //  on Macs that have it. The result goes to the helper, which checks it again. The live authorizer
 //  uses Authorization Services; the sample one authorizes at once, for previews and tests.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

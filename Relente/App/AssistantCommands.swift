@@ -5,7 +5,6 @@
 //  The Go menu: "Back" with ⌘[, the standard Mac shortcut for going back, so it can be found in
 //  the menu bar. macOS moves the shortcut to the same key position on other keyboard layouts.
 //  The app menu: "Uninstall System Helper…", after About (helper rule 6).
-//  Spec: specs/006-assistant-navigation/spec.md, specs/008-system-helper/spec.md
 //
 
 import SwiftUI

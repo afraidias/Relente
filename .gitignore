@@ -24,5 +24,10 @@ xcuserdata/
 .claude/skills/swiftui-whats-new-27/
 .claude/skills/uikit-app-modernization/
 
-# Local notes for Claude Code (not published)
-CLAUDE.md
+# Personal Claude instructions (not published)
+CLAUDE.local.md
+
+# Local discovery link for the selected Apple skill
+.agents/skills/swiftui-specialist
+
+.agents/skills/audit-xcode-security-settings

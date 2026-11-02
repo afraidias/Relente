@@ -2,7 +2,6 @@
 //  AssistantTests.swift
 //  RelenteTests
 //
-//  Spec: specs/006-assistant-navigation/spec.md
 //
 
 import Foundation

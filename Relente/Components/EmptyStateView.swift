@@ -6,7 +6,6 @@
 //  Installer screen, a drive on the USB Drive screen. Both look and behave the same: a symbol
 //  (or, on Installer, the square to add one), a title, a description, optional actions and a
 //  "Waiting for…" indicator.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import SwiftUI

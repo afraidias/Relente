@@ -4,7 +4,6 @@
 //
 //  Asks before uninstalling the system helper. Return and Esc cancel; "Uninstall" only answers a
 //  click. It loses no data, so it isn't destructive, but it undoes the setup.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import SwiftUI

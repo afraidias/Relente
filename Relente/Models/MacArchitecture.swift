@@ -4,7 +4,6 @@
 //
 //  The two kinds of Mac, which start up from an external drive with different keys,
 //  and which one this Mac is.
-//  Spec: specs/005-done-screen/spec.md
 //
 
 import Foundation

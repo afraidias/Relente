@@ -4,7 +4,6 @@
 //
 //  Which disks are USB drives or SD cards. The app uses it to list drives; the helper, to refuse
 //  any other disk before erasing (helper rule 3). One implementation for both.
-//  Spec: specs/008-system-helper/spec.md (rule from specs/007-real-detection/spec.md)
 //
 
 import Foundation
