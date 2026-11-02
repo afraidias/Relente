@@ -1,8 +1,8 @@
 # Direct installer download — intent
 
-Revision: 1 · State: Draft
+Revision: 1 · State: Accepted
 Related issue: N/A — no dedicated issue verified during conversion; roadmap step 9.
-Approval: Pending — conversion authorization is not acceptance of intent, design or plan.
+Approval: Afraidias, 2026-11-02, revision 1 — explicit acceptance in this conversation ("vale").
 
 ## Problem and evidence
 
@@ -47,4 +47,8 @@ Which Apple-controlled origins and redirects are necessary?
 
 ## Approval record
 
-Pending. The owner authorized conversion into lifecycle documents, not their acceptance.
+Accepted by Afraidias on 2026-11-02, revision 1, responding "vale" to the proposed intent:
+download an authentic Apple installer, show real progress, reliably cancel without selectable
+partial artifacts, and preserve local selection and useful previous UI. Catalog, compatibility
+and preparation remain design questions. This accepts intent only, not design or implementation
+plan, and does not authorize merge or release publication.

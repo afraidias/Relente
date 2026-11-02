@@ -16,7 +16,7 @@ Do not implement from the converted draft.
 
 ## Ordered preparation checklist
 
-1. Review and accept the intent, including success measures and host/installer scope.
+1. Completed: owner accepted intent revision 1 on 2026-11-02, including success measures and host/installer scope.
 2. Reconcile the final previous-acquisition branch: identify reusable UI/code, unfinished checks
    and integration dependencies. Preserve useful work without reviving its cancelled approach.
 3. Validate metadata, Apple origins, version/build identity and compatibility using official
@@ -51,3 +51,9 @@ Pending. No accepted implementation plan or approved deviations.
 2026-11-02: source draft converted into these three artifacts with owner authorization. No code,
 external issues, original spec, project or CI configuration changed. No implementation tests or
 live downloads performed. Intent, design and plan acceptance remain pending.
+
+2026-11-02: started feature/direct-installer-download from integrated main at 20d5d23 in the
+migration worktree, leaving the separate acquisition checkout unchanged. Owner accepted intent
+revision 1 ("vale"); design and plan remain Draft/unaccepted. Initial official-source findings
+are recorded in spec.md. Next: resolve metadata/compatibility and preparation options, assess
+reuse from PR #44, then present design decisions. No source/project/CI changes or live transfer.

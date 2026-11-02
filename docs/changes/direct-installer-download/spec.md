@@ -4,7 +4,7 @@ Revision: 1 · State: Draft
 Related issue: N/A — no dedicated issue verified during conversion; roadmap step 9.
 Approval: Pending — conversion authorization is not acceptance of intent, design or plan.
 
-Intent: [intent.md](intent.md) — Draft, acceptance pending.
+Intent: [intent.md](intent.md) — revision 1 accepted by the owner on 2026-11-02.
 
 Converted from the [existing draft](https://github.com/afraidias/Relente/blob/92a1608cd0f20476b79dab44794b5f718e02292e/specs/012-direct-installer-download/spec.md)
 on 2026-11-02. This migration preserves proposed requirements, not evidence of implementation.
@@ -157,3 +157,21 @@ revalidated against Apple sources as part of conversion.
 ## Approval record
 
 Pending. All requirements and decisions above remain proposed until owner acceptance.
+
+## Initial official-source investigation — 2026-11-02
+
+Apple documents that [URLSessionTask.cancel()](https://developer.apple.com/documentation/foundation/urlsessiontask/cancel())
+returns immediately; cancellation is acknowledged through the completion delegate callback, and
+callbacks may still arrive beforehand. Therefore a cancelling UI state must not be treated as
+terminal cancellation. This supports a Relente-owned transfer design but does not establish its
+catalog or installer-preparation path.
+
+Apple's [download completion callback](https://developer.apple.com/documentation/foundation/urlsessiondownloaddelegate/urlsession(_:downloadtask:didfinishdownloadingto:))
+provides a temporary file whose lifetime must be handled before returning. Validation/publication
+as a selectable installer remains a separate operation. This is API documentation evidence,
+not an implemented or runtime-verified download workflow.
+
+The Apple Support download/bootable-installer pages returned HTTP 429 during this investigation.
+Their contents were not verified in this pass. Package source/identity, compatibility mapping,
+Apple-controlled redirects and safe preparation remain open; no package execution or download
+was performed.
