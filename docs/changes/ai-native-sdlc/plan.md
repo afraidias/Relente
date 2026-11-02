@@ -3,7 +3,7 @@
 Revision: 2 · State: Draft — reconstructed current plan, final reconciliation pending.
 Implementation state: In progress
 Issue: N/A — owner-requested process migration.
-PR: N/A — no migration PR created.
+PR: [#45](https://github.com/afraidias/Relente/pull/45) — Draft, owner review and merge approval pending.
 Intent: [intent.md](intent.md) · Design: [spec.md](spec.md)
 
 ## Authorization and revision history
@@ -461,3 +461,8 @@ unchanged for later owner-led reconciliation, superseding any earlier assumption
 exists. Verified configured private Git identity. Preparing this migration as a draft PR under
 approved Git autonomy, not merging or publishing a release. Historical handoff snapshots above
 remain snapshots rather than current Git status.
+
+2026-11-02: committed the reviewed migration as cfaa13a with the existing hooks enabled,
+pushed only docs/ai-native-sdlc, and opened Draft PR #45 against main. No merge, release or
+changes to acquisition PR #44. The working tree was clean after the migration commit; this
+follow-up records traceability. Required PR CI status must be checked at the final pushed head.
