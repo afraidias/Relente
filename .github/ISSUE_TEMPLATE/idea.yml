@@ -47,6 +47,6 @@ body:
     id: found-in
     attributes:
       label: Where did it come from?
-      placeholder: "Found while checking spec 006 (assistant navigation)"
+      placeholder: "Found while reviewing assistant navigation"
     validations:
       required: true

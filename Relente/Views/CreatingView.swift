@@ -5,7 +5,6 @@
 //  Step 4: the bootable installer being made, with its progress around the drive,
 //  the copy figures and the phase bar. Step 4b, when it stops, keeps the same layout
 //  in red, with why it stopped in the subtitle and where in the figures.
-//  Spec: specs/004-creating-screen/spec.md
 //
 
 import AppKit
@@ -187,7 +186,7 @@ struct CreatingHero: View {
 
         let artwork = HeroArtwork(size: 90, haloColor: tint) {
             // Once it stopped, the screen draws the drive itself: the assistant draws shared
-            // artwork above the whole screen, which would cover the cross's ring (spec 008).
+            // artwork above the whole screen, which would cover the cross's ring.
             DriveArtwork(kind: drive.kind)
                 .sharedArtwork(.drive, isActive: !isFailed)
         } badge: {
@@ -202,7 +201,7 @@ struct CreatingHero: View {
         VStack(spacing: 10) {
             if isFailed {
                 // No ring once it stopped: the red halo and badge say it, and STOPPED AT says
-                // where. The ring's space is kept, so nothing moves (spec 005).
+                // where. The ring's space is kept, so nothing moves.
                 artwork
                     .frame(width: Self.ringDiameter, height: Self.ringDiameter)
             } else if progress.isLive

@@ -8,7 +8,6 @@
 //  indicator while macOS waits for the user, a callout about the authorization each erase asks
 //  for, and one footer button that is always the next thing to do. The assistant reads the
 //  helper's status again every 2 s and when the app becomes active, so the screen follows it.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import AppKit

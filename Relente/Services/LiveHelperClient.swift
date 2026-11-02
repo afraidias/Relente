@@ -5,7 +5,6 @@
 //  One XPC connection to the helper's privileged Mach service, which launchd starts on demand.
 //  The connection requires the helper's code signature (helper rule 2); if it's interrupted or
 //  invalidated, the next call opens a new one.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
-  <img src="https://img.shields.io/badge/macOS-14%2B-black" alt="macOS 14 or later">
+  <img src="https://img.shields.io/badge/macOS-26.0%2B-black" alt="macOS 26.0 or later">
   <img src="https://img.shields.io/badge/Swift-6-orange" alt="Swift 6">
 </p>
 
@@ -21,7 +21,7 @@ It is written in Swift and SwiftUI, and only works with macOS installers and rem
 
 ### Requirements
 
-- A Mac running **macOS 14 Sonoma** or later, with Apple silicon or an Intel processor. Older Macs matter here, so the oldest supported version is only dropped when keeping it becomes costly; this is reviewed once a year.
+- An **Apple silicon Mac running macOS 26.0 Tahoe or later** (approved support target). The current project still targets macOS 14 and CI still builds universal binaries; implementation alignment is pending. See the [support policy](docs/product.md#supported-macs).
 - A macOS installer from **Big Sur (11) onwards**, in any of these forms:
   - `Install macOS <name>.app`
   - A `.dmg` that contains the installer app
@@ -64,19 +64,21 @@ This is a personal project and **pull requests aren't accepted for now**. Bug re
 
 ## Project status
 
-Early development. The roadmap (specs refer to these as "roadmap step N"):
+Early development. Roadmap:
 
 1. [x] Project setup
 2. [x] Folder structure and design system
-3. [x] Static screens with sample data: 001 Installer ✓, 002 USB drive ✓, 003 Review ✓, 004 Creating (+ Error) ✓, 005 Done ✓
-4. [x] Assistant navigation and animations: 006 Assistant navigation ✓
-5. [x] Real disk and installer detection: 007 Real detection ✓
+3. [x] Static screens with sample data: Installer, USB drive, Review, Creating, Error and Done
+4. [x] Assistant navigation and animations
+5. [x] Real disk and installer detection
 6. [x] System helper, XPC and security checks (includes the Permissions screen)
-7. [ ] `createinstallmedia` with live progress
+7. [ ] `createinstallmedia` with live progress — implementation present; remaining validation and follow-up are in [release readiness](docs/release-readiness.md)
 8. [ ] Signing, notarization, Authorization Services compatibility across supported Macs, and first release
 9. [ ] Download installers from Apple (Download screen)
 
-Relente is built with spec-driven development: every feature has a specification in [`specs/`](specs), and the project's rules are in [AGENTS.md](AGENTS.md).
+Relente follows an [AI-native software development lifecycle](docs/development.md). Change artifacts live in [`docs/changes/`](docs/changes/), and project rules are in [AGENTS.md](AGENTS.md).
+
+Before distribution, complete the [release readiness checklist](docs/release-readiness.md).
 
 ## License
 

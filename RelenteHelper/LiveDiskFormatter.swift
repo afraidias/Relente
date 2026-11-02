@@ -4,7 +4,6 @@
 //
 //  Runs `DiskutilCommand`: a fixed executable path and an argument array, never a shell (helper
 //  rule 1). Cancelling ends `diskutil`; the drive is then unusable until it's erased again.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

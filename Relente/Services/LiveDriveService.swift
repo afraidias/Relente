@@ -6,7 +6,6 @@
 //  ejects them by unmounting every volume and ejecting the media. Its session runs on the main
 //  run loop, so callbacks arrive on the main actor without any dispatch queue. It only reads:
 //  nothing here writes to a disk.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import DiskArbitration

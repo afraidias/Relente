@@ -4,7 +4,6 @@
 //
 //  The two sizes of a `PickItem`: large in a row, smaller in a grid (`PickLayout`). Items read it
 //  from the environment, so the screens don't pass it around.
-//  Spec: specs/007-real-detection/spec.md ("Many installers or drives")
 //
 
 import SwiftUI

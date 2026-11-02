@@ -4,7 +4,6 @@
 //
 //  Finds the macOS installers on the Mac and reads the ones the user chooses. The live service
 //  watches /Applications; the sample one serves fixed data for previews, tests and `-sampleData`.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

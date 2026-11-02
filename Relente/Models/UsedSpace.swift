@@ -3,7 +3,6 @@
 //  Relente
 //
 //  How much is stored on a drive: a figure, or unknown when part of it can't be measured.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

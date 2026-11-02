@@ -6,7 +6,6 @@
 //  team (helper rule 2, set in `main.swift`); each connection gets its own
 //  `HelperRequestHandler`, sharing its format and creation pipelines across connections.
 //  With no connection for a minute, the helper quits; launchd starts it again on the next one.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

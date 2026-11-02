@@ -4,7 +4,6 @@
 //
 //  Installs, follows and uninstalls the system helper. The live service uses `SMAppService`; the
 //  sample one changes its status by itself, for previews, tests and `-sampleData`.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

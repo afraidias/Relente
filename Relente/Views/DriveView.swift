@@ -3,7 +3,6 @@
 //  Relente
 //
 //  Step 2: pick the USB drive or SD card that will become the installer.
-//  Spec: specs/002-drive-screen/spec.md
 //
 
 import SwiftUI
@@ -56,7 +55,7 @@ struct DriveView: View {
 // MARK: - Installer label
 
 /// A reminder of what will go on the drive: the chosen installer's icon, name, version and size.
-/// Not a control. The installer's icon travels through it on its way to Review (spec 006).
+/// Not a control. The installer's icon travels through it on its way to Review.
 struct DriveInstallerLabel: View {
     let installer: InstallerSource
 
@@ -90,7 +89,6 @@ struct DriveInstallerLabel: View {
 /// the model (or the kind of drive), a gray usage bar, and what's on it. A drive that's too small
 /// has its red chip in the bar's place and its size and the size it needs below; it's disabled
 /// (dimmed, not selectable).
-/// Spec: specs/007-real-detection/spec.md (option C, aligned)
 struct DriveItem: View {
     let name: String
     let kind: Drive.Kind

@@ -2,7 +2,6 @@
 //  AuthenticationMethodTests.swift
 //  RelenteTests
 //
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Testing

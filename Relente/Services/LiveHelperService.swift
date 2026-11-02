@@ -5,7 +5,6 @@
 //  The system helper through `SMAppService`: a launch daemon whose plist is inside the app
 //  (`Contents/Library/LaunchDaemons/`). macOS asks the user to turn it on in System Settings ›
 //  General › Login Items the first time.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

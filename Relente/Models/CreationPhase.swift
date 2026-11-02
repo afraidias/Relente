@@ -3,7 +3,6 @@
 //  Relente
 //
 //  The steps of making the bootable installer, in the order the phase bar shows them.
-//  Spec: specs/004-creating-screen/spec.md
 //
 
 import Foundation

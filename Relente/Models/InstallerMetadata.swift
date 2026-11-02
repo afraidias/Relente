@@ -6,7 +6,6 @@
 //  Info.plist, the software update catalog in its SharedSupport disk image, and an
 //  InstallAssistant.pkg's Distribution file. Pure functions on the files' contents; reading the
 //  files themselves is the installer service's job.
-//  Spec: specs/007-real-detection/spec.md
 //
 
 import Foundation

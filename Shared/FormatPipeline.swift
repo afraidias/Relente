@@ -6,7 +6,6 @@
 //  the disk read again from DiskArbitration, the drive rules and the fingerprint (rule 3), and
 //  only then `diskutil`. One request at a time. The outside pieces are protocols, so all of it is
 //  tested with fakes; the helper gives it the live ones.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

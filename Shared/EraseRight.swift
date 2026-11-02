@@ -5,7 +5,6 @@
 //  The Authorization Services right every erase needs (helper rule 5). The helper adds it to the
 //  authorization database; the app asks for it (macOS shows its dialog); the helper checks it
 //  again before doing anything.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

@@ -3,7 +3,7 @@
 //  Relente
 //
 //  Centered title and subtitle shown at the top of every assistant screen. Inside the
-//  assistant, VoiceOver moves to the title when the screen appears (spec 006).
+//  assistant, VoiceOver moves to the title when the screen appears.
 //
 
 import SwiftUI

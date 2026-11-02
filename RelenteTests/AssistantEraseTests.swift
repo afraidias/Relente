@@ -5,7 +5,6 @@
 //  "Erase and Create" with a creation that erases the drive: the helper must be ready, macOS asks
 //  for authorization first, and the drive is followed by its BSD name once the format renames it.
 //  Sample services only: nothing is authorized, formatted or erased.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

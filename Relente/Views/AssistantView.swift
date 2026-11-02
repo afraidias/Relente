@@ -6,7 +6,6 @@
 //  each button does, comes from `Assistant`. Screens slide forward and back (or crossfade for
 //  endings and restarts); the footer stays still; the chosen drive and the installer's icon fly
 //  from one screen to the next (`SharedArtwork`). With Reduce Motion everything crossfades.
-//  Spec: specs/006-assistant-navigation/spec.md
 //
 
 import AppKit

@@ -4,7 +4,6 @@
 //
 //  Debug builds only: pretends to make the installer, so the whole assistant can be walked and
 //  tested without touching a disk or talking to the helper. Its sample output exercises Details.
-//  Spec: specs/006-assistant-navigation/spec.md
 //
 
 #if DEBUG

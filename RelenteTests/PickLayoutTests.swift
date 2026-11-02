@@ -3,7 +3,6 @@
 //  RelenteTests
 //
 //  How many installers or drives fit as large items in a row, and when they become a grid.
-//  Spec: specs/007-real-detection/spec.md ("Many installers or drives")
 //
 
 import Testing

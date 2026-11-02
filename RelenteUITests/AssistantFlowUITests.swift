@@ -3,8 +3,6 @@
 //  RelenteUITests
 //
 //  The whole assistant in the running app, with sample data and the Debug-only simulation.
-//  Specs: specs/006-assistant-navigation/spec.md, specs/007-real-detection/spec.md,
-//  specs/008-system-helper/spec.md
 //
 
 import XCTest

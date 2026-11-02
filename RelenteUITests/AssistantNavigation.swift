@@ -4,7 +4,6 @@
 //
 //  Shared steps for the UI tests: opening the app and walking the assistant to a screen, with
 //  sample data and the Debug-only simulated creation.
-//  Spec: specs/006-assistant-navigation/spec.md
 //
 
 import XCTest

@@ -5,7 +5,6 @@
 //  The assistant's shared state: the current screen, what was chosen, and how the last screen
 //  change should animate. Every user action checks it's allowed on the current screen and does
 //  nothing otherwise.
-//  Spec: specs/006-assistant-navigation/spec.md, specs/008-system-helper/spec.md
 //
 
 import AppKit

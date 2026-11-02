@@ -4,7 +4,6 @@
 //
 //  What the Done screen shows: the installer made on the drive, how long it took,
 //  and the name the drive has now.
-//  Spec: specs/005-done-screen/spec.md
 //
 
 import Foundation

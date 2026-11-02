@@ -3,7 +3,6 @@
 //  Relente
 //
 //  How a format request ended, as the helper replies over XPC (a plain integer).
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

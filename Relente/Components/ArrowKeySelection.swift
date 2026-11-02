@@ -5,7 +5,6 @@
 //  Left and right arrows move the selection in a row of options (installers, drives) as soon
 //  as the screen appears; in a grid, up and down move it a row. In right-to-left languages the
 //  arrows follow the row's direction.
-//  Specs: specs/006-assistant-navigation/spec.md, specs/007-real-detection/spec.md
 //
 
 import SwiftUI

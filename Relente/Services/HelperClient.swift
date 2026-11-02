@@ -4,7 +4,6 @@
 //
 //  Talks to the system helper over XPC. The live client only talks to the Relente helper signed by
 //  the team (helper rule 2); the sample one answers by itself, for previews and tests.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation

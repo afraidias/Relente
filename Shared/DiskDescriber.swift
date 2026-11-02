@@ -5,7 +5,6 @@
 //  Reads a disk's description from DiskArbitration and the I/O Registry into a `DiskDescription`,
 //  and finds the disks the Mac started up from. The app's drive service and the helper read disks
 //  the same way.
-//  Spec: specs/008-system-helper/spec.md (moved from specs/007-real-detection/spec.md)
 //
 
 import DiskArbitration

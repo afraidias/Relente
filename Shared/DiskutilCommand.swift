@@ -6,7 +6,6 @@
 //  with its arguments as an array, never through a shell. The drive is erased as Apple's guide
 //  prepares it (support.apple.com/101578): Mac OS Extended (Journaled), named "MyVolume", here on
 //  a GPT partition map.
-//  Spec: specs/008-system-helper/spec.md
 //
 
 import Foundation
