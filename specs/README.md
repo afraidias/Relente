@@ -36,7 +36,15 @@ once in [AGENTS.md](../AGENTS.md), and the screen flow and design system in
 | [008 · System helper, XPC and security checks](008-system-helper/spec.md) | 6 | Done |
 | [009 · App icon](009-app-icon/spec.md) | 8 | Done |
 | [010 · Live installer creation](010-live-creation/spec.md) | 7 | Done |
-| [011 · Installer acquisition](011-installer-acquisition/spec.md) | 9 | Draft |
+| [011 · Installer acquisition](011-installer-acquisition/spec.md) | 9 | Approved; approach closed, incomplete |
+| [012 · Direct installer download](012-direct-installer-download/spec.md) | 9 | Draft |
+
+Spec numbers identify features in the order they were specified; roadmap steps identify project
+milestones. The numbers do not need to match, and drafting a later spec does not mark earlier
+roadmap steps complete. For example, spec 009 delivered app-icon polish within step 8, spec 010
+completed live creation in step 7, and spec 011 specifies installer acquisition for step 9.
+Spec 012 replaces spec 011's `softwareupdate` download approach; spec 011 is not Done because its
+cancellation guarantee and final release checks remain incomplete.
 
 ## Capability map
 
@@ -48,10 +56,12 @@ independently:
 | Live creation | 7 | Use a selected local installer, let Apple's `createinstallmedia` prepare and erase the confirmed USB/SD card, and show real progress, output, cancellation and recovery. Review the affected screens so the user always knows what is happening. |
 | Installer acquisition | 9 | Show Apple-compatible installer versions alongside local installers, avoid downloading a version already present, download with progress and retain it for reuse. Feed the resulting installer into the existing installer-selection flow. |
 
-Build order: live creation, then installer acquisition. In the eventual user flow, installer
-selection or download happens before USB selection so the app can compare installer size with
-available drives. Verify the full end-to-end flow after both capabilities are complete. Deleting a
-retained download is tracked separately in [issue #39](https://github.com/afraidias/Relente/issues/39).
+Build order for these capabilities: live creation, then installer acquisition. Roadmap step 8 is a
+separate release gate: signing, notarization, Authorization Services compatibility and the first
+release are still pending. Installer downloads are not required for an MVP that uses local
+installers. In the eventual downloaded-installer flow, selection or download happens before USB
+selection so the app can compare installer size with available drives. Deleting a retained download
+is tracked separately in [issue #39](https://github.com/afraidias/Relente/issues/39).
 
 ## Templates
 
