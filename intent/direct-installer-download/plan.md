@@ -5,7 +5,7 @@ Related issue: N/A — no dedicated issue verified; roadmap step 9.
 Approval: Afraidias, 2026-11-03, revision 3 — "apruebo" to the explicit plan approval question.
 Previous approval: Afraidias, 2026-11-03, revision 2 — "okey" to the explicit implementation-plan approval question.
 Implementation state: In progress
-PR: N/A — no PR created for this change.
+PR: [#47](https://github.com/afraidias/Relente/pull/47) — draft, awaiting manual checks and owner review.
 
 Intent: [intent.md](intent.md) · Accepted design: [spec.md](spec.md), revision 8.
 
@@ -655,3 +655,11 @@ publication scope. Owner review and approval are still required for merge.
   and does not exercise the live privileged helper or a real USB device.
 - Obtain owner review before merging. Xcode's "Update to recommended settings" suggestion is a
   separate project-settings decision and is not a compiler warning in this change.
+
+
+### Draft PR checkpoint — 2026-11-03
+
+Commit 0fda065 was pushed on feature/direct-installer-download, directly above the accepted
+intent commit 74b406e. Draft PR #47 targets main. Local unit, focused UI, Release and lint
+results are recorded above and in the PR; CI and manual appearance/accessibility review are
+pending. No merge or release is authorized by opening the draft.
