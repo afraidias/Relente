@@ -663,3 +663,15 @@ Commit 0fda065 was pushed on feature/direct-installer-download, directly above t
 intent commit 74b406e. Draft PR #47 targets main. Local unit, focused UI, Release and lint
 results are recorded above and in the PR; CI and manual appearance/accessibility review are
 pending. No merge or release is authorized by opening the draft.
+
+
+### PR checks and accessibility review — 2026-11-03
+
+Draft PR #47 reports success for PR title, Lint and Build & test CI checks. The acquisition UI
+tests expose a named, frequently updated progress ring; named stages with Completed, In progress
+and Pending values; and accessible ready/cancelled terminal states. Code inspection confirms
+Reduce Motion disables ring and rolling-number animation, substitutes opacity for artwork motion,
+and shortens state transitions. Xcode Preview's Dark canvas failed with "Failed to launch app
+Relente.app in reasonable time"; a prior app launch argument also left the captured interface
+light. Therefore actual dark-appearance rendering, spoken VoiceOver navigation and observed
+Reduce Motion behavior remain unverified. These need a human pass in a running app before merge.
