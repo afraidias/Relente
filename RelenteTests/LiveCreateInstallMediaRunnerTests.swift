@@ -34,6 +34,32 @@ struct LiveCreateInstallMediaRunnerTests {
         #expect(reported.map(\.progress?.fraction) == [0, 0.25])
     }
 
+    @Test func mismatchedSelectedIdentityNeverLaunchesTheAppleTool() async throws {
+        let installer = try InstallerFixture()
+        defer { installer.remove() }
+        let process = FakeInstallMediaProcess(status: 0, output: [])
+        let actual = try InstallerOSIdentity(version: "13.7.8", build: "22H730")
+        let expected = try InstallerOSIdentity(version: "13.7.8", build: "22H731")
+        let runner = LiveCreateInstallMediaRunner(
+            processRunner: process, verifyAppleSignature: { _, _ in true },
+            readIdentity: { _, _ in actual })
+        let preflightCalls = OSAllocatedUnfairLock(initialState: 0)
+        let result = await runner.create(
+            installerURL: installer.appURL, installerPackageURL: nil,
+            expectedIdentity: expected, volumeURL: URL(filePath: "/Volumes/Relente Test"),
+            cancellation: CreateInstallMediaCancellation(),
+            beforeLaunch: {
+                preflightCalls.withLock { $0 += 1 }
+                return nil
+            }, report: { _ in })
+        guard case .invalidInstaller = result else {
+            Issue.record("Identity mismatch must fail closed")
+            return
+        }
+        #expect(await process.invocation() == nil)
+        #expect(preflightCalls.withLock { $0 } == 0)
+    }
+
     @Test func `a nonzero process status becomes a failed run`() async throws {
         let installer = try InstallerFixture()
         defer { installer.remove() }

@@ -24,7 +24,7 @@ authorized. Any narrower work instruction remains binding.
 Prepare on docs/ai-native-sdlc in this isolated worktree. Keep the other checkout untouched.
 Replace the active process in one integration, with no historical specs archive or Git-history
 rewrite. Rules belong in AGENTS.md, procedures in skills, product knowledge in product docs and
-durable decisions in ADRs. Use the [development guide](../../development.md) for the lifecycle.
+durable decisions in ADRs. Use the [development guide](../../docs/development.md) for the lifecycle.
 
 No app/helper behavior, APIs, CI, signing or release configuration changes belong to this migration.
 The accepted Apple silicon/macOS 26.0+ support policy is documented, but adapting project targets,
@@ -111,7 +111,7 @@ until a separately accepted implementation aligns them. Never claim those settin
 Before integration, changes remain reviewable in this worktree. If an integrated process change
 needs correction, prepare a normal reviewed follow-up or revert; never rewrite history or silently
 restore the retired process as a parallel workflow. Application/release recovery is described in
-[the release runbook](../../release.md) and cannot restore erased disk data.
+[the release runbook](../../docs/release.md) and cannot restore erased disk data.
 
 ## Verification evidence and limitations
 

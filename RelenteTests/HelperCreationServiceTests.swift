@@ -30,7 +30,10 @@ struct HelperCreationServiceTests {
         func connectsToCurrentHelper() async -> Bool { true }
         func format(_ drive: Drive, authorization: Data) async -> FormatOutcome? { .formatted }
 
-        func createInstallMedia(installerURL: URL, installerPackageURL: URL?, drive: Drive, authorization: Data)
+        func createInstallMedia(
+            installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity?, drive: Drive,
+            authorization: Data
+        )
             async -> AsyncStream<HelperCreateEvent>
         {
             installerURLs.append(installerURL)

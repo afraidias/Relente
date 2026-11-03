@@ -105,6 +105,20 @@ struct InstallerMetadataTests {
         }
     }
 
+    @Test func catalogRequiresEveryAssetToHaveTheSameIdentity() throws {
+        func catalog(_ assets: [[String: String]]) throws -> Data {
+            try PropertyListSerialization.data(fromPropertyList: ["Assets": assets], format: .binary, options: 0)
+        }
+        let asset = ["OSVersion": "13.7.8", "Build": "22H730"]
+        #expect(
+            try InstallerMetadata.catalogInfo(fromCatalog: catalog([asset, asset]))
+                == InstallerMetadata.CatalogInfo(version: "13.7.8", build: "22H730"))
+        for other in [["OSVersion": "13.7.8", "Build": "22H731"], ["OSVersion": "13.7.8"], ["Build": "22H730"]] {
+            let data = try catalog([asset, other])
+            #expect(throws: InstallerMetadata.ParseError.self) { try InstallerMetadata.catalogInfo(fromCatalog: data) }
+        }
+    }
+
     // MARK: - InstallAssistant.pkg
 
     @Test func `reads the version and the installed size from a Distribution file`() throws {

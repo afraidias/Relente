@@ -31,3 +31,26 @@ whole-device write counters as installer bytes copied.
 4. **Installer verification before creation.** The helper requires Apple's signature on the installer app and its `createinstallmedia` tool, checks them immediately before launch, rejects symbolic links and mounts disk images read-only. For `InstallAssistant.pkg`, the helper copies the selected package into a root-owned mode-0700 directory, verifies it with Apple's Software Update signer, and expands that copy without running package scripts. It uses only the helper-owned extraction, so the package signature authenticates the resources that `createinstallmedia` consumes and the logged-in user cannot replace them after validation. The helper may skip only legacy app bundle-resource validation for this extraction; the app code and `createinstallmedia` signatures are still checked.
 5. **Administrator authorization for every erase** through a dedicated Authorization Services right. macOS offers Touch ID when available and falls back to the administrator password; the helper verifies the authorization independently before running `createinstallmedia`.
 6. **No networking in the helper.** Activity is logged with the unified logging system (`os_log`), and the helper can be uninstalled from the app.
+
+## Direct installer acquisition
+
+Only the unprivileged app contacts Apple's catalog, metadata and package hosts, over HTTPS with
+normal system TLS validation and exact role-specific origins. Unexpected redirects are rejected.
+The package verifier requires a successful system signature check and the reviewed Apple Software
+Update intermediate/root chain fingerprints; embedded certificates alone are not trusted.
+
+Downloaded installer apps are previews derived from a retained signed package. Before privileged
+creation, the helper independently snapshots that package into a fresh root-owned 0700 directory,
+verifies the snapshot, expands it without scripts, and binds its actual SharedSupport OS identity
+to the expected version/build in the typed request. The original signed package supplies
+SharedSupport; a caller-writable app or Ready record never authorizes root execution. Bundle code
+and createinstallmedia retain Apple signature checks, including all executable architectures.
+
+The fixed system extractor processes authenticated Apple packages. Its bounded APFS workspace
+limits storage consumption; it is not a filesystem path sandbox. Private extracted content and
+internal symbolic links are checked before use. Cancellation waits for owned process-group
+termination before cleanup, and mounted work is removed only after confirmed detach. Uncertain
+process/mount ownership fails closed and retains evidence. Root-owned private preparation folders
+also block a later helper instance after restart; they are never automatically removed or used
+to infer permission to detach an arbitrary device. No new helper networking or general command
+execution API is introduced.

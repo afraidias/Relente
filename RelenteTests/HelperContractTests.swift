@@ -68,7 +68,7 @@ struct HelperContractTests {
     // MARK: - Protocol
 
     @Test func `the protocol has a version the app checks`() {
-        #expect(HelperIdentity.protocolVersion == 5)
+        #expect(HelperIdentity.protocolVersion == 6)
         #expect(HelperIdentity.supports(HelperIdentity.protocolVersion))
         #expect(!HelperIdentity.supports(HelperIdentity.protocolVersion - 1))
         #expect(!HelperIdentity.supports(nil))

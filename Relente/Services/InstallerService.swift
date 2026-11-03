@@ -16,6 +16,7 @@ nonisolated protocol InstallerService: Sendable {
     /// Reads an installer the user chose (an app, a disk image or an InstallAssistant.pkg) and
     /// keeps it in the list while its file exists.
     func add(_ url: URL) async throws(InstallerError) -> InstallerSource
+    func addRetained(_ source: InstallerSource) async throws(InstallerError) -> InstallerSource
 }
 
 /// Why a file can't be used as an installer.
@@ -41,5 +42,11 @@ nonisolated enum InstallerError: Error, Hashable, Sendable {
                 "Choose an installer app, a disk image that contains one, or InstallAssistant.pkg.",
                 comment: "Alert message when the chosen file isn't an installer.")
         }
+    }
+}
+
+nonisolated extension InstallerService {
+    func addRetained(_ source: InstallerSource) async throws(InstallerError) -> InstallerSource {
+        try await add(source.url)
     }
 }

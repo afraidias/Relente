@@ -24,7 +24,8 @@ nonisolated enum InstallerReader {
     /// Reads any of the three kinds, by its extension.
     @concurrent
     static func read(_ url: URL) async throws -> InstallerSource {
-        switch url.pathExtension.lowercased() {
+        guard !InstallerArtifactStore.isUnpublished(url) else { throw ReadError(reason: "Acquisition is incomplete") }
+        return switch url.pathExtension.lowercased() {
         case "app": try await readApp(at: url)
         case "dmg": try await readDiskImage(at: url)
         case "pkg": try await readPackage(at: url)
@@ -44,13 +45,16 @@ nonisolated enum InstallerReader {
         let info = try InstallerMetadata.appInfo(
             fromInfoPlist: Data(contentsOf: url.appending(path: "Contents/Info.plist")))
         var version = info.version
+        var build: String?
         if version >= .bigSur {
             let sharedSupport = url.appending(path: "Contents/SharedSupport/SharedSupport.dmg")
             do {
-                version = try await withAttachedImage(sharedSupport) { mountPoint in
-                    try InstallerMetadata.version(
+                let identity = try await withAttachedImage(sharedSupport) { mountPoint in
+                    try InstallerMetadata.catalogInfo(
                         fromCatalog: Data(contentsOf: mountPoint.appending(path: InstallerMetadata.catalogPath)))
                 }
+                version = identity.version
+                build = identity.build
             } catch {
                 logger.error(
                     "No full version for \(url.lastPathComponent, privacy: .public): \(String(describing: error), privacy: .public)"
@@ -58,7 +62,8 @@ nonisolated enum InstallerReader {
             }
         }
         return InstallerSource(
-            url: source ?? url, name: info.name, version: version, kind: kind, size: allocatedSize(of: url))
+            url: source ?? url, name: info.name, version: version, kind: kind, size: allocatedSize(of: url),
+            build: build)
     }
 
     // MARK: - Disk image

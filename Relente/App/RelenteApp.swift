@@ -7,27 +7,45 @@ import SwiftUI
 
 @main
 struct RelenteApp: App {
+    @NSApplicationDelegateAdaptor(RelenteAppDelegate.self) private var appDelegate
     @State private var assistant = Assistant(
         installerService: Self.installerService,
         driveService: Self.driveService,
         helperService: Self.helperService,
         helperClient: Self.helperClient,
         authorizer: Self.authorizer,
-        creationService: Self.creationService
+        creationService: Self.creationService,
+        acquisitionService: Self.acquisitionService
     )
 
     var body: some Scene {
         WindowGroup {
             AssistantView(assistant: assistant, thisMac: .current)
                 .environment(\.usesClassicControls, Self.forcesClassicControls)
-                .task { await assistant.start() }
+                .onAppear { appDelegate.assistant = assistant }
+                .onChange(of: assistant.isShowingDownloadCancelled) {
+                    guard assistant.isShowingDownloadCancelled, !Self.usesSampleData else { return }
+                    Task { await appDelegate.notifyDownloadCancelled() }
+                }
+                .onChange(of: assistant.downloadCompletionID) {
+                    guard assistant.downloadCompletionID != nil, !Self.usesSampleData else { return }
+                    Task { await appDelegate.notifyDownloadCompleted() }
+                }
+                .onChange(of: assistant.downloadFailureID) {
+                    guard assistant.downloadFailureID != nil, !Self.usesSampleData else { return }
+                    Task { await appDelegate.notifyDownloadFailed() }
+                }
+                .task {
+                    assistant.prefetchAvailableInstallers()
+                    await assistant.start()
+                }
         }
         // Only the window buttons in the top bar, no title.
         .windowStyle(.hiddenTitleBar)
         // The window takes the content's fixed size and can't be resized.
         .windowResizability(.contentSize)
         .commands {
-            AssistantCommands(assistant: assistant)
+            AssistantCommands(assistant: assistant, appDelegate: appDelegate)
         }
 
         Window("Creation Log", id: "creation-output") {
@@ -61,10 +79,19 @@ struct RelenteApp: App {
     }
 
     private static var installerService: any InstallerService {
-        guard usesSampleData else { return LiveInstallerService() }
+        guard usesSampleData else { return liveInstallerService }
         // Catalina too, so the sample data shows an unsupported installer as well.
         let installers = InstallerSource.samples + [InstallerSource.unsupportedSample]
         return SampleInstallerService(installers: sampleEmpty == "installers" ? [] : installers)
+    }
+
+    private static let liveInstallerService = LiveInstallerService()
+    private static let liveAcquisitionService = LiveInstallerAcquisitionService(installerService: liveInstallerService)
+
+    private static var acquisitionService: any InstallerAcquisitionService {
+        guard usesSampleData else { return liveAcquisitionService }
+        let delay = UserDefaults.standard.integer(forKey: "sampleDownloadDelayMilliseconds")
+        return SampleInstallerAcquisitionService(downloadDelay: .milliseconds(delay > 0 ? delay : 30))
     }
 
     private static var driveService: any DriveService {

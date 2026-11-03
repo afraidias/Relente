@@ -7,19 +7,14 @@ nonisolated struct CreateInstallMediaRequest: Sendable {
     let fingerprint: DiskFingerprint
     let installerURL: URL
     var installerPackageURL: URL? = nil
+    var expectedInstallerIdentity: InstallerOSIdentity? = nil
     let volumeURL: URL
     let authorization: Data
 }
 
 nonisolated enum InstallerPackageProvenance {
     static func hasAppleSoftwareUpdateSignature(_ output: String) -> Bool {
-        let lines = output.lowercased().split(whereSeparator: \.isNewline).map {
-            $0.trimmingCharacters(in: .whitespaces)
-        }
-        return lines.contains("status: signed apple software")
-            && lines.contains(where: { $0.hasPrefix("1. software update") })
-            && lines.contains(where: { $0.hasPrefix("2. apple software update certification authority") })
-            && lines.contains(where: { $0.hasPrefix("3. apple root ca") })
+        AppleInstallerPackageSignature.acceptsSuccessfulCheck(output)
     }
 
     static func hasExpectedPreparedLayout(package: URL, app: URL) -> Bool {
@@ -91,6 +86,7 @@ nonisolated final class HelperOperationGate: Sendable {
 nonisolated enum CreateInstallMediaRunResult: Sendable {
     case created
     case invalidInstaller
+    case recoveryRequired
     case refused(CreateInstallMediaOutcome)
     case failed
 }
@@ -107,7 +103,7 @@ nonisolated final class CreateInstallMediaCancellation: Sendable {
 
 nonisolated protocol InstallMediaRunning: Sendable {
     func create(
-        installerURL: URL, installerPackageURL: URL?, volumeURL: URL,
+        installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity?, volumeURL: URL,
         cancellation: CreateInstallMediaCancellation,
         beforeLaunch: @escaping @Sendable () async -> CreateInstallMediaOutcome?,
         report: @escaping @Sendable (CreateInstallMediaUpdate) -> Void
@@ -130,6 +126,7 @@ actor CreateInstallMediaPipeline {
     private let runner: any InstallMediaRunning
     private let volumeWriteChecker: any VolumeWriteChecking
     private var isRunning = false
+    private var recoveryBlocked = false
     private var activeCancellation: CreateInstallMediaCancellation?
 
     init(
@@ -144,6 +141,9 @@ actor CreateInstallMediaPipeline {
     }
 
     func checkWriteAccess(_ request: CreateInstallMediaRequest) async -> CreateInstallMediaOutcome {
+        guard !recoveryBlocked, (try? InstallerPrivateDirectory.hasUnfinishedRootWork()) == false else {
+            return .preparationRecoveryRequired
+        }
         guard !isRunning else { return .busy }
         guard await authorization.isAuthorized(request.authorization) else { return .notAuthorized }
         guard EraseRequestCheck.isValidIdentifier(request.bsdName) else { return .invalidIdentifier }
@@ -157,6 +157,9 @@ actor CreateInstallMediaPipeline {
         _ request: CreateInstallMediaRequest,
         report: @escaping @Sendable (CreateInstallMediaUpdate) -> Void
     ) async -> CreateInstallMediaOutcome {
+        guard !recoveryBlocked, (try? InstallerPrivateDirectory.hasUnfinishedRootWork()) == false else {
+            return .preparationRecoveryRequired
+        }
         guard !isRunning else { return .busy }
         isRunning = true
         let cancellation = CreateInstallMediaCancellation()
@@ -176,6 +179,7 @@ actor CreateInstallMediaPipeline {
 
         let result = await runner.create(
             installerURL: request.installerURL, installerPackageURL: request.installerPackageURL,
+            expectedIdentity: request.expectedInstallerIdentity,
             volumeURL: request.volumeURL, cancellation: cancellation,
             beforeLaunch: { await self.preflightFailure(for: request) }, report: report)
         switch result {
@@ -183,6 +187,9 @@ actor CreateInstallMediaPipeline {
             return .created
         case .invalidInstaller:
             return .invalidInstaller
+        case .recoveryRequired:
+            recoveryBlocked = true
+            return .preparationRecoveryRequired
         case .refused(let refusal):
             return refusal
         case .failed:

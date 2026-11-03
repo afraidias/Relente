@@ -9,7 +9,7 @@ predictability come before everything else.
 these rules with specialized knowledge and procedures. If a skill conflicts with this file,
 this file takes precedence; the agent must flag the conflict and propose a review when appropriate.
 Change artifacts live in
-[`docs/changes/`](docs/changes/); the roadmap is in the [README](README.md#project-status); folders are described
+[`intent/`](intent/); the roadmap is in the [README](README.md#project-status); folders are described
 in [BUILDING.md](BUILDING.md#project-layout). The owner may authorize edits to this file in the
 conversation. Changes remain reviewable through a `docs:` pull request approved by the owner;
 commits, pushes and PR creation follow the approved work scope; merging requires owner review and approval.
@@ -17,7 +17,7 @@ commits, pushes and PR creation follow the approved work scope; merging requires
 ## AI-native software development lifecycle
 
 Follow Plan, Design, Build, Test, Deploy and Maintain. Before starting or resuming a change, read
-[the lifecycle guide](docs/development.md) and the relevant [change artifacts](docs/changes/README.md).
+[the lifecycle guide](docs/development.md) and the relevant [change artifacts](intent/README.md).
 
 The owner accepts intent, requirements/design and the implementation plan before implementation.
 These reviews may happen in one conversation; keep documents proportionate to the change.

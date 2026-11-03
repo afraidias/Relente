@@ -5,7 +5,11 @@ nonisolated struct PreparedInstallerPackage: Sendable {
     let packageURL: URL
     let temporaryDirectory: URL
 
-    func remove() {
-        try? FileManager.default.removeItem(at: temporaryDirectory)
+    @discardableResult
+    func remove() -> Bool {
+        do {
+            try FileManager.default.removeItem(at: temporaryDirectory)
+            return true
+        } catch { return false }
     }
 }

@@ -8,6 +8,7 @@
 
 import Foundation
 import os
+
 #if RELENTE_TESTS
     @testable import Relente
 #endif
@@ -50,23 +51,39 @@ nonisolated final class HelperRequestHandler: NSObject, HelperProtocol, Sendable
         }
         Task {
             let outcome = await pipeline.format(request)
-            Self.operationGate.end(owner: connectionID)
             Self.logger.info(
                 "Format of \(bsdName, privacy: .public) ended: \(String(describing: outcome), privacy: .public)")
+            Self.operationGate.end(owner: connectionID)
             reply(outcome.rawValue)
         }
     }
 
     func createInstallMedia(
         bsdName: String, mediaUUID: String?, serialNumber: String?, size: Int64,
-        installerPath: String, installerPackagePath: String?, volumePath: String, authorization: Data,
+        installerPath: String, installerPackagePath: String?, expectedVersion: String? = nil,
+        expectedBuild: String? = nil, volumePath: String, authorization: Data,
         reply: @escaping @Sendable (Int) -> Void
     ) {
+        let identity: InstallerOSIdentity?
+        if let expectedVersion, let expectedBuild {
+            guard let parsed = try? InstallerOSIdentity(version: expectedVersion, build: expectedBuild) else {
+                reply(CreateInstallMediaOutcome.invalidInstaller.rawValue)
+                return
+            }
+            identity = parsed
+        } else {
+            guard expectedVersion == nil, expectedBuild == nil else {
+                reply(CreateInstallMediaOutcome.invalidInstaller.rawValue)
+                return
+            }
+            identity = nil
+        }
         let request = CreateInstallMediaRequest(
             bsdName: bsdName,
             fingerprint: DiskFingerprint(mediaUUID: mediaUUID, serialNumber: serialNumber, size: size),
             installerURL: URL(filePath: installerPath),
             installerPackageURL: installerPackagePath.map { URL(filePath: $0) },
+            expectedInstallerIdentity: identity,
             volumeURL: URL(filePath: volumePath),
             authorization: authorization)
         Self.logger.info("createinstallmedia requested for \(bsdName, privacy: .public)")
@@ -75,7 +92,6 @@ nonisolated final class HelperRequestHandler: NSObject, HelperProtocol, Sendable
             return
         }
         Task {
-            defer { Self.operationGate.end(owner: connectionID) }
             let outcome = await creationPipeline.create(request) { update in
                 self.progress.withLock { wrapper in
                     wrapper?.proxy.report(
@@ -88,6 +104,7 @@ nonisolated final class HelperRequestHandler: NSObject, HelperProtocol, Sendable
                 }
             }
             Self.logger.info("createinstallmedia ended: \(outcome.rawValue, privacy: .public)")
+            Self.operationGate.end(owner: connectionID)
             reply(outcome.rawValue)
         }
     }
@@ -106,9 +123,9 @@ nonisolated final class HelperRequestHandler: NSObject, HelperProtocol, Sendable
             installerURL: URL(filePath: "/"), installerPackageURL: nil,
             volumeURL: URL(filePath: volumePath), authorization: authorization)
         Task {
-            defer { Self.operationGate.end(owner: connectionID) }
             let outcome = await creationPipeline.checkWriteAccess(request)
             Self.logger.info("Volume access preflight ended: \(outcome.rawValue, privacy: .public)")
+            Self.operationGate.end(owner: connectionID)
             reply(outcome.rawValue)
         }
     }

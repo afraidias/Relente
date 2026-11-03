@@ -14,6 +14,7 @@ nonisolated struct CreationFailure: Hashable, Sendable {
         case driveDisconnected
         case cancelled
         case installerDamaged
+        case preparationRecoveryRequired
         case verificationFailed
         /// The drive isn't the one the user confirmed (the helper's fingerprint check).
         case driveChanged
@@ -34,7 +35,8 @@ nonisolated struct CreationFailure: Hashable, Sendable {
         var sendsBackToDriveScreen: Bool {
             switch self {
             case .driveDisconnected, .driveChanged, .driveNotAllowed: true
-            case .cancelled, .installerDamaged, .verificationFailed, .formatFailed, .createFailed, .volumeAccessDenied,
+            case .cancelled, .installerDamaged, .preparationRecoveryRequired, .verificationFailed, .formatFailed,
+                .createFailed, .volumeAccessDenied,
                 .helperUnavailable,
                 .unknown:
                 false
@@ -50,6 +52,10 @@ nonisolated struct CreationFailure: Hashable, Sendable {
             case .cancelled:
                 LocalizedStringResource(
                     "You stopped the process.", comment: "Error screen: the user cancelled the creation.")
+            case .preparationRecoveryRequired:
+                LocalizedStringResource(
+                    "Installer preparation needs recovery.",
+                    comment: "Error screen: helper preparation could not confirm safe cleanup.")
             case .installerDamaged:
                 LocalizedStringResource(
                     "The installer couldn't be verified.",
@@ -99,6 +105,10 @@ nonisolated struct CreationFailure: Hashable, Sendable {
                 LocalizedStringResource(
                     "Try again to erase the drive and start over.",
                     comment: "Error screen: what to do after cancelling.")
+            case .preparationRecoveryRequired:
+                LocalizedStringResource(
+                    "Stop here and review Relente’s preparation diagnostics before trying again.",
+                    comment: "Recovery when the helper blocked further operations after uncertain preparation cleanup.")
             case .installerDamaged:
                 LocalizedStringResource(
                     "Download the installer again, then try again.",

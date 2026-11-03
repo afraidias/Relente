@@ -37,7 +37,7 @@ To build it yourself, see [BUILDING.md](BUILDING.md).
 ### Create a bootable USB drive
 
 1. Open Relente and approve its system helper when macOS asks. For live USB creation, enable Relente in **System Settings → Privacy & Security → Full Disk Access** and allow its helper under **General → Login Items**. You can browse installers and choose a USB before enabling Full Disk Access; Relente checks write access before starting an erase.
-2. **Installer:** choose one of the macOS installers found on your Mac. Downloading installers from Apple is planned for a later step.
+2. **Installer:** choose one of the macOS installers found on your Mac. The direct Apple download flow is under validation; see [download status](docs/product.md#download-status).
 3. **USB drive:** choose the drive to use. Drives that are too small are marked.
 4. **Review:** check what will be erased, confirm, and authorize the erase with Touch ID when available or your administrator password otherwise.
 5. **Creating:** Relente asks its helper to run Apple's signed `createinstallmedia`, shows available progress and elapsed time, and verifies the resulting installer volume before marking it ready. Activity offers a compact history and technical output. The command erases the selected drive.
@@ -76,7 +76,7 @@ Early development. Roadmap:
 8. [ ] Signing, notarization, Authorization Services compatibility across supported Macs, and first release
 9. [ ] Download installers from Apple (Download screen)
 
-Relente follows an [AI-native software development lifecycle](docs/development.md). Change artifacts live in [`docs/changes/`](docs/changes/), and project rules are in [AGENTS.md](AGENTS.md).
+Relente follows an [AI-native software development lifecycle](docs/development.md). Change artifacts live in [`intent/`](intent/), and project rules are in [AGENTS.md](AGENTS.md).
 
 Before distribution, complete the [release readiness checklist](docs/release-readiness.md).
 

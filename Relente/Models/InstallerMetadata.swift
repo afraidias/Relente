@@ -60,14 +60,31 @@ nonisolated enum InstallerMetadata {
     /// Where the catalog lives inside `Contents/SharedSupport/SharedSupport.dmg`, once mounted.
     static let catalogPath = "com_apple_MobileAsset_MacSoftwareUpdate/com_apple_MobileAsset_MacSoftwareUpdate.xml"
 
-    /// The full macOS version, e.g. 15.6, from the software update catalog.
-    static func version(fromCatalog data: Data) throws(ParseError) -> MacOSVersion {
-        guard
+    struct CatalogInfo: Hashable, Sendable {
+        let version: MacOSVersion
+        let build: String?
+    }
+
+    /// All hardware-specific assets must agree; a first-entry match cannot establish identity.
+    static func catalogInfo(fromCatalog data: Data) throws(ParseError) -> CatalogInfo {
+        guard data.count <= 8 * 1_024 * 1_024,
             let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
-            let assets = plist["Assets"] as? [[String: Any]],
-            let version = assets.lazy.compactMap({ ($0["OSVersion"] as? String).flatMap(MacOSVersion.init) }).first
+            let assets = plist["Assets"] as? [[String: Any]], !assets.isEmpty
         else { throw ParseError() }
-        return version
+        var identities: Set<CatalogInfo> = []
+        for asset in assets {
+            guard let text = asset["OSVersion"] as? String, let version = MacOSVersion(text) else {
+                throw ParseError()
+            }
+            let build = (asset["Build"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            identities.insert(CatalogInfo(version: version, build: build?.isEmpty == false ? build : nil))
+        }
+        guard identities.count == 1, let identity = identities.first else { throw ParseError() }
+        return identity
+    }
+
+    static func version(fromCatalog data: Data) throws(ParseError) -> MacOSVersion {
+        try catalogInfo(fromCatalog: data).version
     }
 
     // MARK: - InstallAssistant.pkg

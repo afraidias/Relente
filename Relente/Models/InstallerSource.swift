@@ -36,9 +36,26 @@ nonisolated struct InstallerSource: Identifiable, Hashable, Sendable {
     let name: String
     /// macOS version, e.g. 26.0.
     let version: MacOSVersion
+    /// Exact Apple build, when available. An unknown build cannot establish an acquisition match.
+    let build: String?
+    /// Retained authenticated source; the helper must independently copy and verify it before use.
+    let packageURL: URL?
     let kind: Kind
     /// Size in bytes.
     let size: Int64
+
+    init(
+        url: URL, name: String, version: MacOSVersion, kind: Kind, size: Int64, build: String? = nil,
+        packageURL: URL? = nil
+    ) {
+        self.url = url
+        self.name = name
+        self.version = version
+        self.kind = kind
+        self.size = size
+        self.build = build
+        self.packageURL = packageURL
+    }
 
     var id: URL { url }
 
@@ -82,21 +99,21 @@ nonisolated extension InstallerSource {
             name: "macOS Tahoe",
             version: "26.0",
             kind: .app,
-            size: 16_800_000_000
+            size: 16_800_000_000, build: "25A354"
         ),
         InstallerSource(
             url: URL(filePath: "/Users/Shared/macOS Sequoia.dmg"),
             name: "macOS Sequoia",
             version: "15.6",
             kind: .diskImage,
-            size: 15_200_000_000
+            size: 15_200_000_000, build: "24G84"
         ),
         InstallerSource(
             url: URL(filePath: "/Users/Shared/InstallAssistant.pkg"),
             name: "macOS Sonoma",
             version: "14.7",
             kind: .package,
-            size: 13_400_000_000
+            size: 13_400_000_000, build: "23H124"
         ),
     ]
 

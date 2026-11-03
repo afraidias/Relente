@@ -13,7 +13,7 @@ behavior, acceptance criteria, edge cases, UX/security concerns, decisions and a
 behavior. Apply relevant skills and Apple HIG; record deliberate exceptions and their reasons.
 The owner accepts the design before implementation planning begins.
 
-Use one `docs/changes/<short-name>/` folder for the change. See the [artifact templates](changes/README.md).
+Use one `intent/<short-name>/` folder for the change. See the [artifact templates](../intent/README.md).
 Record approvals as owner, date, artifact revision and conversation reference or a short accurate
 quotation. Use a revision number until a commit permalink exists. Changed scope, behavior or risk
 invalidates the affected acceptance; obtain explicit acceptance of the revision. Do not treat a

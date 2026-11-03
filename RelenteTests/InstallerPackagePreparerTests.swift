@@ -8,13 +8,7 @@ struct InstallerPackagePreparerTests {
     @Test func `accepts the Apple Software Update package signature`() {
         #expect(
             InstallerPackageProvenance.hasAppleSoftwareUpdateSignature(
-                """
-                Status: signed Apple Software
-                Certificate Chain:
-                   1. Software Update
-                   2. Apple Software Update Certification Authority
-                   3. Apple Root CA
-                """))
+                AppleInstallerPackageSignatureTests.validOutput))
     }
 
     @Test(arguments: [
@@ -27,7 +21,7 @@ struct InstallerPackagePreparerTests {
         #expect(!InstallerPackageProvenance.hasAppleSoftwareUpdateSignature(output))
     }
 
-    @Test func `copies verifies expands and links SharedSupport in a private directory`() async throws {
+    @Test func `copies verifies expands and links the authenticated package as SharedSupport`() async throws {
         let source = try makePackage()
         defer { try? FileManager.default.removeItem(at: source.deletingLastPathComponent()) }
         let tool = FakePackageTool()
@@ -38,7 +32,7 @@ struct InstallerPackagePreparerTests {
         defer { prepared.remove() }
 
         let stagedPackage = prepared.temporaryDirectory.appending(path: "InstallAssistant.pkg")
-        let sharedSupport = prepared.temporaryDirectory.appending(path: "expanded/SharedSupport.dmg")
+        let sharedSupport = stagedPackage
         let linkedSharedSupport = prepared.appURL.appending(path: "Contents/SharedSupport/SharedSupport.dmg")
         let directoryAttributes = try FileManager.default.attributesOfItem(atPath: prepared.temporaryDirectory.path)
         let packageAttributes = try FileManager.default.attributesOfItem(atPath: stagedPackage.path)
@@ -59,6 +53,31 @@ struct InstallerPackagePreparerTests {
         let temporaryDirectory = prepared.temporaryDirectory
         prepared.remove()
         #expect(!FileManager.default.fileExists(atPath: temporaryDirectory.path))
+    }
+
+    @Test(arguments: [false, true])
+    func `canonical path aliases preserve internal links but reject escapes`(escape: Bool) async throws {
+        let source = try makePackage()
+        defer { try? FileManager.default.removeItem(at: source.deletingLastPathComponent()) }
+        let tool = FakePackageTool()
+        let action: InstallerPackagePreparer.CommandRunner = { executable, arguments in
+            let result = tool.run(executable, arguments)
+            if arguments.first == "--expand-full" {
+                let app = URL(filePath: arguments[2]).appending(path: "Payload/Applications/Install macOS Test.app")
+                try FileManager.default.createSymbolicLink(
+                    at: app.appending(path: "Contents/alias"),
+                    withDestinationURL: escape ? source : app.appending(path: "Contents/Resources/createinstallmedia"))
+            }
+            return result
+        }
+        if escape {
+            await #expect(throws: InstallerPackagePreparer.PreparationError.self) {
+                try await InstallerPackagePreparer.prepare(source, run: action)
+            }
+        } else {
+            let prepared = try await InstallerPackagePreparer.prepare(source, run: action)
+            prepared.remove()
+        }
     }
 
     @Test func `rejects an invalid package signature before expansion and cleans up`() async throws {
@@ -197,11 +216,5 @@ private final class FakePackageTool: @unchecked Sendable {
         }
     }
 
-    private static let appleSignature = """
-        Status: signed Apple Software
-        Certificate Chain:
-           1. Software Update
-           2. Apple Software Update Certification Authority
-           3. Apple Root CA
-        """
+    private static let appleSignature = AppleInstallerPackageSignatureTests.validOutput
 }

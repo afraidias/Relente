@@ -16,6 +16,8 @@ actor LiveInstallerService: InstallerService {
     private struct Stamp: Hashable {
         let modified: Date?
         let size: Int?
+        let packageModified: Date?
+        let packageSize: Int?
     }
 
     private static let applications = URL(filePath: "/Applications", directoryHint: .isDirectory)
@@ -23,6 +25,7 @@ actor LiveInstallerService: InstallerService {
 
     private var cache: [URL: (stamp: Stamp, installer: InstallerSource?)] = [:]
     private var chosen: [URL] = []
+    private var retained: [URL: InstallerSource] = [:]
     private var installers: [InstallerSource]?
     private var listeners: [UUID: AsyncStream<[InstallerSource]>.Continuation] = [:]
     private var watching: Task<Void, Never>?
@@ -46,6 +49,16 @@ actor LiveInstallerService: InstallerService {
         }
         await scan()
         return installer
+    }
+
+    func addRetained(_ source: InstallerSource) async throws(InstallerError) -> InstallerSource {
+        guard source.packageURL != nil, source.build != nil else { throw .notAnInstaller(fileName: source.name) }
+        retained[source.url] = source
+        cache[source.url] = nil
+        do { return try await add(source.url) } catch {
+            retained[source.url] = nil
+            throw error
+        }
     }
 
     // MARK: - Watching
@@ -95,11 +108,27 @@ actor LiveInstallerService: InstallerService {
     /// The installer at `url`, read again only if the file changed since the last time.
     /// `nil` if it isn't one, or can't be read yet (e.g. still downloading).
     private func installer(at url: URL) async -> InstallerSource? {
-        let stamp = Self.stamp(of: url)
+        let expected = retained[url]
+        let stamp = Self.stamp(of: url, package: expected?.packageURL)
         if let cached = cache[url], cached.stamp == stamp { return cached.installer }
         let installer: InstallerSource?
         do {
-            installer = try await InstallerReader.read(url)
+            let read = try await InstallerReader.read(url)
+            if let expected, let package = expected.packageURL {
+                let output = try await InstallerCommand.verifyPackage(package).run(
+                    in: package.deletingLastPathComponent(), timeout: 60)
+                guard let text = String(data: output, encoding: .utf8),
+                    AppleInstallerPackageSignature.acceptsSuccessfulCheck(text),
+                    read.version == expected.version, read.build == expected.build
+                else {
+                    throw InstallerReader.ReadError(reason: "Retained package identity changed")
+                }
+                installer = InstallerSource(
+                    url: read.url, name: read.name, version: read.version,
+                    kind: read.kind, size: read.size, build: read.build, packageURL: package)
+            } else {
+                installer = read
+            }
         } catch {
             logger.error(
                 "Can't read \(url.lastPathComponent, privacy: .public): \(String(describing: error), privacy: .public)")
@@ -110,12 +139,15 @@ actor LiveInstallerService: InstallerService {
     }
 
     /// An app changes inside: its Info.plist and its SharedSupport image are what's read.
-    private static func stamp(of url: URL) -> Stamp {
+    private static func stamp(of url: URL, package: URL?) -> Stamp {
         let file =
             url.pathExtension == "app" ? url.appending(path: "Contents/SharedSupport/SharedSupport.dmg") : url
         let values = try? file.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey])
         let bundle = try? url.resourceValues(forKeys: [.contentModificationDateKey])
+        let packageValues = try? package?.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey])
         return Stamp(
-            modified: values?.contentModificationDate ?? bundle?.contentModificationDate, size: values?.fileSize)
+            modified: values?.contentModificationDate ?? bundle?.contentModificationDate,
+            size: values?.fileSize, packageModified: packageValues?.contentModificationDate,
+            packageSize: packageValues?.fileSize)
     }
 }
