@@ -39,7 +39,7 @@ temporary project variants or signing overrides. The CLI equivalent uses the sam
 ```bash
 # Debug unit tests with project signing (xcode-select may point to the Command Line Tools)
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild test -scheme Relente -configuration Debug -destination 'platform=macOS' -only-testing:RelenteTests
-# Compile-only universal Release check, as in CI; does not validate signing or live helper access
+# Compile-only arm64 Release check, as in CI; does not validate signing or live helper access
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild build -scheme Relente -configuration Release -destination 'generic/platform=macOS' CODE_SIGNING_ALLOWED=NO
 # Lint changed Swift files during iteration; full scope below before integrating code
 xcrun swift-format lint -r --strict Relente RelenteHelper Shared RelenteTests RelenteUITests

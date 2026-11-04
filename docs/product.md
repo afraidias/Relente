@@ -51,11 +51,9 @@ decision, 2026-11-02). Running Relente on Intel Macs or macOS versions earlier t
 the supported scope. This reduces compatibility and validation work for the MVP, at the cost of
 requiring users on earlier systems to upgrade before running Relente.
 
-The existing project still targets macOS 14, and the project and CI still produce universal
-builds. Aligning deployment targets, build architecture, compatibility code and release checks
-with this decision is pending a separate implementation change; this documentation decision
-does not modify project or CI settings. The architecture of a Mac
-that will start from a created installer is a separate compatibility question.
+The app and helper target macOS 26.0 and build for Apple silicon (arm64); CI checks those Release
+properties. The architecture of a Mac that will start from a created installer is a separate
+compatibility question.
 
 ## Screen flow
 

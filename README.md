@@ -21,7 +21,7 @@ It is written in Swift and SwiftUI, and only works with macOS installers and rem
 
 ### Requirements
 
-- An **Apple silicon Mac running macOS 26.0 Tahoe or later** (approved support target). The current project still targets macOS 14 and CI still builds universal binaries; implementation alignment is pending. See the [support policy](docs/product.md#supported-macs).
+- An **Apple silicon Mac running macOS 26.0 Tahoe or later**. See the [support policy](docs/product.md#supported-macs).
 - A macOS installer from **Big Sur (11) onwards**, in any of these forms:
   - `Install macOS <name>.app`
   - A `.dmg` that contains the installer app

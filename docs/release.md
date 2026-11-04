@@ -8,11 +8,10 @@ The first distributed release remains gated by [release readiness](release-readi
 ## Before publishing
 
 Obtain owner authorization and review the diff, accepted change artifacts and security findings.
-Confirm all existing required CI checks pass, including the universal build while that remains
-configured. Record the exact commit/tag, build tools, actual architectures and deployment target,
+Confirm all existing required CI checks pass, including the arm64 Release build. Record the exact commit/tag, build tools, actual architectures and deployment target,
 test results and manual supported-Mac evidence. Check these against the
 [approved support policy](product.md#supported-macs): Apple silicon and macOS 26.0 or later.
-Project and CI alignment is pending; a universal binary does not imply Intel host support. Verify the
+Verify the
 actual distributed bundle's Developer ID signatures, notarization and Gatekeeper acceptance, not
 only an unsigned CI build. Check helper registration, mutual signing checks, fresh authorization,
 permission preflight, uninstall and sample-data UI behavior. Any real erase needs its own explicit

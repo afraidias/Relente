@@ -4,10 +4,9 @@
 
 - Xcode 27, which runs on macOS 26.6 or later.
 
-The approved support target is **macOS 26.0 and later on Apple silicon**; see the
-[product support policy](docs/product.md#supported-macs). The existing Xcode project still targets
-macOS 14 and produces universal builds, as does CI. Aligning those settings is pending a separate
-implementation change; current build settings do not define the new support commitment.
+The supported target is **macOS 26.0 and later on Apple silicon**; see the
+[product support policy](docs/product.md#supported-macs). The app and helper build for arm64 with
+macOS 26.0 as their minimum deployment target. CI verifies these Release properties.
 
 ## Build and run in Xcode
 
@@ -46,7 +45,7 @@ on a newer system does not establish behavior on the minimum supported version.
 
 The existing code still includes classic macOS 14–15 control fallbacks, Classic previews and the
 Debug `-classicControls YES` launch argument. These are implementation remnants pending review,
-not a requirement to support or validate macOS 14–15 or Intel hosts. A classic-control preview
+not a requirement to support or validate older macOS versions or Intel hosts. A classic-control preview
 is not a substitute for a runtime check on a supported macOS version.
 
 ## Simulated creation (Debug builds)
