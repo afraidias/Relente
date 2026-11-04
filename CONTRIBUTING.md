@@ -18,7 +18,7 @@ Bug reports and ideas are welcome. Before opening an issue, please search the ex
 
 These contribution conventions complement the project rules in [AGENTS.md](AGENTS.md).
 
-- **Lifecycle:** [Plan, Design, Build, Test, Deploy and Maintain](docs/development.md), with accepted intent, design and implementation plan in `docs/changes/<short-name>/`. Commits, branch pushes and PR creation may proceed within approved scope; merge requires owner review and approval, and release publication requires separate authorization.
+- **Lifecycle:** [Plan, Design, Build, Test, Deploy and Maintain](docs/development.md), with accepted intent, design and implementation plan in `intent/<short-name>/`. Commits, branch pushes and PR creation may proceed within approved scope; merge requires owner review and approval, and release publication requires separate authorization.
 - **Branches:** GitHub Flow. `main` always builds; every change lands through a pull request from a short-lived branch (`feature/…`, `fix/…`, `chore/…`, `docs/…`) with *squash merge*.
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/), in English. For example: `feat(installer): add installer picker`.
 - **Privacy and attribution:** use **Afraidias** as Relente's copyright holder. Do not include the maintainer's real name in repository content or commit attribution; use the configured private Git identity. Preserve third-party license notices.

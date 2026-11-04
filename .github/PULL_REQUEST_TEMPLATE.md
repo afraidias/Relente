@@ -4,7 +4,7 @@
 
 ## Traceability and verification
 
-- Change documents: <!-- docs/changes/<short-name>/ -->
+- Change documents: <!-- intent/<short-name>/ -->
 - Issue: <!-- link, or N/A with reason -->
 - Approval and plan deviations: <!-- recorded acceptance and any revised decisions -->
 - Verification: <!-- commands/results, review findings and unverified checks -->

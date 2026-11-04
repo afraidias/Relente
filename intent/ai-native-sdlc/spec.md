@@ -33,7 +33,7 @@ trail. Native permission coverage varies by runtime; no new universal approval h
 No product UI is changed, so this migration introduces no new HIG exception.
 
 Deferred work: final acquisition reconciliation and pilot are in [plan.md](plan.md).
-Release/runtime deferrals are in [release readiness](../../release-readiness.md).
+Release/runtime deferrals are in [release readiness](../../docs/release-readiness.md).
 
 ## Approval
 

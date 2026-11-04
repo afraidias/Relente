@@ -55,7 +55,10 @@ actor LiveHelperClient: HelperClient {
         return raw.flatMap(CreateInstallMediaOutcome.init(rawValue:))
     }
 
-    func createInstallMedia(installerURL: URL, installerPackageURL: URL?, drive: Drive, authorization: Data)
+    func createInstallMedia(
+        installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity?, drive: Drive,
+        authorization: Data
+    )
         async -> AsyncStream<HelperCreateEvent>
     {
         let stream = AsyncStream.makeStream(of: HelperCreateEvent.self)
@@ -72,6 +75,7 @@ actor LiveHelperClient: HelperClient {
                     bsdName: drive.bsdName, mediaUUID: fingerprint.mediaUUID, serialNumber: fingerprint.serialNumber,
                     size: fingerprint.size, installerPath: installerURL.path(percentEncoded: false),
                     installerPackagePath: installerPackageURL?.path(percentEncoded: false),
+                    expectedVersion: expectedIdentity?.version, expectedBuild: expectedIdentity?.build,
                     volumePath: drive.volumeURL?.path(percentEncoded: false) ?? "", authorization: authorization,
                     reply: reply)
             }

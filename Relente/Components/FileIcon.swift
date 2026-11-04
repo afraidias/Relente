@@ -26,17 +26,33 @@ struct FileIcon: View {
             }
         }
         .task(id: url) {
+            await Task.yield()
             icon = Self.loadIcon(url: url, fallbackType: fallbackType)
         }
         .accessibilityHidden(true)
     }
 
-    private static func loadIcon(url: URL, fallbackType: UTType) -> NSImage {
+    static func loadIcon(url: URL, fallbackType: UTType) -> NSImage {
         if FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) {
-            NSWorkspace.shared.icon(forFile: url.path(percentEncoded: false))
-        } else {
-            NSWorkspace.shared.icon(for: fallbackType)
+            if url.pathExtension == "app", let icon = applicationBundleIcon(at: url) {
+                return icon
+            }
+            return NSWorkspace.shared.icon(forFile: url.path(percentEncoded: false))
         }
+        return NSWorkspace.shared.icon(for: fallbackType)
+    }
+
+    private static func applicationBundleIcon(at url: URL) -> NSImage? {
+        let infoURL = url.appending(path: "Contents/Info.plist")
+        guard let data = try? Data(contentsOf: infoURL),
+            let info = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+            let iconName = info["CFBundleIconFile"] as? String
+        else { return nil }
+
+        let resources = url.appending(path: "Contents/Resources", directoryHint: .isDirectory)
+        let iconURL = resources.appending(path: iconName)
+        let namedURL = iconURL.pathExtension.isEmpty ? iconURL.appendingPathExtension("icns") : iconURL
+        return NSImage(contentsOf: namedURL)
     }
 }
 

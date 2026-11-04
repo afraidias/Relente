@@ -25,7 +25,10 @@ nonisolated struct HelperCreationService: CreationService {
                 var reportedPermissionError = false
                 let events = await client.createInstallMedia(
                     installerURL: installer.url,
-                    installerPackageURL: installer.kind == .package ? installer.url : nil,
+                    installerPackageURL: installer.packageURL ?? (installer.kind == .package ? installer.url : nil),
+                    expectedIdentity: installer.build.flatMap {
+                        try? InstallerOSIdentity(version: installer.version.description, build: $0)
+                    },
                     drive: drive, authorization: authorization?.externalForm ?? Data())
                 withExtendedLifetime(authorization) {}
                 for await event in events {
@@ -123,6 +126,7 @@ nonisolated struct HelperCreationService: CreationService {
         case .driveChanged: .driveChanged
         case .driveDisconnected: .driveDisconnected
         case .invalidInstaller: .installerDamaged
+        case .preparationRecoveryRequired: .preparationRecoveryRequired
         case .createFailed, .invalidVolume, .volumeAccessDenied: .createFailed
         }
     }

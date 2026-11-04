@@ -11,8 +11,13 @@ import SwiftUI
 
 struct AssistantCommands: Commands {
     let assistant: Assistant
+    let appDelegate: RelenteAppDelegate
 
     var body: some Commands {
+        CommandGroup(replacing: .appTermination) {
+            Button("Quit Relente") { appDelegate.requestQuit() }
+                .keyboardShortcut("q", modifiers: .command)
+        }
         CommandGroup(after: .appInfo) {
             Divider()
             Button("Uninstall System Helper…", action: assistant.requestHelperUninstall)

@@ -2,6 +2,7 @@ import Darwin
 import Foundation
 import Security
 import os
+
 #if RELENTE_TESTS
     @testable import Relente
 #endif
@@ -27,19 +28,24 @@ actor LiveCreateInstallMediaRunner: InstallMediaRunning {
     private static let logger = Logger(subsystem: "com.afraidias.Relente", category: "helper")
     private let processRunner: any CreateInstallMediaProcessRunning
     private let verifyAppleSignature: @Sendable (URL, Bool) -> Bool
+    private let readIdentity: @Sendable (URL, CreateInstallMediaCancellation) async throws -> InstallerOSIdentity
 
     init(
         processRunner: any CreateInstallMediaProcessRunning = PseudoTerminalCreateInstallMediaProcess(),
         verifyAppleSignature: @escaping @Sendable (URL, Bool) -> Bool = { url, resources in
-            hasAppleCodeSignature(url, validateResources: resources)
+            AppleInstallerCodeSignature.isValid(url, validateResources: resources)
+        },
+        readIdentity: @escaping @Sendable (URL, CreateInstallMediaCancellation) async throws -> InstallerOSIdentity = {
+            app, cancellation in try await LiveCreateInstallMediaRunner.readOSIdentity(app, cancellation: cancellation)
         }
     ) {
         self.processRunner = processRunner
         self.verifyAppleSignature = verifyAppleSignature
+        self.readIdentity = readIdentity
     }
 
     func create(
-        installerURL: URL, installerPackageURL: URL?, volumeURL: URL,
+        installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity? = nil, volumeURL: URL,
         cancellation: CreateInstallMediaCancellation,
         beforeLaunch: @escaping @Sendable () async -> CreateInstallMediaOutcome?,
         report: @escaping @Sendable (CreateInstallMediaUpdate) -> Void
@@ -47,7 +53,6 @@ actor LiveCreateInstallMediaRunner: InstallMediaRunning {
         let installer: URL
         var preparedPackage: PreparedInstallerPackage?
         var mount: InstallerImageMount?
-        defer { preparedPackage?.remove() }
 
         if let installerPackageURL {
             let prepared: PreparedInstallerPackage
@@ -56,15 +61,20 @@ actor LiveCreateInstallMediaRunner: InstallMediaRunning {
                     installerPackageURL, isCancelled: { cancellation.isRequested })
             } catch InstallerPackagePreparer.PreparationError.cancelled {
                 return .failed
+            } catch InstallerPackagePreparer.PreparationError.recoveryRequired {
+                return .recoveryRequired
+            } catch InstallerPackagePreparer.PreparationError.cleanupFailed {
+                return .recoveryRequired
             } catch {
                 return .invalidInstaller
             }
             preparedPackage = prepared
-            guard !cancellation.isRequested else { return .failed }
-            guard Self.isRootOwnedPreparedPackage(prepared),
+            guard !cancellation.isRequested else { return prepared.remove() ? .failed : .recoveryRequired }
+            let matchesSelectedPath =
                 prepared.appURL.lastPathComponent == installerURL.lastPathComponent
-            else {
-                return .invalidInstaller
+                || (installerURL.pathExtension.lowercased() == "pkg" && installerURL == installerPackageURL)
+            guard Self.isRootOwnedPreparedPackage(prepared), matchesSelectedPath else {
+                return prepared.remove() ? .invalidInstaller : .recoveryRequired
             }
             installer = prepared.appURL
         } else {
@@ -74,28 +84,45 @@ actor LiveCreateInstallMediaRunner: InstallMediaRunning {
             guard !cancellation.isRequested else { return .failed }
         }
 
-        return await InstallerImageMounter.withCleanup(of: mount, run: Self.run) {
+        let stagedPackageURL = preparedPackage?.packageURL
+        let result = await InstallerImageMounter.withCleanup(of: mount, run: Self.run) {
             await self.create(
-                installer: installer, installerPackageURL: installerPackageURL, volumeURL: volumeURL,
+                installer: installer, installerPackageURL: stagedPackageURL, expectedIdentity: expectedIdentity,
+                volumeURL: volumeURL,
                 cancellation: cancellation, beforeLaunch: beforeLaunch, report: report)
         }
+        if case .recoveryRequired = result { return result }
+        guard preparedPackage?.remove() ?? true else { return .recoveryRequired }
+        return result
     }
 
     private func create(
-        installer: URL, installerPackageURL: URL?, volumeURL: URL,
+        installer: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity?, volumeURL: URL,
         cancellation: CreateInstallMediaCancellation,
         beforeLaunch: @escaping @Sendable () async -> CreateInstallMediaOutcome?,
         report: @escaping @Sendable (CreateInstallMediaUpdate) -> Void
     ) async -> CreateInstallMediaRunResult {
         let executable = installer.appending(path: "Contents/Resources/createinstallmedia")
-        guard isValidInstaller(installer, executable: executable, packageURL: installerPackageURL) else {
-            return .invalidInstaller
+        if let failure = await installerValidationFailure(
+            installer, executable: executable, packageURL: installerPackageURL, cancellation: cancellation)
+        {
+            return failure
+        }
+        if let expectedIdentity {
+            do {
+                let actual = try await readIdentity(installer, cancellation)
+                guard actual == expectedIdentity else { return .invalidInstaller }
+            } catch InstallerSupportMetadata.Failure.recoveryRequired {
+                return .recoveryRequired
+            } catch is CancellationError { return .failed } catch { return .invalidInstaller }
         }
         let refusal = await beforeLaunch()
         guard !cancellation.isRequested else { return .failed }
         if let refusal { return .refused(refusal) }
-        guard isValidInstaller(installer, executable: executable, packageURL: installerPackageURL) else {
-            return .invalidInstaller
+        if let failure = await installerValidationFailure(
+            installer, executable: executable, packageURL: installerPackageURL, cancellation: cancellation)
+        {
+            return failure
         }
 
         Self.logger.info("Starting createinstallmedia for \(volumeURL.lastPathComponent, privacy: .public)")
@@ -176,34 +203,65 @@ actor LiveCreateInstallMediaRunner: InstallMediaRunning {
         }
     }
 
-    nonisolated private static func hasAppleCodeSignature(_ url: URL, validateResources: Bool) -> Bool {
-        var staticCode: SecStaticCode?
-        guard SecStaticCodeCreateWithPath(url as CFURL, [], &staticCode) == errSecSuccess,
-            let staticCode
-        else { return false }
-        var requirement: SecRequirement?
-        guard SecRequirementCreateWithString("anchor apple" as CFString, [], &requirement) == errSecSuccess,
-            let requirement
-        else { return false }
-        let flags: SecCSFlags = validateResources ? [] : SecCSFlags(rawValue: kSecCSDoNotValidateResources)
-        return SecStaticCodeCheckValidity(staticCode, flags, requirement) == errSecSuccess
+    @concurrent
+    private static func readOSIdentity(_ app: URL, cancellation: CreateInstallMediaCancellation) async throws
+        -> InstallerOSIdentity
+    {
+        let folder = try InstallerPrivateDirectory.create()
+        do {
+            let identity = try await InstallerSupportMetadata.identity(
+                in: app.appending(path: "Contents/SharedSupport/SharedSupport.dmg"), workingDirectory: folder,
+                isCancelled: { cancellation.isRequested })
+            try FileManager.default.removeItem(at: folder)
+            return identity
+        } catch InstallerSupportMetadata.Failure.recoveryRequired {
+            throw InstallerSupportMetadata.Failure.recoveryRequired(folder)
+        } catch {
+            do { try FileManager.default.removeItem(at: folder) } catch {
+                throw InstallerSupportMetadata.Failure.recoveryRequired(folder)
+            }
+            throw error
+        }
     }
 
-    private func isValidInstaller(_ installer: URL, executable: URL, packageURL: URL?) -> Bool {
-        let packageBacked = packageURL.map { Self.isTrustedPreparedPackage($0, app: installer) } ?? false
-        return InstallerCodeSignaturePolicy.isValid(
-            installer: installer, executable: executable, packageBacked: packageBacked,
-            verifyAppleSignature: verifyAppleSignature)
+    private func installerValidationFailure(
+        _ installer: URL, executable: URL, packageURL: URL?,
+        cancellation: CreateInstallMediaCancellation
+    ) async
+        -> CreateInstallMediaRunResult?
+    {
+        do {
+            let packageBacked: Bool
+            if let packageURL {
+                guard
+                    try await Self.isTrustedPreparedPackage(
+                        packageURL, app: installer, isCancelled: { cancellation.isRequested })
+                else {
+                    return .invalidInstaller
+                }
+                packageBacked = true
+            } else {
+                packageBacked = false
+            }
+            return InstallerCodeSignaturePolicy.isValid(
+                installer: installer, executable: executable, packageBacked: packageBacked,
+                verifyAppleSignature: verifyAppleSignature) ? nil : .invalidInstaller
+        } catch InstallerCommand.Failure.lostProcess { return .recoveryRequired } catch is CancellationError {
+            return .failed
+        } catch { return .invalidInstaller }
     }
 
-    private static func isTrustedPreparedPackage(_ package: URL, app: URL) -> Bool {
+    private static func isTrustedPreparedPackage(
+        _ package: URL, app: URL,
+        isCancelled: @Sendable () -> Bool
+    ) async throws -> Bool {
         guard InstallerPackageProvenance.hasExpectedPreparedLayout(package: package, app: app),
             isRootOwnedPrivateDirectory(package.deletingLastPathComponent()), isRootOwned(package), isRootOwned(app),
             InstallerPathSafety.isSafe(package)
         else { return false }
-        guard let output = run("/usr/sbin/pkgutil", ["--check-signature", package.path(percentEncoded: false)]),
-            let text = String(data: output, encoding: .utf8)
-        else { return false }
+        let output = try await InstallerCommand.verifyPackage(package)
+            .run(in: package.deletingLastPathComponent(), timeout: 60, isCancelled: isCancelled)
+        guard let text = String(data: output, encoding: .utf8) else { return false }
         return InstallerPackageProvenance.hasAppleSoftwareUpdateSignature(text)
     }
 
@@ -229,6 +287,10 @@ actor LiveCreateInstallMediaRunner: InstallMediaRunning {
     private static func run(_ executable: String, _ arguments: [String]) -> Data? {
         let process = Process()
         process.executableURL = URL(filePath: executable)
+        var environment = ProcessInfo.processInfo.environment
+        environment["LC_ALL"] = "C"
+        environment["LANG"] = "C"
+        process.environment = environment
         process.arguments = arguments
         let output = Pipe()
         process.standardOutput = output

@@ -18,7 +18,10 @@ nonisolated protocol HelperClient: Sendable {
     func format(_ drive: Drive, authorization: Data) async -> FormatOutcome?
 
     /// Runs the validated installer on a drive and streams real progress/output before the outcome.
-    func createInstallMedia(installerURL: URL, installerPackageURL: URL?, drive: Drive, authorization: Data)
+    func createInstallMedia(
+        installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity?, drive: Drive,
+        authorization: Data
+    )
         async -> AsyncStream<HelperCreateEvent>
 
     /// Checks selected-volume write access from the helper without formatting or erasing.
@@ -34,7 +37,10 @@ nonisolated enum HelperCreateEvent: Sendable {
 }
 
 nonisolated extension HelperClient {
-    func createInstallMedia(installerURL: URL, installerPackageURL: URL? = nil, drive: Drive, authorization: Data)
+    func createInstallMedia(
+        installerURL: URL, installerPackageURL: URL? = nil, expectedIdentity: InstallerOSIdentity? = nil, drive: Drive,
+        authorization: Data
+    )
         async -> AsyncStream<HelperCreateEvent>
     {
         AsyncStream {
@@ -56,7 +62,10 @@ nonisolated struct SampleHelperClient: HelperClient {
 
     func format(_ drive: Drive, authorization: Data) async -> FormatOutcome? { outcome }
 
-    func createInstallMedia(installerURL: URL, installerPackageURL: URL?, drive: Drive, authorization: Data)
+    func createInstallMedia(
+        installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity?, drive: Drive,
+        authorization: Data
+    )
         async -> AsyncStream<HelperCreateEvent>
     {
         AsyncStream {

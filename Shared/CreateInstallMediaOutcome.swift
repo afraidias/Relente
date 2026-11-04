@@ -12,6 +12,7 @@ nonisolated enum CreateInstallMediaOutcome: Int, Hashable, Sendable {
     case busy = 8
     case invalidVolume = 9
     case volumeAccessDenied = 10
+    case preparationRecoveryRequired = 11
 }
 
 nonisolated struct CreateInstallMediaUpdate: Hashable, Sendable {

@@ -3,7 +3,7 @@ import Testing
 
 @testable import Relente
 
-@Suite(.timeLimit(.minutes(1)))
+@Suite(.serialized, .timeLimit(.minutes(1)))
 struct HelperRequestHandlerTests {
     private nonisolated static let disk = DiskDescription(
         bsdName: "disk4", isWhole: true, isRemovable: true, deviceProtocol: "USB", mediaUUID: "uuid",
@@ -40,7 +40,7 @@ struct HelperRequestHandlerTests {
         private(set) var didCancel = false
 
         func create(
-            installerURL: URL, installerPackageURL: URL?, volumeURL: URL,
+            installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity? = nil, volumeURL: URL,
             cancellation: CreateInstallMediaCancellation,
             beforeLaunch: @escaping @Sendable () async -> CreateInstallMediaOutcome?,
             report: @escaping @Sendable (CreateInstallMediaUpdate) -> Void
@@ -68,7 +68,7 @@ struct HelperRequestHandlerTests {
 
     private struct ReportingRunner: InstallMediaRunning {
         func create(
-            installerURL: URL, installerPackageURL: URL?, volumeURL: URL,
+            installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity? = nil, volumeURL: URL,
             cancellation: CreateInstallMediaCancellation,
             beforeLaunch: @escaping @Sendable () async -> CreateInstallMediaOutcome?,
             report: @escaping @Sendable (CreateInstallMediaUpdate) -> Void

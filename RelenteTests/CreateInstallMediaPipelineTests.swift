@@ -106,7 +106,7 @@ struct CreateInstallMediaPipelineTests {
         let result: CreateInstallMediaRunResult
         let calls: CallLog
         func create(
-            installerURL: URL, installerPackageURL: URL?, volumeURL: URL,
+            installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity? = nil, volumeURL: URL,
             cancellation: CreateInstallMediaCancellation,
             beforeLaunch: @escaping @Sendable () async -> CreateInstallMediaOutcome?,
             report: @escaping @Sendable (CreateInstallMediaUpdate) -> Void
@@ -131,7 +131,7 @@ struct CreateInstallMediaPipelineTests {
         private(set) var cancellation: CreateInstallMediaCancellation?
 
         func create(
-            installerURL: URL, installerPackageURL: URL?, volumeURL: URL,
+            installerURL: URL, installerPackageURL: URL?, expectedIdentity: InstallerOSIdentity? = nil, volumeURL: URL,
             cancellation: CreateInstallMediaCancellation,
             beforeLaunch: @escaping @Sendable () async -> CreateInstallMediaOutcome?,
             report: @escaping @Sendable (CreateInstallMediaUpdate) -> Void
@@ -285,4 +285,14 @@ struct CreateInstallMediaPipelineTests {
         #expect(await writer.didStart)
         #expect(await calls.entries == ["authorization", "disk", "volume"])
     }
+    @Test func `unresolved preparation recovery blocks repeated creation and write checks`() async {
+        let calls = CallLog()
+        let subject = pipeline(result: .recoveryRequired, calls: calls)
+        #expect(await subject.create(request(), report: { _ in }) == .preparationRecoveryRequired)
+        let firstCalls = await calls.entries
+        #expect(await subject.create(request(), report: { _ in }) == .preparationRecoveryRequired)
+        #expect(await subject.checkWriteAccess(request()) == .preparationRecoveryRequired)
+        #expect(await calls.entries == firstCalls)
+    }
+
 }

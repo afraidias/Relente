@@ -5,17 +5,20 @@
 //  The installers or drives to pick from, laid out by `PickLayout`: a row of large items, or a grid
 //  of small ones that scrolls when it doesn't fit. The selection slides between the items and
 //  follows the arrow keys in both.
+//  Design: intent/direct-installer-download/spec.md
 //
 
 import SwiftUI
 
 struct PickCollection<ID: Hashable, Content: View>: View {
-    /// How many items `content` makes, the add square included.
+    /// How many items `content` makes. Callers include any add-item control in this count.
     let itemCount: Int
     /// The selected item's id, as given to its `ForEach`.
     let selection: ID?
     /// Arrow keys: -1 or +1 for Left and Right; a grid row for Up and Down.
     let onMoveSelection: (Int) -> Void
+    /// Whether scrolling the grid is temporarily unavailable, such as during a download.
+    var isScrollDisabled = false
     @ViewBuilder let content: Content
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -51,6 +54,7 @@ struct PickCollection<ID: Hashable, Content: View>: View {
                             .frame(maxWidth: .infinity, minHeight: proxy.size.height - 2 * Self.scrollMargin)
                     }
                     .scrollBounceBehavior(.basedOnSize)
+                    .scrollDisabled(isScrollDisabled)
                     // Items fade out at the top and bottom edges instead of being cut.
                     .mask { edgeFade }
                     // Room between the items and the header or the button below when it scrolls.

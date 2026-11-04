@@ -31,18 +31,24 @@ minimum macOS version for running Relente does not establish installer compatibi
 
 ### Download status
 
-The installer-acquisition branch contains download UI and a `softwareupdate`-based implementation.
-That acquisition approach was closed without verified cancellation and is not a completed download
-capability on this migration baseline. Preserve useful reviewed UI and behavior when reconciling
-that branch; do not treat its incomplete verification as passed.
+The direct-acquisition implementation is under validation in
+[`intent/direct-installer-download/`](../intent/direct-installer-download/). The accepted design
+uses a Relente-owned HTTPS transfer from Apple's exact delivery origins. Catalog version/build
+identity must match this Mac's `softwareupdate --list-full-installers` result; a catalog entry
+alone does not establish eligibility. Local reuse requires the same known build.
 
-Direct downloading from Apple through a Relente-owned transfer is proposed in the pending 012
-change, currently a draft rather than an accepted or implemented capability. Catalog identity,
-compatibility mapping and safe installer preparation remain unresolved. Offer a version only when
-its availability and compatibility can be verified; do not infer compatibility from a catalog entry.
-The draft must be reconciled into the new lifecycle artifacts before its design and implementation
-are accepted. Download-screen descriptions below record the existing design direction, not proof
-that direct acquisition is implemented or verified.
+Downloads proceed through Downloading, Verifying and Preparing. Relente verifies the signed
+Apple package, expands a private copy without running package scripts in a bounded temporary
+filesystem, and confirms the actual OS version/build from SharedSupport metadata. Only then is
+the retained package and derived app registered as Ready. Storage is inside Relente's Application
+Support directory; `/Applications` is not a download destination. An existing installer is never
+overwritten. A retained Ready record is an index and content is revalidated before reuse.
+
+Cancellation waits for the owned transfer or tool process to terminate and for owned mount
+cleanup to finish. Return keeps the download running in its confirmation sheet. Quitting during
+acquisition waits for that same terminal cleanup; unresolved work blocks further acquisition and
+requires recovery. Relaunch never promotes an unfinished directory. Verification results and
+remaining limitations are recorded in the implementation plan; release readiness is not implied.
 
 ## Supported Macs
 
@@ -79,7 +85,15 @@ the step indicator animates (the pill stretches to the new step and the number r
    other file shows "Isn't a macOS Installer". With 5 or more items (the add square counts), they
    become a grid of 5 columns of smaller items, which scrolls when even those don't fit; Up and
    Down then move a row (the same on step 2). "Download from Apple…".
-   1b. **Download:** grid of 4 versions, with a progress ring on the one downloading.
+   1b. **Download:** the most recent unambiguous eligible version of each installer family. An active
+       catalog item keeps its macOS artwork with a small activity indicator; opening its details shows
+       the progress ring, measured bytes and the connection, download, verification and preparation
+       stages. Completed stages are green, the current stage blue and future stages gray. The labeled
+       stop control sits beneath the ring in details only. Verified exact-build local matches offer Use;
+       ambiguous local matches require manual selection. If Apple's list cannot be loaded, a visible
+       state explains the failure and offers retry. Unresolved owned work instead shows a recovery
+       explanation and an action to inspect Relente's installer storage in Finder. Acquisition errors
+       also use system notifications when authorized; recovery remains visible if notifications are off.
    1c. **No installers:** the same empty state as 2b, with the add square as its symbol (it also
    takes drops), "No Installers Found", "Download from Apple…" and "Waiting for an installer…";
    the list replaces it as soon as an installer appears.
@@ -104,16 +118,14 @@ the step indicator animates (the pill stretches to the new step and the number r
    disappears, on steps 2 or 3, back to step 1.
 4. **Creating:** while the helper validates and prepares the selected source, the screen says so
    without claiming the USB is already formatting. It shows a progress ring around the drive and
-   ELAPSED; after `createinstallmedia` reports erasure, it shows ELAPSED with one focused progress
-   bar, then ELAPSED / COPIED / REMAINING and a 4-phase bar (Prepare and erase, Copy, Make bootable,
-   Verify). Progress comes from Apple's signed
-   `createinstallmedia` running in the helper; the command prepares and erases the selected volume.
-   Activity opens a compact popover with recent phase updates and selectable technical output; a
-   separate window is available for longer output. Output remains in memory for the current run.
-   Missing measurements show an unknown state; the screen does not show approximate whole-device
-   write throughput. The app only shows Done after Apple's completion marker and the expected
-   installer app on the resulting volume are verified. The percentage and figures roll like a counter
-   as they change. "Cancel" (also Esc) asks for confirmation in a sheet that
+   ELAPSED, plus four named phases with SF Symbols (Prepare and erase, Copy, Make bootable, Verify)
+   and the active phase highlighted. Progress comes from Apple's signed `createinstallmedia` running
+   in the helper; the command prepares and erases the selected volume. During Copy, show COPIED only
+   when measured; unknown progress stays indeterminate with a localized explanation. Do not show an
+   estimated remaining time or “almost done” claim without reliable data. There is no Activity button,
+   popover or creation-log window. The app only shows Done after Apple's completion marker and the
+   expected installer app on the resulting volume are verified. "Cancel" (also Esc) asks for
+   confirmation in a sheet that
    looks like a macOS alert: "Keep Going" answers Return and Esc; "Stop", which leaves the drive
    unusable until it's erased again, only a click.
    4b. **Error:** same layout, nothing moves, in red: no ring (its space is kept), a red halo and

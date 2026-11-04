@@ -18,7 +18,7 @@ nonisolated enum HelperIdentity {
     /// The launchd plist inside the app, in `Contents/Library/LaunchDaemons/`.
     static let plistName = "com.afraidias.Relente.Helper.LiveCreation.plist"
     /// Changes whenever `HelperProtocol` changes, so the app can tell an outdated helper apart.
-    static let protocolVersion = 5
+    static let protocolVersion = 6
 
     static func supports(_ version: Int?) -> Bool { version == protocolVersion }
 }
@@ -52,7 +52,8 @@ nonisolated enum HelperIdentity {
     /// performs its own erase and preparation phase.
     func createInstallMedia(
         bsdName: String, mediaUUID: String?, serialNumber: String?, size: Int64,
-        installerPath: String, installerPackagePath: String?, volumePath: String, authorization: Data,
+        installerPath: String, installerPackagePath: String?, expectedVersion: String?, expectedBuild: String?,
+        volumePath: String, authorization: Data,
         reply: @escaping @Sendable (Int) -> Void)
 
     /// Confirms that the helper can write a harmless temporary marker to the confirmed volume.

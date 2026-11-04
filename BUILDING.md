@@ -122,7 +122,7 @@ release signatures, privileged-helper registration or genuine XPC connections wo
 | `RelenteHelper` | The system helper: a command-line tool that runs as root, embedded in the app (`Contents/MacOS/RelenteHelper`) and registered with `SMAppService`. |
 | `Shared` | Code compiled into both the app and the helper: the XPC protocol and the security checks. |
 | `Config` | Build settings (`Version.xcconfig`) and the helper's launchd plist, copied to `Contents/Library/LaunchDaemons/`. |
-| `docs/changes` | Intent, requirements/design and implementation plans for each change. See [`docs/development.md`](docs/development.md). |
+| `intent` | Intent, requirements/design and implementation plans for each change. See [`docs/development.md`](docs/development.md). |
 | `docs` | Product and design overview ([`docs/product.md`](docs/product.md)): scope, supported Macs, screen flow and design system. |
 
 ## App icon
