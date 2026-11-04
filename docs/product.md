@@ -68,13 +68,13 @@ centered; the footer shows the step indicator on the left (dots plus "Step X of 
 buttons on the right. The footer stays still when the screen changes: its buttons swap at once and
 the step indicator animates (the pill stretches to the new step and the number rolls).
 
-0. **Permissions** (while the system helper is not ready): app icon and status badge, a status
-   line with an approval indicator when macOS is waiting, a blue callout with the Touch ID symbol
-   when available or a lock for password fallback, and one footer button for the next action: Install Helper,
-   Open Settings…, Continue, or Try Again. A short explanation links to Full Disk Access settings
-   and explains Full Disk Access and Background App Activity. Users can choose an installer and
-   drive before enabling Full Disk Access; the helper checks the selected USB at Review and blocks
-   before erasing if it cannot write.
+0. **Permissions** (while the system helper is not ready): a status callout explains the next
+   helper action, with Install Helper, Open System Settings…, Continue or Try Again in the footer.
+   A separate callout opens Full Disk Access settings without claiming its status; each erase
+   requires administrator authorization. Users can choose an installer and drive before enabling
+   Full Disk Access; the helper checks the selected USB at Review and blocks before erasing if it
+   cannot write. If the helper is disabled during selection, the screen explains the return and
+   retains the selections.
 1. **Installer:** the `Install macOS *.app` in `/Applications`, found live, as Finder-style
    options with the real file icon (`NSWorkspace.shared.icon(forFile:)`), newest first, the newest
    supported one selected; the selected one has a gray plate behind it and its name in a blue

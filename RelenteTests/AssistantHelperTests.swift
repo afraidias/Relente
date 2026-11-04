@@ -75,6 +75,7 @@ struct AssistantHelperTests {
         assistant.continueFromPermissions()
         #expect(assistant.step == .installer)
         #expect(assistant.lastChange == ScreenChange(direction: .forward, style: .crossfade))
+        #expect(assistant.helperTurnedOff == nil)
     }
 
     @Test func `a failed registration shows the failure until trying again`() async {
@@ -142,6 +143,7 @@ struct AssistantHelperTests {
         assistant.refreshHelperStatus()
         assistant.continueFromPermissions()
         #expect(assistant.step == .installer)
+        #expect(assistant.helperTurnedOff == nil)
         #expect(assistant.selectedDriveID == drive)
     }
 

@@ -55,18 +55,29 @@ final class AssistantFlowUITests: XCTestCase {
     func testPermissionsThenTheWholeFlow() {
         app = .relente(extraArguments: ["-sampleHelper", "notInstalled"])
         expectScreen("Set Up Relente")
-        XCTAssertTrue(app.element("The system helper isn't installed.").exists)
+        XCTAssertTrue(app.element("Helper not installed").exists)
         XCTAssertTrue(app.buttons["Install Helper"].exists)
-        XCTAssertTrue(app.element("macOS protects access to disks and removable drives.").exists)
+        XCTAssertTrue(app.buttons["Open Full Disk Access Settings…"].exists)
 
         app.buttons["Install Helper"].click()
-        XCTAssertTrue(app.element("System helper ready.").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.element("Helper enabled").waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Continue"].isEnabled)
         app.buttons["Continue"].click()
         expectScreen("Choose an Installer")
 
         app.goToDone()
         expectScreen("Installer Ready")
+    }
+
+    @MainActor
+    func testHelperRegistrationFailureCanBeRetried() {
+        app = .relente(extraArguments: ["-sampleHelper", "registrationFailure"])
+        expectScreen("Set Up Relente")
+        app.buttons["Install Helper"].click()
+        XCTAssertTrue(app.element("Couldn’t install the helper").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Open Full Disk Access Settings…"].exists)
+        app.buttons["Try Again"].click()
+        XCTAssertTrue(app.element("Couldn’t install the helper").waitForExistence(timeout: 5))
     }
 
     @MainActor

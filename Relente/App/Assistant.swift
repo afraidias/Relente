@@ -540,6 +540,7 @@ final class Assistant {
     /// Permissions' "Continue", once the helper is ready.
     func continueFromPermissions() {
         guard step == .permissions, helperStatus == .ready else { return }
+        helperTurnedOff = nil
         change(to: .installer, .forward, .crossfade)
     }
 

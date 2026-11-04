@@ -14,12 +14,18 @@ struct Callout<Content: View>: View {
     enum Tone {
         /// Orange, with a warning triangle.
         case warning
+        case success
+        case failure
+        case secondary(systemImage: String)
         /// Blue, for information; it shows `systemImage`.
         case info(systemImage: String)
 
         var color: Color {
             switch self {
             case .warning: Theme.Colors.warning
+            case .success: Theme.Colors.success
+            case .failure: Theme.Colors.danger
+            case .secondary: Theme.Colors.secondary
             case .info: Theme.Colors.accent
             }
         }
@@ -27,6 +33,9 @@ struct Callout<Content: View>: View {
         var systemImage: String {
             switch self {
             case .warning: "exclamationmark.triangle.fill"
+            case .success: "checkmark.circle"
+            case .failure: "xmark.circle"
+            case .secondary(let systemImage): systemImage
             case .info(let systemImage): systemImage
             }
         }
