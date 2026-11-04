@@ -14,6 +14,7 @@ actor SampleInstallerAcquisitionService: InstallerAcquisitionService {
     private let catalogError: InstallerAcquisitionError?
     private let downloadError: InstallerAcquisitionError?
     private let downloadDelay: Duration
+    private let cancellationDelay: Duration
     private var activeTask: Task<Void, Never>?
     private var activeContinuation: AsyncStream<InstallerAcquisitionEvent>.Continuation?
 
@@ -25,12 +26,14 @@ actor SampleInstallerAcquisitionService: InstallerAcquisitionService {
         ],
         catalogError: InstallerAcquisitionError? = nil,
         downloadError: InstallerAcquisitionError? = nil,
-        downloadDelay: Duration = .milliseconds(30)
+        downloadDelay: Duration = .milliseconds(30),
+        cancellationDelay: Duration = .zero
     ) {
         self.installers = AvailableInstaller.sorted(installers)
         self.catalogError = catalogError
         self.downloadError = downloadError
         self.downloadDelay = downloadDelay
+        self.cancellationDelay = cancellationDelay
     }
 
     func availableInstallers() async throws(InstallerAcquisitionError) -> [AvailableInstaller] {
@@ -75,6 +78,7 @@ actor SampleInstallerAcquisitionService: InstallerAcquisitionService {
 
     func cancelDownload() async {
         guard let task = activeTask else { return }
+        try? await Task.sleep(for: cancellationDelay)
         task.cancel()
         await task.value
     }

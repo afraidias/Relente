@@ -22,7 +22,8 @@ partial installer selectable. Preserve offline local selection and the existing 
 ## Constraints and non-goals
 
 - Run Relente on Apple silicon with macOS 26.0 or later, per the accepted product policy.
-  The existing project and CI still need separate alignment with that policy.
+  Project and CI alignment was handled by the separately accepted
+  [Apple silicon host change](../../docs/changes/apple-silicon-host/plan.md).
 - Keep network transfers in the unprivileged app and use Apple-hosted content.
 - Preserve authenticity, disk validation and erase authorization guarantees.
 - Never install macOS on the host or begin USB creation merely by downloading.
@@ -37,13 +38,14 @@ A real download reports genuine progress and yields the requested verified insta
 transfer cancellation waits for the owned task to stop; partial work is not selectable, including
 after relaunch. Failures and preparation boundaries are explained accurately. Existing local
 selection and reviewed download UI remain usable and accessible. See [design](spec.md) for
-acceptance criteria; no measurements or checks have yet been recorded for this change.
+acceptance criteria and the [plan](plan.md) for recorded verification and remaining limitations.
 
-## Open questions
+## Investigation questions
 
-Which Apple metadata reliably maps version/build to an available package and compatibility?
-Which preparation method is safe, with understood authorization, side effects and cancellation?
-Which Apple-controlled origins and redirects are necessary?
+The original questions concerned catalog identity and compatibility, safe preparation and
+authorization boundaries, and permitted Apple origins and redirects. The [design investigation
+conclusions](spec.md#investigation-conclusions--2026-11-04) record the accepted pilot answers
+and their limitations. No runtime validation on other Macs or versions is claimed.
 
 ## Approval record
 

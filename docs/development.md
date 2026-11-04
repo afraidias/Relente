@@ -6,7 +6,7 @@ maker. Agents research, draft, implement and verify within the owner's authoriza
 
 ## Plan and Design
 
-Read current product behavior, the roadmap, relevant issues and code. Capture the problem,
+Read current product behavior, relevant issues and code. Capture the problem,
 audience, desired outcome, constraints, non-goals and evidence in `intent.md`. Resolve material
 unknowns with the owner, then record acceptance. Produce `spec.md` in a working design session:
 behavior, acceptance criteria, edge cases, UX/security concerns, decisions and affected existing
@@ -53,7 +53,7 @@ practice does not enable them or modify third-party skills.
 ## Documentation ownership
 
 AGENTS.md holds project-specific rules. Current app behavior belongs in docs/product.md;
-durable decisions belong in docs/decisions/ and pending work in issues or the roadmap. Link
+durable decisions belong in docs/decisions/ and pending work in issues or the release-readiness checklist. Link
 accepted change documents to these sources instead of duplicating them. Keep intent, design,
 plan, implementation and evidence connected to the issue and PR. Record the merged outcome
 with a PR or commit permalink once available. Update affected artifacts before implementing an
@@ -146,7 +146,7 @@ Release publication is separately authorized; Git preparation is not release app
 
 Triage reports with macOS version, app version, installer source/version and relevant sanitized
 logs. Security reports follow [SECURITY.md](../SECURITY.md), not public issues. Record accepted
-improvements as issues or roadmap items, then start a new intent. Update current product docs,
+improvements as issues, then start a new intent. Update current product docs,
 ADRs and relevant skills when behavior or durable knowledge changes.
 
 Use PR history to inspect time to review, first-pass CI success and rework during the pilot.

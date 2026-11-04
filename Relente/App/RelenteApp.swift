@@ -105,7 +105,9 @@ struct RelenteApp: App {
             UserDefaults.standard.bool(forKey: "sampleDownloadFailure") ? .downloadSizeUnexpected : nil
         return SampleInstallerAcquisitionService(
             catalogError: catalogError, downloadError: downloadError,
-            downloadDelay: .milliseconds(delay > 0 ? delay : 30))
+            downloadDelay: .milliseconds(delay > 0 ? delay : 30),
+            cancellationDelay: .milliseconds(
+                UserDefaults.standard.integer(forKey: "sampleCancellationDelayMilliseconds")))
     }
 
     private static var driveService: any DriveService {

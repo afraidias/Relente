@@ -12,6 +12,13 @@ Intent: [intent.md](intent.md) — revision 1 accepted by the owner on 2026-11-0
 Converted from the [existing draft](https://github.com/afraidias/Relente/blob/92a1608cd0f20476b79dab44794b5f718e02292e/specs/012-direct-installer-download/spec.md)
 on 2026-11-02. This migration preserves proposed requirements, not evidence of implementation.
 
+## Cancellation presentation follow-up — accepted 2026-11-04
+
+Owner requested removal of the “Cancelling download” text and hiding progress numbers while
+cancellation is pending; the loading indicator and disabled cancellation button remain. The owner
+accepted the implementation plan in this conversation (“apruebo”). This presentation change does
+not alter cancellation, terminal-state handling or cleanup.
+
 ## Revision 11 — allow normal quit from an idle recovery state (Accepted)
 
 Approved by Afraidias on 2026-11-04: an instance with no active acquisition must be allowed to
@@ -258,22 +265,32 @@ merge or release approval is implied.
 
 ## Acceptance criteria
 
-- [ ] A real download from Apple's servers on the available Mac shows actual progress; cancelling
+- [x] A real download from Apple's servers on the available Mac shows actual progress; cancelling
   at a known percentage stops the owned network task, waits for its terminal result and leaves no
   selectable partial installer. Verify after the UI returns to idle and again after relaunch.
-- [ ] Normal quit during transfer offers waiting or cancellation and does not exit before a
+- [x] Normal quit during transfer offers waiting or cancellation and does not exit before a
   confirmed cancellation and safe cleanup. A force quit or crash never makes a partial selectable.
-- [ ] An idle instance can quit while recovery work is pending; quitting preserves the pending work
+- [x] An idle instance can quit while recovery work is pending; quitting preserves the pending work
   and does not make another download available.
-- [ ] A completed real download is verified, prepared and detected as the requested version/build;
+- [x] A completed real download is verified, prepared and detected as the requested version/build;
   it is usable by the existing USB creation flow without installing macOS on the host.
-- [ ] Redirect, host, signature, integrity, version/build ambiguity, collision, interrupted transfer,
+- [x] Redirect, host, signature, integrity, version/build ambiguity, collision, interrupted transfer,
   insufficient storage, unavailable network and cleanup failures are rejected or surfaced without
   overwriting another item. Logic and security boundaries have automated tests.
 - [ ] Existing local installer selection, previously reviewed Download UI, VoiceOver, Reduce Motion,
   light and dark appearance and native notifications remain functional.
-- [ ] The real-device check records the macOS version, product and outcome; it does not claim
+- [x] The real-device check records the macOS version, product and outcome; it does not claim
   verification on other macOS versions or models. Complete the required build, tests and lint.
+
+Evidence: the checked criteria use the plan’s dated real preparation/USB, controlled security,
+quit/recovery UI and build/test/lint checkpoints. The
+[live cancellation/relaunch follow-up](plan.md#live-cancellation-and-relaunch--2026-11-04)
+completes the first criterion on the available Mac; it records delayed terminal cancellation
+and does not claim immediate stopping or an exact final byte count. The appearance/accessibility criterion also
+remains unchecked: light and dark download details were visually verified in the
+[follow-up](plan.md#follow-up-verification--2026-11-04), but that does not establish every screen
+and appearance state. Owner-reported VoiceOver and Reduce Motion evidence is recorded separately
+in the plan.
 
 ## Boundaries
 
@@ -306,7 +323,28 @@ merge or release approval is implied.
   daemon-wide restart for a verified terminal transfer result.
 - Carry forward the previous acquisition work’s user-facing work without marking its incomplete cancellation task Done.
 
-## Open questions
+## Investigation conclusions — 2026-11-04
+
+The following questions are resolved for the accepted pilot, with limits preserved:
+
+- Catalog: `AppleInstallerCatalog` reads the bounded `swscan.apple.com` catalog and
+  `swdist.apple.com` Distribution metadata, joining exact unique version/build against the current
+  Mac’s softwareupdate listing. See [metadata observation](metadata-observation.md) and the
+  [plan’s real catalog test](plan.md#revision-4--acquisition-error-and-recovery-presentation-accepted).
+  This is an observed schema, not a stable public Apple catalog API or proof for other Macs.
+- Preparation: authenticated retained package, script-free bounded app inspection and independent
+  private helper snapshot resolve the preparation question within the accepted package-backed
+  trust boundary. See [provenance design](package-provenance-design.md) and the plan’s real
+  signature, two-generation preparation and terminal cancellation evidence. Acquisition owns its
+  transfer/process cancellation; USB use retains independent helper validation and administrator
+  authorization. No package scripts or host macOS installation are part of this path.
+- Origins: `AppleInstallerOrigin` allows exact role-specific HTTPS hosts `swscan.apple.com`,
+  `swdist.apple.com` and `swcdn.apple.com`; it rejects credentials, unexpected ports and other
+  hosts. `InstallerDownload` revalidates redirects and bounds them to three. Controlled tests
+  and live transfer evidence support this policy; an unobserved Apple delivery change fails
+  closed and needs review rather than a wildcard allowance.
+
+Original investigation questions (historical):
 
 - Which current Apple catalog and package metadata provide a reliable version/build-to-package
   mapping and compatibility for this Mac across supported versions?
@@ -318,8 +356,8 @@ merge or release approval is implied.
 
 ## Open items
 
-- Compatibility and live end-to-end verification on macOS versions or Mac models not available
-  during development remain release validation for roadmap step 8; do not imply they passed.
+- Compatibility and live end-to-end behavior on other macOS versions or Mac models were not
+  verified. The owner removed that validation as a roadmap step 8 requirement on 2026-11-04.
 - Deleting complete retained installers remains a separate roadmap step 9 item (issue #39).
 
 ## References
@@ -332,7 +370,11 @@ merge or release approval is implied.
 
 ## Approval record
 
-Pending. All requirements and decisions above remain proposed until owner acceptance.
+The original draft was pending; acceptance of revisions 5–8 is recorded in the header,
+revision 9 in the plan, and revisions 10–11 in their accepted sections and plan. This closure
+records evidence only and does not invent a new approval. See the
+[closure checkpoint](plan.md#closure-checkpoint--2026-11-04) for integration and release status.
+The dated investigation notes below preserve what was known at each stage.
 
 ## Initial official-source investigation — 2026-11-02
 
@@ -545,7 +587,8 @@ capability or optimistic cancellation language. Recovery here concerns only app-
 
 ## Revision 10 — creation feedback without Activity
 
-State: Accepted. Approved by Afraidias on 2026-11-04 — "apruebo". Prototype: [creation-feedback.html](../../../.codex/visualizations/2026/11/04/01a1a606-3237-7161-95f1-063805582ffe/creation-feedback.html).
+State: Accepted. Approved by Afraidias on 2026-11-04 — "apruebo". Prototype: `creation-feedback.html` from the 2026-11-04 design session (local visualization,
+not available in this checkout; the accepted behavior is recorded below).
 
 Remove the Activity button, popover and separate creation-log window from the creation flow. Keep
 the user informed on the creation screen itself with a clear current phase, its SF Symbol, and an

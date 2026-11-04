@@ -9,7 +9,7 @@ predictability come before everything else.
 these rules with specialized knowledge and procedures. If a skill conflicts with this file,
 this file takes precedence; the agent must flag the conflict and propose a review when appropriate.
 Change artifacts live in
-[`intent/`](intent/); the roadmap is in the [README](README.md#project-status); folders are described
+[`intent/`](intent/); release follow-up is in [release readiness](docs/release-readiness.md); folders are described
 in [BUILDING.md](BUILDING.md#project-layout). The owner may authorize edits to this file in the
 conversation. Changes remain reviewable through a `docs:` pull request approved by the owner;
 commits, pushes and PR creation follow the approved work scope; merging requires owner review and approval.

@@ -30,7 +30,7 @@ the autonomy and any narrower owner instructions in AGENTS.md.
 - Changes to existing behavior
 - Testable acceptance criteria and edge cases
 - Security/UX concerns and decisions, including HIG exceptions
-- Deferred work linked to issues or roadmap items
+- Deferred work linked to issues or release-readiness follow-up
 - Approval record
 
 ## plan.md

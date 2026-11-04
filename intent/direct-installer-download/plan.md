@@ -4,10 +4,161 @@ Revision: 6 · State: Accepted
 Related issue: N/A — no dedicated issue verified; roadmap step 9.
 Approval: Afraidias, 2026-11-03, revision 3 — "apruebo" to the explicit plan approval question.
 Previous approval: Afraidias, 2026-11-03, revision 2 — "okey" to the explicit implementation-plan approval question.
-Implementation state: In progress
-PR: [#47](https://github.com/afraidias/Relente/pull/47) — draft, awaiting manual checks and owner review.
+Implementation state: Integrated
+PR: [#47](https://github.com/afraidias/Relente/pull/47) — merged on 2026-11-04 (`cff04a2`).
 
 Intent: [intent.md](intent.md) · Accepted design: [spec.md](spec.md), revision 11.
+
+## Cancellation presentation follow-up — accepted 2026-11-04
+
+Owner approved the plan in this conversation (“apruebo”): remove the cancellation status text,
+hide numeric progress while cancelling, retain the spinner and disabled button, and verify terminal
+cancellation remains unchanged. Update both languages and check accessibility and focused UI tests.
+This follow-up is unintegrated on the current docs branch; the original feature remains integrated.
+
+Implemented in `DownloadDetailsSheet`: removed the status text and its unused localization; hide
+bytes and numeric accessibility progress while cancelling. Spinner and disabled button remain;
+transfer and cancellation logic are unchanged. On macOS 27.2, all seven signed sample acquisition
+UI tests passed using the existing scheme and automatic signing; focused strict swift-format lint,
+String Catalog JSON parsing and `git diff --check` passed. Result bundle:
+`/private/tmp/Relente-CancelPresentation-20261104.xcresult`. The transient cancelling state was
+not separately captured visually in this run; no new live download was started. Follow-up integration checks: full strict Swift lint passed; unsigned arm64 Release build passed;
+the signed Debug unit suite passed (375 tests, 5 opt-in real cases skipped; 444 parameterized
+executions passed), result `/private/tmp/Relente-CancelPresentation-Unit-Retry-20261104.xcresult`.
+The initial simultaneous Release/unit attempt failed before tests because Xcode’s shared build
+database was locked; the sequential unit rerun passed. The earlier seven focused acquisition UI
+tests passed. No new real network cases or visual capture of the transient state are claimed.
+
+### Cancellation-state visual verification
+
+The sample acquisition service accepts an optional cancellation delay for the UI test. With a
+three-second delay, the focused signed UI test verified the disabled Cancel Download button,
+non-numeric accessibility label and absence of the old status text and byte count; it then
+observed terminal cancellation. The retained screenshot was visually reviewed: the spinner,
+stages and disabled button are visible, with no progress numbers or cancellation status text.
+Result bundle: `/private/tmp/Relente-Cancelling-Visual-20261104.xcresult`; screenshot:
+`/private/tmp/Relente-Cancelling-Visual-Attachments/4DED4BE3-BE31-4A41-813F-5D3FA0D2F32F.png`.
+This uses sample data, not a live transfer. After adding this coverage, full strict lint, signed
+unit tests (five opt-in cases skipped), unsigned arm64 Release build and `git diff --check` passed.
+The earlier note about an uncaptured transient state describes the preceding checkpoint.
+
+## Closure checkpoint — 2026-11-04
+
+Documentation reconciliation of revision 6; accepted scope and approval records are unchanged.
+PR [#47](https://github.com/afraidias/Relente/pull/47) merged as
+[`cff04a2`](https://github.com/afraidias/Relente/commit/cff04a2f51488be6693fb438e88827e2e2cbfcfc).
+Release PR [#46](https://github.com/afraidias/Relente/pull/46) merged as `423c119` and
+[v0.11.0](https://github.com/afraidias/Relente/releases/tag/v0.11.0) was published on 2026-11-04.
+The release commit's [CI attempt 2](https://github.com/afraidias/Relente/actions/runs/41885147109/attempts/2)
+passed Build & test and Lint; PR title was skipped for the push event. The owner reports that the
+local unit suite also passed and neither of the two transient first-run failures reproduced.
+No new local test run or failure diagnosis is claimed by this documentation checkpoint; a green
+rerun does not establish their root cause.
+
+Implementation evidence remains in the dated checkpoints below: the five explicit real tests and
+two-generation preparation results near the top; acquisition/helper, retention, cancellation and
+quit checkpoints; all 32 sample UI tests; revision 5 creation feedback and live Ventura USB result;
+and revision 6's 380-unit/7-acquisition-UI results. Earlier “not pushed”, Draft and next-action
+statements describe their dates, not current integration status. Earlier universal Release builds
+are historical evidence, not the current architecture policy.
+
+The platform discrepancy recorded below was resolved independently by
+[`4d99f79`](https://github.com/afraidias/Relente/commit/4d99f79bb8acb711ddbe6367aec901f46d46eb3f),
+with its own [accepted intent/design/plan](../../docs/changes/apple-silicon-host/plan.md).
+Current project settings target macOS 26.0 and arm64; CI asserts those values. This download
+closure does not authorize configuration changes or extend the supported platform matrix.
+
+Remaining work: complete retained-installer deletion ([issue #39](https://github.com/afraidias/Relente/issues/39)), and manual appearance evidence
+where absent (dark download details were subsequently checked below; other states remain unverified). Integration and release do not prove these checks.
+Unchecked composite tasks/criteria below retain their missing evidence; they do not mean the
+merged implementation is still in progress. No additional download, disk operation or release is
+needed to reconcile these records.
+
+## Follow-up verification — 2026-11-04
+
+On the current arm64 Mac, macOS 27.2 / 26B123, the existing project/scheme and configured
+Debug automatic signing passed all seven `InstallerAcquisitionUITests` (zero failures).
+Command: `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild test -scheme Relente
+-configuration Debug -destination 'platform=macOS' -only-testing:RelenteUITests/InstallerAcquisitionUITests`.
+Result bundle: `/private/tmp/Relente-Closure-Acquisition-Services-20261104.xcresult`;
+log: `/private/tmp/Relente-Closure-Acquisition-Services-20261104.log`.
+The first restricted-shell invocation failed before testing because it could not write DerivedData;
+the successful run had access to Xcode services and used no project variants or signing overrides.
+Xcode emitted debugger-version lookup warnings; these did not fail the tests.
+
+With the owner's explicit authorization, System Settings Appearance was changed from Automatic to
+Dark, then restored to Automatic and confirmed selected. The focused
+`testCancellationConfirmationKeepsTheDownloadByDefault` passed again (18.926 s).
+Its retained “Download details” screenshot was exported and visually reviewed: real dark rendering,
+complete legible percentage/byte text, stage icons, Close and Cancel Download controls, with no
+visible clipping in this window. This is sample progress (25%, 4.2 GB of 16.8 GB), not Apple traffic.
+Bundle: `/private/tmp/Relente-Closure-Dark-20261104.xcresult`; screenshot:
+`/private/tmp/Relente-Closure-Dark-Attachments/D16D091A-2F55-48EF-B3DD-601D363951A7.png`.
+Temporary result paths are local evidence and may be removed by the system.
+
+The same focused test then passed in explicitly selected Light appearance (18.006 s), with owner
+authorization to change and restore the setting. Automatic was restored and confirmed selected.
+The exported screenshot was visually reviewed: complete legible percentage/byte text, stage icons,
+Close and Cancel Download controls, with no visible clipping. Bundle:
+`/private/tmp/Relente-Closure-Light-20261104.xcresult`; screenshot:
+`/private/tmp/Relente-Closure-Light-Attachments/330AFC58-C9D7-4E18-B9B5-3BA0812C6928.png`.
+Both appearance checks use the unchanged sample scenario and automatic project signing.
+
+This closes the missing light/dark-rendering observation for download details only. It does not prove
+all screens/error states, spoken announcements, animations or other supported Macs/OS versions.
+The composite appearance criterion remains unchecked. The real UI percentage/cancellation/relaunch criterion was subsequently
+verified below. At this earlier sample-only checkpoint no real download, package deletion or disk operation was performed; the
+roadmap step 8 matrix and issue #39 remained separate follow-up work at that checkpoint. The owner
+subsequently removed other-Mac/version validation as a step 8 requirement. No code or tests were changed.
+
+### Cancellation evidence gap identified before the live follow-up
+
+Read-only review confirms that the real `InstallerDownloadTests` opt-in case records byte count,
+fraction, terminal callback and an empty owned directory. `InstallerArtifactStoreTests` covers
+unpublished directories staying unavailable and a Ready marker alone not registering an installer.
+`LiveInstallerAcquisitionService.cancelDownload()` waits for the owned job, and cancellation is
+reported after cleanup; uncertain cleanup blocks for recovery. These are separate evidence layers,
+not a complete UI/relaunch observation; at this checkpoint the composite criterion remained unchecked.
+
+To complete that observation, use the signed live app on the current Mac, record selected Apple
+product/version/build and actual visible progress, cancel through its confirmation, wait for the
+terminal idle/recovery outcome, and inspect only the owned operation directory. Quit normally and
+relaunch; verify no partial is selectable and existing retained installers are preserved. A cleanup
+uncertainty must remain recovery-blocked rather than be removed to obtain a pass. Record actual
+bytes transferred and network/storage allowance before starting; manual UI cancellation alone does
+not enforce a download cap. No such live run was started in this follow-up. The existing low-byte
+transport test cannot substitute for this observation. Other-Mac/version checks require those Macs;
+complete-installer deletion requires issue #39's separate accepted change.
+
+## Live cancellation and relaunch — 2026-11-04
+
+Owner authorized continuing the remaining verification. Used the existing signed Debug app from
+the current project's DerivedData, without sample launch arguments, on arm64 macOS 27.2 / 26B123.
+No signing overrides, alternate project or disk operation. Storage had 207.67 GB free; the owned
+`~/Library/Application Support/Relente/Installers` store initially had no operation directories.
+The live Apple catalog offered Monterey 12.7.6 / 21H1320 (12.41 GB). Started this package only to
+cancel early, with no intention to complete it. Manual cancellation is not a strict traffic cap.
+
+Observed actual UI progress: 2% / 297.6 MB, then clicked Cancel Download and confirmed in the
+native sheet. The UI changed to Cancelling; progress callbacks continued (4% / 521.9 MB, then
+6% / approximately 694 MB and 7% / 906 MB). It subsequently reached “Download cancelled” with
+Retry Download. Cancellation was delayed, not instantaneous. The exact final byte count and
+request-to-terminal duration were not captured; 906 MB is the last observation, not a total.
+An initial concern that it was permanently stuck was disproved by this terminal outcome.
+
+The operation directory was absent after terminal cancellation. Closing details showed Monterey
+12.7.6 as Download, with Continue disabled. Quit normally with Command-Q; the following AX query
+reported the process no longer existed. Relaunched the same app: local Ventura 13.7.8 and the
+existing Monterey 12.7.4 were selectable from `/Applications`; the cancelled 12.7.6 was not.
+Reopened Download: the catalog loaded normally and still offered Download for 12.7.6, with no
+recovery block. The owned store still had no operation directories. No manual cleanup was used.
+
+This completes the real progress/cancellation/idle/relaunch acceptance observation on this Mac,
+combined with the separately recorded terminal-callback transport tests. It does not promise
+prompt cancellation or establish runtime behavior on other Macs. Local observation records:
+`/private/tmp/relente-live-cancel-baseline-20261104.json` and
+`/private/tmp/relente-live-cancel-outcome-20261104.json` (temporary, not CI artifacts).
+The app was left idle in Download. No complete installer was deleted and no USB was used.
 
 ## Revision 4 — acquisition error and recovery presentation (Accepted)
 
@@ -114,8 +265,8 @@ minimum macOS 14.0, Swift 6, Hardened Runtime enabled and Release Swift warnings
 The app has App Sandbox disabled. CI explicitly requires both architectures, checks the helper
 plist and prints (but does not assert) the deployment target. This differs from the accepted host
 support target of Apple silicon and macOS 26+. Updating the project target/architectures and CI
-remains a separate owner-authorized configuration change; Intel boot-target instructions are a
-separate product capability from the architecture of the Mac running Relente.
+was handled by the separately accepted platform change linked in the closure checkpoint. Intel
+boot-target instructions are a separate product capability from the architecture of the Mac running Relente.
 
 ## Revision 3 — presentation implementation plan (Accepted)
 
@@ -183,7 +334,7 @@ service and tests; inspect Assistant/View dependencies before any port (read-onl
 
 - [ ] Inventory the exact 011 UI dependencies and port only required contracts/sample behavior;
   omit softwareupdate fetch, unrelated changes and unverified cancellation claims.
-- [ ] Preserve local offline selection and establish sample acquisition events for the new flow.
+- [x] Preserve local offline selection and establish sample acquisition events for the new flow.
 - Proof: focused existing local-selection/sample tests; review selected diff against the previous
   branch, no whole-branch integration. Separate UI porting is task 9.
 
@@ -192,9 +343,9 @@ service and tests; inspect Assistant/View dependencies before any port (read-onl
 Dependencies: 1. Likely files: new AppleInstallerCatalog service/parser, AvailableInstaller model,
 SoftwareUpdate listing parser and focused catalog tests (split transport/parser if needed).
 
-- [ ] Parse bounded Apple catalog/Distribution data without executing scripts; require one known
+- [x] Parse bounded Apple catalog/Distribution data without executing scripts; require one known
   layout, package URL/size and exact OS version/build. Intersect with current-Mac listing only.
-- [ ] Reject conflicts, absent identity, deferred/unavailable entries, missing sizes and unexpected
+- [x] Reject conflicts, absent identity, deferred/unavailable entries, missing sizes and unexpected
   origins. Recheck before acquisition; keep local-selection recovery available.
 - Proof: sanitized observed metadata fixtures plus ambiguous/malformed/oversized/unknown-layout
   cases, stale selection and failed listing. Real metadata observation is supplementary evidence.
@@ -204,9 +355,9 @@ SoftwareUpdate listing parser and focused catalog tests (split transport/parser 
 Dependencies: 1; used by 5 and 7. Likely files: proposed shared AppleInstallerPackageVerifier,
 existing provenance policy in CreateInstallMediaPipeline and focused verifier/policy tests.
 
-- [ ] Require successful system package trust/signature evaluation on stable bytes and bind the
+- [x] Require successful system package trust/signature evaluation on stable bytes and bind the
   validated chain to the accepted Apple root/intermediate identities; names alone do not suffice.
-- [ ] Control language/output bounds; reject ambiguity, wrong chains, unsupported rotation,
+- [x] Control language/output bounds; reject ambiguity, wrong chains, unsupported rotation,
   altered bytes, verification failure and unavailable trust. Do not modify trust settings.
 - Proof: fixture-based result-policy tests and a system check of the existing signed sample plus
   a deliberately changed research copy. If the actual signer/output binding cannot be proved,
@@ -217,9 +368,9 @@ existing provenance policy in CreateInstallMediaPipeline and focused verifier/po
 Dependencies: 1–2. Likely files: proposed direct-download service/delegate, operation state model,
 owned working-directory policy and focused transfer/state tests.
 
-- [ ] Use default/ephemeral URLSession, exact role-specific origins and reviewed redirects, real
+- [x] Use default/ephemeral URLSession, exact role-specific origins and reviewed redirects, real
   byte progress and an exact transfer limit. Keep operation identity across callbacks.
-- [ ] Cancellation waits for every owned terminal callback, wins publication races correctly and
+- [x] Cancellation waits for every owned terminal callback, wins publication races correctly and
   blocks another operation until safe completion/recovery; no late callback selects a partial.
 - Proof: controlled URLProtocol/test transport covering redirects, HTTP errors, unknown totals,
   truncated/oversized bodies, cancellation/completion races and stale callbacks. Do not replace
@@ -230,9 +381,9 @@ owned working-directory policy and focused transfer/state tests.
 Dependencies: 2–4. Likely files: InstallerPackagePreparer, new internal-OS-metadata reader,
 staging resource policy and focused preparation/identity tests; split as necessary.
 
-- [ ] Verify complete package snapshot before expansion, use fixed official tool and bounded
+- [x] Verify complete package snapshot before expansion, use fixed official tool and bounded
   private owned staging, no scripts; enforce known layout and safe file/link handling.
-- [ ] Compose supported SharedSupport layout explicitly; reject missing/conflicting internal
+- [x] Compose supported SharedSupport layout explicitly; reject missing/conflicting internal
   OS identity, mismatched build or executable signature failure. Retain package provenance.
 - Proof: subprocess fixtures and safe small archives for path/type/collision/space failures;
   existing Ventura research for real expansion/composition/identity. Do not treat full-app resource
@@ -243,9 +394,9 @@ staging resource policy and focused preparation/identity tests; split as necessa
 Dependencies: 3–5. Likely files: shared owned-process runner/cancellation state, preparer,
 working-artifact lifecycle and focused termination/recovery tests.
 
-- [ ] Cancellation/timeout targets only owned work, observes terminal process-tree results and
+- [x] Cancellation/timeout targets only owned work, observes terminal process-tree results and
   precedes cleanup/detach. Never force detach or report cancellation from a signal request alone.
-- [ ] Publish Ready atomically with successful validation, reconcile owned unpublished work after
+- [x] Publish Ready atomically with successful validation, reconcile owned unpublished work after
   relaunch, surface cleanup/termination uncertainty and preserve unrelated/verified files.
 - Proof: cancellation during verification/expansion, late exit, refused termination, cleanup or
   detach failure and relaunch fixtures. Record limits of process-tree ownership on the toolchain.
@@ -262,9 +413,9 @@ Dependencies: 3, 5–6. Likely files: LiveCreateInstallMediaRunner, InstallerPac
 PreparedInstallerPackage/provenance policy and focused existing helper-package tests (split
 snapshot and runner integration changes into separate commits/tasks if scope grows).
 
-- [ ] Copy and verify a private root-owned package snapshot independently; bind actual staged
+- [x] Copy and verify a private root-owned package snapshot independently; bind actual staged
   package path, app path and exact selected OS identity. Fix original/staged path routing.
-- [ ] Validate trusted layout/permissions/symlinks, support composition, executable Apple signing
+- [x] Validate trusted layout/permissions/symlinks, support composition, executable Apple signing
   and pre-launch provenance. Caller-writable candidates/manifests never authorize execution.
 - Proof: injected file/process/verifier tests for replacement, path confusion, changed identity,
   ownership and signatures. Preserve existing destination/authorization/TOCTOU tests. No root
@@ -275,9 +426,9 @@ snapshot and runner integration changes into separate commits/tasks if scope gro
 Dependencies: 7. Likely files: existing typed creation request/pipeline, InstallerSource metadata,
 app request construction and focused request/pipeline tests.
 
-- [ ] Carry package-backed source identity through the existing typed request with independent
+- [x] Carry package-backed source identity through the existing typed request with independent
   helper validation. Keep networking in app and admin/disk checks immediately before execution.
-- [ ] Separate acquisition cancellation from authorized USB-operation lifecycle; no generic command,
+- [x] Separate acquisition cancellation from authorized USB-operation lifecycle; no generic command,
   new standalone privileged service or accidental launch caused by acquisition completion.
 - Proof: request/contract and injected runner tests for both package-backed and existing local
   sources, cancellation and fingerprint/authorization refusals. Do not alter the unrelated
@@ -288,9 +439,10 @@ app request construction and focused request/pipeline tests.
 Dependencies: 1, 4–6. Likely files: ported DownloadView/DownloadDetailsSheet and related components;
 then separate Assistant integration/sample previews/String Catalog updates.
 
-- [ ] Preserve family grouping, older releases, cancellation confirmation, activity details and
+- [x] Preserve family grouping and cancellation confirmation; older-release navigation and Activity
+  were superseded by accepted revisions 3 and 5. Preserve
   local reuse; replace raw softwareupdate fetch output with actual acquisition/preparation events.
-- [ ] Show truthful stage progress, errors, retained package/candidate status and Ready only after
+- [x] Show truthful stage progress, errors, retained package/candidate status and Ready only after
   validation; prevent collision overwrites and accidental destructive/default actions.
 - Proof: sample previews, focused UI tests and English/Spanish strings; check layout and keyboard
   behavior against native macOS guidance. Port dependencies deliberately, without resurrecting fetch.
@@ -300,7 +452,7 @@ then separate Assistant integration/sample previews/String Catalog updates.
 Dependencies: 6, 8–9. Likely files: app lifecycle/delegate and Assistant cancellation integration,
 UI test fixtures and accessibility/localization adjustments in focused substeps.
 
-- [ ] Normal quit waits for confirmed cancellation/cleanup or offers continued waiting; forced exit
+- [x] Normal quit waits for confirmed cancellation/cleanup or offers continued waiting; forced exit
   leaves recoverable unpublished work, never a selectable partial. No control of old system fetches.
 - [ ] Preserve notifications and local selection; verify VoiceOver, Reduce Motion, keyboard access,
   light/dark appearance and applicable sample-flow UI tests.
