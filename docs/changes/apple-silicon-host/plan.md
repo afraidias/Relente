@@ -3,7 +3,7 @@
 Revision 1 · Accepted\
 Design: [spec.md](spec.md)\
 Issue: N/A (owner-directed platform alignment)\
-PR: Pending\
+PR: [#48](https://github.com/afraidias/Relente/pull/48) (Draft)\
 Implementation: Verified\
 Approval: project owner, 2026-11-04, revision 1, conversation: “acepto” after plan review.
 
@@ -40,4 +40,4 @@ setting and CI/doc changes restores the prior build behavior.
 - Xcode Product → Build For → Profiling completed successfully after a Clean Build Folder and again after the final project-setting change (12:30). A clean Release `xcodebuild` completed successfully outside the restricted shell, generated `AppIcon.icns` from the existing `AppIcon.icon`, and produced arm64-only app and helper binaries. Both checked bundles contain only arm64; the app plist reports `LSMinimumSystemVersion` 26.0; the embedded launchd plist passes `plutil -lint`.
 - The Xcode 27.1 App Intents metadata phase warned that no `AppIntents.framework` dependency was found even though the app has no App Intents. Weak-linking the system framework in the app target's Debug and Release configurations removes that warning; a clean Release build now reports only “Extracted no relevant App Intents symbols, skipping writing output.”
 - The earlier standalone `actool` failure was specific to running the compiler in the restricted shell: even a newly saved Icon Composer document failed there, while the same project built successfully through Xcode and through `xcodebuild` with the required Xcode services available. The tracked icon source was left unchanged; regeneration was unnecessary.
-- CI execution remains pending the PR.
+- CI execution is pending on [PR #48](https://github.com/afraidias/Relente/pull/48).
