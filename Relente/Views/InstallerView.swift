@@ -33,7 +33,7 @@ struct InstallerView: View {
                     .frame(maxHeight: .infinity)
                     .contentShape(.rect)
                     .dropDestination(for: URL.self) { urls, _ in
-                        drop(urls)
+                        _ = drop(urls)
                     }
             } else {
                 // The add square counts as an item: it takes a place in the row or grid.

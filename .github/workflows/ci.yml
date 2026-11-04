@@ -1,5 +1,5 @@
 # Checks every pull request to main (and every push to main):
-# formatting, build, tests, a universal Release build, and the PR title.
+# formatting, build, tests, an Apple silicon Release build, and the PR title.
 name: CI
 
 on:
@@ -60,22 +60,24 @@ jobs:
           -destination 'platform=macOS'
           -only-testing:RelenteTests
           CODE_SIGNING_ALLOWED=NO
-      - name: Build universal Release (warnings as errors)
+      - name: Build Apple silicon Release (warnings as errors)
         run: >
           xcodebuild build
           -scheme Relente
           -configuration Release
           -destination 'generic/platform=macOS'
           CODE_SIGNING_ALLOWED=NO
-      - name: Check architectures and minimum macOS
+      - name: Check architecture and minimum macOS
         run: |
           app=$(find ~/Library/Developer/Xcode/DerivedData -path '*/Build/Products/Release/Relente.app' -maxdepth 5 | head -n 1)
           # The app and the system helper embedded in it.
           for binary in "$app/Contents/MacOS/Relente" "$app/Contents/MacOS/RelenteHelper"; do
             archs=$(lipo -archs "$binary")
             echo "$(basename "$binary") architectures: $archs"
-            [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || { echo "::error::$(basename "$binary") is not universal"; exit 1; }
+            [[ "$archs" == arm64 ]] || { echo "::error::$(basename "$binary") is not arm64-only"; exit 1; }
           done
           test -f "$app/Contents/Library/LaunchDaemons/com.afraidias.Relente.Helper.LiveCreation.plist" \
             || { echo "::error::The helper's launchd plist is missing"; exit 1; }
-          echo "Minimum macOS: $(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$app/Contents/Info.plist")"
+          minimum_macos=$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$app/Contents/Info.plist")
+          echo "Minimum macOS: $minimum_macos"
+          [[ "$minimum_macos" == 26.0 ]] || { echo "::error::Expected minimum macOS 26.0"; exit 1; }
