@@ -53,3 +53,9 @@ The owner requested restoring the original icon and halo, equal callout widths, 
 - `performAccessibilityAudit()` failed on an unnamed group encompassing the window. The same audit against an isolated `origin/main` archive failed with the same message and a full-window element capture. The warning remains unresolved; no audit exception was added. Details and reproduction are in [accessibility-audit.md](accessibility-audit.md).
 - VoiceOver automated activation timed out. A second attempt while it was manually active was rejected by automatic approval review over the risk of leaving VoiceOver active; VoiceOver was restored to off. Spoken output and status announcements remain unverified.
 - Still pending: manual VoiceOver validation, resolving or separately accepting the pre-existing audit warning, visual inspection of the revoked-helper state, and verifying Login Items navigation on supported systems. The PR remains draft.
+
+### Further checks
+
+- A simulated revocation returned to setup, retained the selection and exposed the settings action; the focused UI test passed and the owner-visible Spanish dark state was inspected.
+- The Login Items action opened the expected settings page on macOS 27.2 without changing any setting. Its visible Spanish section label was “Actividad de apps en segundo plano”; the Spanish copy was aligned to it. Other supported versions remain unverified.
+- Re-ran the focused revocation UI test after adding an opt-in simulated route to the real Login Items settings entry point; it passed. Full Debug unit tests, Release compile, strict lint and diff checks passed after these changes. No real helper or system permission was modified. macOS 26 remains unverified on this host.

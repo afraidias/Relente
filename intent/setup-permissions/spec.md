@@ -40,9 +40,11 @@ Apple's [privacy guidance](https://developer.apple.com/design/human-interface-gu
 
 - Not installed: “Helper not installed” / “Ayudante no instalado”.
 - Installing: “Installing helper…” / “Instalando ayudante…”.
-- Approval: “Waiting for activation” / “Esperando activación”; “In the window that opens, find Relente under App Background Activity and turn it on. Then return here.” / “En la ventana que se abre, busca Relente en Actividad en segundo plano y actívalo. Después vuelve aquí.” The action opens System Settings.
+- Approval: “Waiting for activation” / “Esperando activación”; “In the window that opens, find Relente under App Background Activity and turn it on. Then return here.” / “En la ventana que se abre, busca Relente en Actividad de apps en segundo plano y actívalo. Después vuelve aquí.” The action opens System Settings.
 - Ready: “Helper enabled” / “Ayudante activado”.
 - Error: “Couldn’t install the helper. Try again. If the problem continues, make sure Relente is in your Applications folder.” / “No se ha podido instalar el ayudante. Vuelve a intentarlo. Si el problema continúa, comprueba que Relente está en la carpeta Aplicaciones.”
 - Revoked: explain that the helper is disabled and current selections are preserved.
 
 These strings are working copy; confirm system terminology and final layout before implementation. No HIG exception has been identified at this stage.
+
+The observed Spanish label on macOS 27.2 is “Actividad de apps en segundo plano”; the settings button opened that page without changing a permission. Other supported versions remain to be checked.

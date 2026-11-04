@@ -106,7 +106,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En la ventana que se abre, busca Relente en Actividad en segundo plano y actívalo. Después vuelve aquí."
+            "value" : "En la ventana que se abre, busca Relente en Actividad de apps en segundo plano y actívalo. Después vuelve aquí."
           }
         }
       }
@@ -176,7 +176,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu selección se conserva. Activa Relente en Actividad en segundo plano en Ajustes del Sistema para continuar."
+            "value" : "Tu selección se conserva. Activa Relente en Actividad de apps en segundo plano en Ajustes del Sistema para continuar."
           }
         }
       }

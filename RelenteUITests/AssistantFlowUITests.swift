@@ -70,6 +70,17 @@ final class AssistantFlowUITests: XCTestCase {
     }
 
     @MainActor
+    func testRevokedHelperShowsRecovery() {
+        app = .relente(extraArguments: ["-sampleHelper", "revoked"])
+        XCTAssertTrue(app.element("Helper disabled").waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Open System Settings…"].exists)
+        XCTAssertTrue(
+            app.element(
+                "Your selections are preserved. Turn on Relente under App Background Activity in System Settings to continue."
+            ).exists)
+    }
+
+    @MainActor
     func testHelperRegistrationShowsInstallingState() {
         app = .relente(extraArguments: ["-sampleHelper", "slowRegistration"])
         expectScreen("Set Up Relente")

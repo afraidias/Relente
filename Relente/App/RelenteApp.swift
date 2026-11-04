@@ -124,6 +124,13 @@ struct RelenteApp: App {
             switch UserDefaults.standard.string(forKey: "sampleHelper") {
             case "notInstalled":
                 return SampleHelperService(status: .notInstalled)
+            case "revoked":
+                let helper = SampleHelperService(status: .ready, opensSystemSettings: true)
+                Task {
+                    try? await Task.sleep(for: .seconds(3))
+                    helper.revoke()
+                }
+                return helper
             case "slowRegistration":
                 return SampleHelperService(status: .notInstalled, registrationDelay: .seconds(15))
             case "registrationFailure":

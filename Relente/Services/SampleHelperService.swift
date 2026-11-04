@@ -16,17 +16,19 @@ nonisolated final class SampleHelperService: HelperService {
     private let registrationDelay: Duration?
     private let registerError: HelperError?
     private let unregisterError: HelperError?
+    private let opensSystemSettings: Bool
     private let state: OSAllocatedUnfairLock<HelperStatus>
 
     init(
         status: HelperStatus = .ready, approvalDelay: Duration? = .seconds(1), registerError: HelperError? = nil,
-        unregisterError: HelperError? = nil, registrationDelay: Duration? = nil
+        unregisterError: HelperError? = nil, registrationDelay: Duration? = nil, opensSystemSettings: Bool = false
     ) {
         state = OSAllocatedUnfairLock(initialState: status)
         self.approvalDelay = approvalDelay
         self.registrationDelay = registrationDelay
         self.registerError = registerError
         self.unregisterError = unregisterError
+        self.opensSystemSettings = opensSystemSettings
     }
 
     var status: HelperStatus {
@@ -49,7 +51,14 @@ nonisolated final class SampleHelperService: HelperService {
         state.withLock { $0 = .notInstalled }
     }
 
-    func openSettings() {}
+    func openSettings() {
+        if opensSystemSettings { LiveHelperService().openSettings() }
+    }
+
+    /// As if the user turned the helper off in System Settings.
+    func revoke() {
+        state.withLock { if $0 == .ready { $0 = .needsApproval } }
+    }
 
     /// As if the user turned the helper on in System Settings.
     func approve() {
