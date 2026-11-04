@@ -46,8 +46,8 @@ final class RelenteAppDelegate: NSObject, NSApplicationDelegate, UNUserNotificat
         #endif
     }
 
-    func notifyDownloadFailed() async {
-        await deliverNotification(body: "The installer couldn’t be obtained. Open Relente for details.")
+    func notifyAcquisitionError(_ error: InstallerAcquisitionError) async {
+        await deliverNotification(body: error.message)
     }
 
     private func deliverNotification(body: LocalizedStringResource) async {

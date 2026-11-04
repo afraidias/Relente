@@ -15,7 +15,6 @@ struct CreatingView: View {
     let drive: Drive
     /// Running, or stopped with a reason. Both share this layout, so the screen doesn't jump.
     let state: CreationState
-    let output: [CreationOutputLine]
     /// What the creation only pretended (Debug builds), or `nil`: a label then says so.
     var simulation: CreationSimulation?
     var onOpenFullDiskAccessSettings: () -> Void = {}
@@ -68,59 +67,35 @@ struct CreatingView: View {
                     }
                 }
 
-                if progress.isPreparingInstaller {
-                    Group {
-                        if state.failure == nil {
-                            ProgressView()
-                        } else {
-                            ProgressView(value: 0)
-                                .tint(Theme.Colors.danger)
-                        }
-                    }
-                    .accessibilityLabel(
-                        Text(state.failure == nil ? "Preparing the installer" : "Installer preparation stopped")
-                    )
-                    .accessibilityValue(Text(state.failure == nil ? "In progress" : "Stopped"))
-                    .frame(height: 28)
-                    .accessibilityIdentifier("creation.preparingInstaller")
-                } else if state.failure == nil, progress.phase == .format {
-                    // During erasure, one real progress bar is clearer than showing the
-                    // later creation phases as if they were already underway.
-                    Group {
-                        if let fraction = progress.phaseFraction {
-                            ProgressView(value: fraction)
-                        } else {
-                            ProgressView()
-                        }
-                    }
-                    .accessibilityLabel(Text("Formatting the USB drive"))
-                    .accessibilityValue(
-                        Text(
-                            verbatim: progress.phaseFraction.map { $0.formatted(.percent) }
-                                ?? String(localized: "In progress")
-                        )
-                    )
-                    .frame(height: 28)
-                } else if state.failure == nil, progress.isLive, progress.phaseFraction == nil {
+                if progress.isPreparingInstaller
+                    || (state.failure == nil && progress.isLive && progress.phaseFraction == nil)
+                {
                     VStack(spacing: 8) {
                         ProgressView()
-                        Text(progress.phase == .copy ? "Measuring installer image…" : "In progress")
-                            .font(Theme.Fonts.footnote)
-                            .foregroundStyle(Theme.Colors.secondary)
+                        if progress.isLive && progress.phase == .copy {
+                            Text("Waiting for installer image data…")
+                                .font(Theme.Fonts.footnote)
+                                .foregroundStyle(Theme.Colors.secondary)
+                        }
                     }
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel(Text(progress.phase.name))
-                    .accessibilityValue(Text("In progress"))
+                    .accessibilityLabel(
+                        Text(progress.isPreparingInstaller ? "Preparing the installer" : progress.phase.name)
+                    )
+                    .accessibilityValue(Text(state.failure == nil ? "In progress" : "Stopped"))
                     .frame(height: 44)
-                    .accessibilityIdentifier("creation.indeterminateProgress")
-                } else {
-                    PhaseBar(
-                        current: progress.phase,
-                        currentFraction: progress.phaseFraction ?? 0,
-                        isIndeterminate: state.failure == nil && progress.isLive && progress.phaseFraction == nil,
-                        isFailed: state.failure != nil
+                    .accessibilityIdentifier(
+                        progress.isPreparingInstaller ? "creation.preparingInstaller" : "creation.indeterminateProgress"
                     )
                 }
+
+                PhaseBar(
+                    current: progress.phase,
+                    currentFraction: progress.phaseFraction ?? 0,
+                    isIndeterminate: state.failure == nil
+                        && (progress.isPreparingInstaller || progress.phaseFraction == nil),
+                    isFailed: state.failure != nil
+                )
             }
             .frame(width: Theme.Sizes.contentWidth)
 
@@ -129,11 +104,6 @@ struct CreatingView: View {
             Spacer(minLength: 8)
         }
         .padding(.top, Theme.Sizes.headerTopPadding)
-        .overlay(alignment: .topTrailing) {
-            CreationOutputDetails(lines: output, failure: state.failure?.reason)
-                .padding(.top, 8)
-                .padding(.trailing, 24)
-        }
     }
 
     /// The Error screen's subtitle: why it stopped, in the primary color, then what to do.
@@ -294,13 +264,13 @@ struct CreatingStats: View {
             .accessibilityValue(Text(verbatim: Self.elapsedText(elapsed)))
             .accessibilityIdentifier("creation.elapsed")
 
-            if progress.phase != .format {
+            if progress.phase == .copy {
                 BigStat(
                     label: LocalizedStringResource(
                         "COPIED", comment: "Creating screen figure: bytes of the installer copied to the drive so far."),
                     value: Text(
                         verbatim: progress.isLive && !progress.hasMeasuredCopyProgress
-                            ? String(localized: "Measuring…") : Self.bytes(progress.displayedCopiedBytes)),
+                            ? String(localized: "Waiting…") : Self.bytes(progress.displayedCopiedBytes)),
                     caption: progress.isLive && !progress.hasMeasuredCopyProgress
                         ? Text("Waiting for installer image data…")
                         : Text(
@@ -315,23 +285,7 @@ struct CreatingStats: View {
                 .accessibilityIdentifier("creation.copied")
             }
 
-            if progress.phase != .format {
-                BigStat(
-                    label: LocalizedStringResource(
-                        "REMAINING", comment: "Creating screen figure: estimated time left."),
-                    value: Text(progress.remaining.text),
-                    rollingValue: remainingSeconds
-                )
-                .frame(maxWidth: .infinity)
-                .accessibilityIdentifier("creation.remaining")
-            }
         }
-    }
-
-    /// REMAINING in seconds, so it rolls downwards as it shrinks; 0 when there's no estimate.
-    private var remainingSeconds: Double? {
-        guard case .estimate(let duration) = progress.remaining else { return nil }
-        return Double(duration.components.seconds)
     }
 
     /// Bytes formatted for people, writing zero as "0 bytes" rather than "Zero KB".
@@ -466,7 +420,7 @@ struct CreatingScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             CreatingView(
-                installer: InstallerSource.samples[0], drive: Drive.samples[0], state: state, output: [],
+                installer: InstallerSource.samples[0], drive: Drive.samples[0], state: state,
                 simulation: simulation
             )
             .padding(.horizontal, 32)

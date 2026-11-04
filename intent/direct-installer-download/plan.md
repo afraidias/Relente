@@ -1,13 +1,121 @@
 # Direct installer download — implementation plan
 
-Revision: 3 · State: Accepted
+Revision: 4 · State: Accepted
 Related issue: N/A — no dedicated issue verified; roadmap step 9.
 Approval: Afraidias, 2026-11-03, revision 3 — "apruebo" to the explicit plan approval question.
 Previous approval: Afraidias, 2026-11-03, revision 2 — "okey" to the explicit implementation-plan approval question.
 Implementation state: In progress
 PR: [#47](https://github.com/afraidias/Relente/pull/47) — draft, awaiting manual checks and owner review.
 
-Intent: [intent.md](intent.md) · Accepted design: [spec.md](spec.md), revision 8.
+Intent: [intent.md](intent.md) · Accepted design: [spec.md](spec.md), revision 10.
+
+## Revision 4 — acquisition error and recovery presentation (Accepted)
+
+Owner approved design revision 9 on 2026-11-03. Keep errors out of inline screen text and send
+localized macOS notifications for catalog and acquisition failures. Preserve the Finder action
+for isolated recovery storage; it does not clear a recovery block. Differentiate local recovery
+blocking from Apple catalog/network failure so the UI never implies Apple has no compatible
+installers when no catalog request was made. If notifications are denied, preserve VoiceOver
+access to the error and the Finder recovery action. Implement as one focused slice before other
+remaining tasks; do not change acquisition or cleanup safety behavior.
+
+1. Add a stable error notification event for catalog failures and recovery-required state. Avoid
+   duplicate notifications for transfer failures, which already have a terminal notification.
+2. Remove inline acquisition error prose while preserving Finder recovery access and accurate
+   empty-catalog wording for genuine successful empty results.
+3. Add English/Spanish notification copy and focused state/UI coverage. Verify authorization
+   denial leaves an accessible error and recovery action. Run unit/UI tests and strict lint.
+
+Implementation checkpoint, 2026-11-03: catalog and transfer failures now use the localized system
+notification path; error prose was removed from Download and download details, while retry and
+Finder recovery actions remain. VoiceOver receives a concise error label on the empty state. The
+new catalog recovery/retry unit test passes; full unit tests and strict lint pass, and a universal
+Release build is not part of this slice. The focused acquisition UI test runner exited with SIGKILL
+before bootstrapping, so UI behavior and notification-denial behavior still need verification.
+With project signing and access to Xcode services, all three existing acquisition UI tests pass:
+completion, cancellation and quit. These tests do not cover the new error screen or notification
+denial, which remain unverified manually.
+The signed recovery UI test now injects a pending-work failure using sample data, with sample
+notifications suppressed. It verifies the Finder action, accessible recovery label, disabled
+Continue, enabled Back and absence of the misleading empty-catalog message. This does not exercise
+macOS notification authorization denial or spoken VoiceOver output.
+Live check, 2026-11-03: with Relente notifications disabled in System Settings, the signed app
+detected the existing pending directory and showed the Finder action, Back enabled and Continue
+disabled. Its accessibility tree exposed the localized recovery explanation. VoiceOver was
+enabled while navigating the screen; spoken output was not independently audible to this check.
+Notifications and VoiceOver were restored to their original enabled and disabled states. No pending
+files were removed.
+After the owner approved the recovery prototype, the screen was changed to show a visible
+explanation, Finder action and local-installer alternative. The signed focused recovery UI test
+passes with sample pending work; strict swift-format lint passes.
+Later live inspection found the previously observed pending directory no longer present. The
+running app displayed the Apple catalog and the existing local Ventura installer; no download was
+started. With Reduce Motion enabled, selecting the local installer and returning to Installer
+worked; visual timing of all acquisition transitions remains unverified. VoiceOver was enabled
+and the catalog accessibility tree and navigation were inspected, but spoken output could not be
+independently heard. Both settings were restored to off. PR #47's checks passed on b0d3ad2; the
+subsequent local changes have not been pushed and therefore have not run in CI.
+Final local rerun: signed unit tests and the four acquisition UI tests passed on macOS 27.2;
+Xcode reports 378 tests passed and 5 skipped (447 parameterized executions passed). Strict lint
+and diff checks passed. Universal Release built without signing for arm64 and x86_64; Xcode emitted
+its App Intents metadata-skipped warning, and the UI runner emitted main-thread runtime warnings.
+Spoken VoiceOver and observed acquisition transitions under Reduce Motion remain open.
+With both VoiceOver and Reduce Motion enabled in macOS, the signed sample download/cancellation
+UI test passed. During transfer the accessibility tree exposed 25%, 4.2 GB of 16.8 GB, the four
+named stages and their current statuses, and Cancel Download. Both system settings were restored
+to off. This checks operation with the settings enabled; it does not establish spoken output or
+visually measure the transition animation.
+The owner confirmed hearing VoiceOver during this test and that the spoken content and order were
+correct. Visual observation of the acquisition transitions with Reduce Motion remains open.
+The signed sample cancellation UI test passed again with the system Reduce Motion setting on,
+then the setting was restored to off. Static inspection confirms that the ring and numeric text
+disable their motion and artwork uses an opacity transition. The available screenshot captured the
+confirmation sheet rather than animation frames, so the visual transition remains unverified.
+The owner subsequently reported the visual result was acceptable ("todo bien"). The agent did
+not capture animation frames; this is owner-reported feedback, separate from the passing UI test.
+On 2026-11-04 the catalog failure screen was made visible and actionable, with localized text and
+retry. The signed unit run passed (374 tests; 5 skipped, 443 parameterized executions passed),
+strict lint and universal unsigned Release passed. The combined UI run and a focused retry both
+failed before any UI test ran: XCTest timed out enabling macOS automation mode. The new catalog
+failure UI test is therefore unverified; earlier recovery UI tests passed on 2026-11-03.
+After the graphical session became available, the signed focused catalog-failure UI test passed
+on 2026-11-04; the earlier failures occurred before XCTest executed the test.
+Final 2026-11-04 verification after catalog cleanup: signed unit and acquisition UI run passed
+(379 tests passed, 5 opt-in real tests skipped; 448 executions including parameterized cases). All 32
+signed UI tests then passed separately, including the full assistant flow and both failure states.
+The five opt-in tests cover real catalog, Apple transfer cancellation, package signature,
+preparation and expansion cancellation; their earlier successful live runs are recorded below.
+Strict lint and diff checks passed, and an unsigned universal Release build succeeded for arm64
+and x86_64. Existing String Catalog keys and their translations were preserved during cleanup.
+
+Owner clarification, 2026-11-04: all five opt-in real tests must be executed for this review;
+their omission from the ordinary suite is not completion evidence. They were run separately on
+macOS 27.2, using the already downloaded packages and preserving the prior proof files:
+For subsequent integration verification, run these real cases explicitly as part of the same
+verification checkpoint rather than counting skips or old evidence as a pass. The existing CI
+configuration does not run them; changing CI to do so needs a separately reviewed plan for
+Apple network access, package fixtures, storage, runtime and signing.
+
+- Live Apple catalog and current-Mac compatibility listing: passed (12.343 s), including cleanup.
+- Apple package system signature verification for Ventura: passed (7.106 s).
+- Real Apple transfer cancellation: passed (0.489 s); cancellation requested at 1,081,344 bytes,
+  terminal callback observed and owned directory empty.
+- Ventura 13.7.8 / 22H730 preparation, identity, retention and reload: passed (81.471 s).
+- Real Ventura expansion cancellation and workspace cleanup: passed (24.909 s).
+- The same preparation and reload check also passed for macOS 27.2 / 26B123 (120.723 s).
+
+Each test was explicitly enabled in its own run or safe group; a skip in another run does not
+negate these results. No full package was re-downloaded, no package scripts were run and no USB was
+used. XCTest result bundles are in `/private/tmp/Relente-Revision9-Signed/Logs/Test/`; command
+logs are `/private/tmp/relente-real-*-2026-11-04.log`.
+
+Xcode configuration review, 2026-11-04: Release app and helper both build `arm64 x86_64`, with
+minimum macOS 14.0, Swift 6, Hardened Runtime enabled and Release Swift warnings treated as errors.
+The app has App Sandbox disabled. CI explicitly requires both architectures, checks the helper
+plist and prints (but does not assert) the deployment target. This differs from the accepted host
+support target of Apple silicon and macOS 26+. Updating the project target/architectures and CI
+remains a separate owner-authorized configuration change; Intel boot-target instructions are a
+separate product capability from the architecture of the Mac running Relente.
 
 ## Revision 3 — presentation implementation plan (Accepted)
 
@@ -675,3 +783,49 @@ and shortens state transitions. Xcode Preview's Dark canvas failed with "Failed 
 Relente.app in reasonable time"; a prior app launch argument also left the captured interface
 light. Therefore actual dark-appearance rendering, spoken VoiceOver navigation and observed
 Reduce Motion behavior remain unverified. These need a human pass in a running app before merge.
+
+### Proposed creation-feedback revision — 2026-11-04
+
+The owner approved design revision 10 and plan revision 5 on 2026-11-04. Implementation may proceed within this scope.
+
+
+## Revision 5 — creation feedback without Activity (Accepted)
+
+Scope: implement accepted design revision 10 in the USB creation screen only. Preserve the helper,
+installer source, authorization, creation lifecycle and terminal outcomes.
+
+1. Inspect the current creation view, progress model/parser, localization catalog and UI tests.
+2. Remove the Activity button, popover and log window from the creation flow. Show the four named
+   phases with SF Symbols and highlight the current phase using helper-reported events.
+3. Keep elapsed time. Show copied bytes only during Copy and only when measured; otherwise show a
+   localized indeterminate state and truthful phase-specific explanation. Do not show guessed ETA,
+   percentages or “almost done” text.
+4. Localize all new or changed text in English and Spanish. Expose current phase and progress state
+   to VoiceOver, ensure complete labels at supported window sizes, and respect Reduce Motion.
+5. Update focused model/UI tests for phase mapping, copy-only metrics, unknown progress and terminal
+   success/failure. Run project unit tests, focused creation UI tests, Release build and strict lint.
+
+Acceptance evidence: no Activity control remains; each helper phase appears in the main screen;
+unknown progress stays indeterminate; copied bytes appear only during Copy; localization and
+accessibility labels are present; success and failure remain visible. Real USB testing is not a
+required implementation check because it was separately exercised during this session.
+
+
+Approval: Afraidias, 2026-11-04, revision 5 — "apruebo" to the explicit plan review.
+
+### Creation feedback revision implemented — 2026-11-04
+
+Implemented accepted revision 5. The creation screen now keeps the four SF Symbol phases visible,
+marks the active phase and exposes each phase with its status to accessibility. The Activity button,
+popover, technical log window, and their unused output buffer are removed. Elapsed time remains;
+the copied metric appears only during Copy, unknown bytes say “Waiting…” with Spanish localization,
+and remaining-time estimates are no longer shown. Product documentation and the string catalog
+were updated.
+
+Verification on macOS 27.2 (26B123): all 443 unit tests passed, with 5 opt-in integration cases
+skipped by this generic suite invocation; the separately run 13-test CreatingScreen UI suite passed
+with zero failures; universal Release build succeeded; full strict swift-format lint and `git diff
+--check` passed. A first combined unit/UI invocation exposed three unrelated UI automation
+interruption failures; the focused creation suite was then run sequentially and passed. The live
+Ventura USB creation separately completed through Relente and showed “Installer Ready” after 34
+minutes. No commit, push or PR was created here.

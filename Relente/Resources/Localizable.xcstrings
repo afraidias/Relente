@@ -705,16 +705,6 @@
         }
       }
     },
-    "Creation steps and progress reported by macOS." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fases y progreso comunicados por macOS durante la creación."
-          }
-        }
-      }
-    },
     "Done" : {
       "comment" : "Name of the assistant's last screen, once the installer is ready.",
       "localizations" : {
@@ -773,6 +763,7 @@
     },
     "Download Failed" : {
       "comment" : "Title in the download details sheet warning when the installer download fails.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1052,16 +1043,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "LIBRE DESPUÉS"
-          }
-        }
-      }
-    },
-    "Full Creation Log" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Registro completo de creación"
           }
         }
       }
@@ -1480,7 +1461,6 @@
         }
       }
     },
-    "Measuring…" : {},
     "More than one matching installer is available. Choose one on the Installer screen." : {
       "comment" : "Download screen: multiple local installers match; return so the user can choose manually.",
       "localizations" : {
@@ -1615,17 +1595,6 @@
         }
       }
     },
-    "Open Full Creation Log…" : {
-      "comment" : "Activity popover button that opens the complete technical creation log in a larger window.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir registro completo de creación…"
-          }
-        }
-      }
-    },
     "Open Full Disk Access Settings…" : {
       "localizations" : {
         "es" : {
@@ -1664,16 +1633,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abrir Ajustes…"
-          }
-        }
-      }
-    },
-    "Open the complete technical log in a larger window." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abre el registro técnico completo en una ventana más grande."
           }
         }
       }
@@ -1785,16 +1744,6 @@
         }
       }
     },
-    "Recent Activity" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actividad reciente"
-          }
-        }
-      }
-    },
     "Refreshing Apple’s list…" : {
       "comment" : "Download screen status while a prefetched Apple installer catalog refreshes.",
       "localizations" : {
@@ -1851,6 +1800,7 @@
     },
     "Relente couldn’t confirm a compatible full installer from Apple. Refresh the list or choose a local installer." : {
       "comment" : "Download screen recovery or eligibility explanation.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2269,6 +2219,7 @@
       }
     },
     "The installer couldn’t be obtained. Open Relente for details." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2673,6 +2624,7 @@
     },
     "Use Cancel beside the version to stop this download." : {
       "comment" : "VoiceOver hint for the disabled artwork of an installer currently downloading.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2710,16 +2662,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esperando una memoria…"
-          }
-        }
-      }
-    },
-    "Waiting for activity…" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esperando actividad…"
           }
         }
       }
@@ -2851,6 +2793,97 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abre los detalles de la descarga para ver el progreso o cancelarla."
+          }
+        }
+      }
+    },
+    "Choose a local installer or try again later." : {
+      "comment" : "Empty state description when Apple successfully returns no compatible full installers.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un instalador local o inténtalo de nuevo más tarde."
+          }
+        }
+      }
+    },
+    "Installer List Unavailable" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista de instaladores no disponible"
+          }
+        }
+      }
+    },
+    "Open Folder in Finder" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir carpeta en el Finder"
+          }
+        }
+      }
+    },
+    "Previous Download Needs Review" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa la descarga anterior"
+          }
+        }
+      }
+    },
+    "Relente couldn’t confirm that the previous work finished safely." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relente no ha podido confirmar que el trabajo anterior haya terminado de forma segura."
+          }
+        }
+      }
+    },
+    "Relente couldn’t load Apple’s installer list. Try again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relente no ha podido cargar la lista de instaladores de Apple. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "Review the pending work before downloading." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa el trabajo pendiente antes de descargar."
+          }
+        }
+      }
+    },
+    "Try loading the list again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intenta cargar la lista de nuevo."
+          }
+        }
+      }
+    },
+    "Waiting…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando…"
           }
         }
       }

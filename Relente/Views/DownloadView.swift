@@ -41,7 +41,7 @@ struct DownloadView: View {
         VStack(spacing: 0) {
             ScreenHeader(
                 title: "Download macOS",
-                subtitle: "Choose a full installer available for this Mac."
+                subtitle: headerSubtitle
             )
             .padding(.top, Theme.Sizes.headerTopPadding)
             .padding(.bottom, 8)
@@ -62,23 +62,12 @@ struct DownloadView: View {
                 installerGrid
             }
 
-            if error == .recoveryRequired {
+            if error == .recoveryRequired, !supportedInstallers.isEmpty {
                 Button("Show Installer Storage in Finder") {
                     NSWorkspace.shared.open(InstallerArtifactStore().root)
                 }
                 .buttonStyle(.secondary)
                 .padding(.top, 8)
-            }
-            if let error, error != .downloadFailed, !isShowingDetailsSheet {
-                Text(error.message)
-                    .foregroundStyle(Theme.Colors.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 12)
-                if error != .downloadFailed && error != .recoveryRequired {
-                    Button("Try Again", action: onRetry)
-                        .buttonStyle(.secondary)
-                        .padding(.top, 8)
-                }
             }
         }
         .animation(reduceMotion ? .easeInOut(duration: 0.2) : .easeInOut(duration: 0.4), value: isDownloading)
@@ -139,13 +128,42 @@ struct DownloadView: View {
     }
 
     private var emptyCatalog: some View {
-        ContentUnavailableView(
-            "No Full Installers Available",
-            systemImage: "arrow.down.circle",
-            description: Text(
-                "Relente couldn’t confirm a compatible full installer from Apple. Refresh the list or choose a local installer."
-            )
-        )
+        Group {
+            if error == .recoveryRequired {
+                ContentUnavailableView {
+                    Label {
+                        Text("Previous Download Needs Review")
+                    } icon: {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(Theme.Colors.warning)
+                    }
+                } description: {
+                    Text("Relente couldn’t confirm that the previous work finished safely.")
+                } actions: {
+                    Button("Open Folder in Finder", systemImage: "folder") {
+                        NSWorkspace.shared.open(InstallerArtifactStore().root)
+                    }
+                    .buttonStyle(.secondary)
+                }
+            } else if error == .catalogUnavailable {
+                ContentUnavailableView {
+                    Label("Installer List Unavailable", systemImage: "exclamationmark.triangle.fill")
+                } description: {
+                    Text("Relente couldn’t load Apple’s installer list. Try again.")
+                } actions: {
+                    Button("Try Again", action: onRetry)
+                        .buttonStyle(.secondary)
+                }
+            } else {
+                ContentUnavailableView(
+                    "No Full Installers Available",
+                    systemImage: "arrow.down.circle",
+                    description: Text(
+                        "Choose a local installer or try again later."
+                    )
+                )
+            }
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
@@ -153,11 +171,17 @@ struct DownloadView: View {
         AvailableInstaller.sorted(installers.filter(\.isSupported))
     }
 
+    private var headerSubtitle: LocalizedStringResource {
+        switch error {
+        case .recoveryRequired: "Review the pending work before downloading."
+        case .catalogUnavailable: "Try loading the list again."
+        default: "Choose a full installer available for this Mac."
+        }
+    }
+
     private var layout: PickLayout {
         PickLayout(itemCount: latestInstallers.count)
     }
-
-    private var isShowingDetailsSheet: Bool { mainDownloadDetails != nil }
 
     private var latestInstallers: [AvailableInstaller] {
         AvailableInstaller.latestPerFamily(supportedInstallers)

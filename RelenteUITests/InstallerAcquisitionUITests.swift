@@ -4,6 +4,36 @@ final class InstallerAcquisitionUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     @MainActor
+    func testCatalogFailureExplainsHowToRetry() {
+        let app = XCUIApplication.relente(extraArguments: [
+            "-sampleEmpty", "installers", "-sampleCatalogUnavailable", "YES",
+        ])
+        XCTAssertTrue(app.buttons["Download from Apple…"].waitForExistence(timeout: 5))
+        app.buttons["Download from Apple…"].click()
+        XCTAssertTrue(app.buttons["Try Again"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["Installer List Unavailable"].exists)
+        XCTAssertTrue(app.staticTexts["Relente couldn’t load Apple’s installer list. Try again."].exists)
+        XCTAssertFalse(app.staticTexts["Choose a full installer available for this Mac."].exists)
+    }
+
+    @MainActor
+    func testRecoveryOffersFinderWithoutMisleadingEmptyCatalog() {
+        let app = XCUIApplication.relente(extraArguments: [
+            "-sampleEmpty", "installers", "-sampleRecoveryRequired", "YES",
+        ])
+        XCTAssertTrue(app.buttons["Download from Apple…"].waitForExistence(timeout: 5))
+        app.buttons["Download from Apple…"].click()
+        XCTAssertTrue(app.buttons["Open Folder in Finder"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["No Full Installers Available"].exists)
+        XCTAssertTrue(app.staticTexts["Review the pending work before downloading."].exists)
+        XCTAssertTrue(
+            app.descendants(matching: .any)["Previous Download Needs Review"].exists
+        )
+        XCTAssertFalse(app.buttons["Continue"].isEnabled)
+        XCTAssertTrue(app.buttons["Back"].isEnabled)
+    }
+
+    @MainActor
     func testCompletedSampleBecomesSelectableBeforeTheUSBStep() {
         let app = XCUIApplication.relente(extraArguments: ["-sampleEmpty", "installers"])
         XCTAssertTrue(app.buttons["Download from Apple…"].waitForExistence(timeout: 5))

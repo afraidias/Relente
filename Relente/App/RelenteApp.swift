@@ -32,8 +32,16 @@ struct RelenteApp: App {
                     Task { await appDelegate.notifyDownloadCompleted() }
                 }
                 .onChange(of: assistant.downloadFailureID) {
-                    guard assistant.downloadFailureID != nil, !Self.usesSampleData else { return }
-                    Task { await appDelegate.notifyDownloadFailed() }
+                    guard assistant.downloadFailureID != nil, !Self.usesSampleData,
+                        let error = assistant.acquisitionError
+                    else { return }
+                    Task { await appDelegate.notifyAcquisitionError(error) }
+                }
+                .onChange(of: assistant.catalogErrorNotificationID) {
+                    guard assistant.catalogErrorNotificationID != nil, !Self.usesSampleData,
+                        let error = assistant.acquisitionError
+                    else { return }
+                    Task { await appDelegate.notifyAcquisitionError(error) }
                 }
                 .task {
                     assistant.prefetchAvailableInstallers()
@@ -48,9 +56,6 @@ struct RelenteApp: App {
             AssistantCommands(assistant: assistant, appDelegate: appDelegate)
         }
 
-        Window("Creation Log", id: "creation-output") {
-            CreationOutputWindow(lines: assistant.creationOutput)
-        }
         .defaultSize(width: 800, height: 520)
     }
 
@@ -91,7 +96,13 @@ struct RelenteApp: App {
     private static var acquisitionService: any InstallerAcquisitionService {
         guard usesSampleData else { return liveAcquisitionService }
         let delay = UserDefaults.standard.integer(forKey: "sampleDownloadDelayMilliseconds")
-        return SampleInstallerAcquisitionService(downloadDelay: .milliseconds(delay > 0 ? delay : 30))
+        let catalogError: InstallerAcquisitionError? =
+            UserDefaults.standard.bool(forKey: "sampleRecoveryRequired")
+            ? .recoveryRequired
+            : UserDefaults.standard.bool(forKey: "sampleCatalogUnavailable")
+                ? .catalogUnavailable : nil
+        return SampleInstallerAcquisitionService(
+            catalogError: catalogError, downloadDelay: .milliseconds(delay > 0 ? delay : 30))
     }
 
     private static var driveService: any DriveService {

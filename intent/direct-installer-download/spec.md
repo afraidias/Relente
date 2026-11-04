@@ -12,6 +12,32 @@ Intent: [intent.md](intent.md) — revision 1 accepted by the owner on 2026-11-0
 Converted from the [existing draft](https://github.com/afraidias/Relente/blob/92a1608cd0f20476b79dab44794b5f718e02292e/specs/012-direct-installer-download/spec.md)
 on 2026-11-02. This migration preserves proposed requirements, not evidence of implementation.
 
+## Revision 9 — proposed acquisition error and recovery presentation
+
+State: Accepted. Approved by Afraidias on 2026-11-03 — "Aprobar propuesta".
+
+Owner refinement, 2026-11-03: after reviewing the recovery prototype, show a visible centered
+recovery explanation and Finder action even when system notifications are unavailable. Explain
+that previous download files require review before another download, and that the user can return
+to choose a local installer. This supersedes the no-inline-error rule for the recovery state.
+Subsequent owner correction: make the header specific to recovery instead of asking the user to
+choose from an unavailable list. Use a native empty-state hierarchy and concise copy that does not
+claim which cleanup or process failed. Keep the Finder action and the existing Back navigation.
+Apply the same visible, actionable empty-state principle when the catalog itself fails to load:
+explain that the list is unavailable and offer a retry, without asserting a particular cause.
+
+- Distinguish catalog/network failure from local recovery blocking. When Relente detects pending
+  work or cannot prove cleanup, do not imply that Apple has no compatible installers or that the
+  catalog request failed; the catalog request is blocked before it is made.
+- Present acquisition errors through localized macOS system notifications, including catalog
+  failures and recovery-required state. Do not repeat the error message inline.
+- Keep the recovery action available in the Download screen: opening Relente's isolated installer
+  storage in Finder lets the owner inspect the pending work. The action does not clear the block;
+  only verified safe cleanup may do so. Keep local installer selection and USB workflow available
+  where their existing safety rules permit.
+- If notification authorization is denied, preserve actionable recovery access and expose the
+  error to VoiceOver without claiming it was delivered as a system notification.
+
 ## Revision 8 — accepted connected stages and terminal presentation
 
 The owner refined the details prototype on 2026-11-03: connect the four stage icons with a
@@ -507,3 +533,19 @@ from the 011 design (decision 10 in its source draft). This differs deliberately
 macOS arrow to make app click targets discoverable; native system dialogs retain native pointers.
 The current implementation port does not adopt the old system-cache/incomplete-installer trash
 capability or optimistic cancellation language. Recovery here concerns only app-owned operations.
+
+## Revision 10 — creation feedback without Activity
+
+State: Accepted. Approved by Afraidias on 2026-11-04 — "apruebo". Prototype: [creation-feedback.html](../../../.codex/visualizations/2026/11/04/01a1a606-3237-7161-95f1-063805582ffe/creation-feedback.html).
+
+Remove the Activity button, popover and separate creation-log window from the creation flow. Keep
+the user informed on the creation screen itself with a clear current phase, its SF Symbol, and an
+indeterminate animated progress indicator whenever the helper has not reported measurable
+progress. Show measured copied bytes only during Copy and only when the value is available. Show
+elapsed time as secondary information; omit guessed percentages, remaining time and “almost done”
+claims when macOS has not reported them. Present the four named phases—Prepare and erase, Copy,
+Make bootable and Verify—as a compact icon-and-label sequence, with the active phase highlighted.
+Use localized English and Spanish text, complete unclipped labels, accessible phase/status
+announcements and Reduce Motion behavior. Show actionable errors and terminal success directly in
+the main creation flow. This change does not alter the helper operation, authorization, installer
+source or creation boundaries.

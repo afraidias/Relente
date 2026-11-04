@@ -28,8 +28,7 @@ struct PhaseBar: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(accessibilityText)
+        .accessibilityElement(children: .contain)
     }
 
     // MARK: - Segment
@@ -70,12 +69,10 @@ struct PhaseBar: View {
             .frame(height: 6)
             .animation(reduceMotion ? nil : .smooth, value: fill(of: phase))
 
-            HStack(spacing: 4) {
-                if state == .finished {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(Theme.Colors.accent)
-                        .fontWeight(.bold)
-                }
+            HStack(spacing: 5) {
+                Image(systemName: phase.symbol)
+                    .foregroundStyle(state == .current ? Theme.Colors.accent : Theme.Colors.secondary)
+                    .accessibilityHidden(true)
                 Text(phase.name)
                     .fontWeight(state == .current ? .semibold : .regular)
                     .foregroundStyle(state == .current ? .primary : Theme.Colors.secondary)
@@ -83,6 +80,9 @@ struct PhaseBar: View {
                     .truncationMode(.tail)
             }
             .font(Theme.Fonts.footnote)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("\(phase.name), \(accessibilityStatus(for: state))"))
+            .accessibilityIdentifier("creation.phase.\(phase.identifier)")
         }
     }
 
@@ -124,36 +124,11 @@ struct PhaseBar: View {
         }
     }
 
-    // MARK: - Accessibility
-
-    /// "Phase 2 of 4, Copy", or "Stopped in phase 2 of 4, Copy".
-    private var accessibilityText: Text {
-        let number = currentIndex + 1
-        let total = phases.count
-        let name = Text(current.name)
-        return isFailed
-            ? Text(
-                "Stopped in phase \(number) of \(total), \(name)",
-                comment:
-                    "VoiceOver label of the phase bar after a failure. Values: phase number, total phases, phase name."
-            )
-            : Text(
-                "Phase \(number) of \(total), \(name)",
-                comment:
-                    "VoiceOver label of the phase bar. Values: phase number, total phases, phase name (e.g. Copy)."
-            )
+    private func accessibilityStatus(for state: SegmentState) -> LocalizedStringResource {
+        switch state {
+        case .finished: "Completed"
+        case .current: "In progress"
+        case .pending: "Pending"
+        }
     }
-}
-
-#Preview {
-    VStack(spacing: 28) {
-        PhaseBar(current: .format, currentFraction: 0.6)
-        PhaseBar(current: .copy, currentFraction: 0.43)
-        PhaseBar(current: .copy, currentFraction: 0, isIndeterminate: true)
-        PhaseBar(current: .makeBootable, currentFraction: 0)
-        PhaseBar(current: .verify, currentFraction: 0.5)
-        PhaseBar(current: .copy, currentFraction: 0.43, isFailed: true)
-    }
-    .frame(width: Theme.Sizes.contentWidth)
-    .padding(32)
 }

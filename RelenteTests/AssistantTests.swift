@@ -399,21 +399,17 @@ struct AssistantTests {
         #expect(assistant.selectedDriveID == big.id)
     }
 
-    @Test func `try again clears output from the failed creation`() async {
-        let output = CreationOutputLine(timestamp: Date(timeIntervalSince1970: 123), text: "Copying files…")
+    @Test func `try again returns to review after failed creation`() async {
         let failure = CreationFailure(reason: .cancelled, progress: copying)
         let assistant = makeAssistant(
-            service: StubCreationService(events: [.output(output), .failed(failure)]))
+            service: StubCreationService(events: [.failed(failure)]))
         await startCreating(assistant)
         await waitUntil { assistant.creation?.failure != nil }
         settle(assistant)
 
-        #expect(assistant.creationOutput == [output])
-
         assistant.tryAgain()
 
         #expect(assistant.step == .review)
-        #expect(assistant.creationOutput.isEmpty)
     }
 
     @Test(arguments: [CreationFailure.Reason.driveChanged, .driveNotAllowed, .driveDisconnected])

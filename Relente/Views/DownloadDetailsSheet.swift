@@ -6,6 +6,7 @@
 //  Design: intent/direct-installer-download/spec.md
 //
 
+import AppKit
 import SwiftUI
 
 struct DownloadDetailsSheet: View {
@@ -217,8 +218,11 @@ struct DownloadDetailsSheet: View {
 
     @ViewBuilder
     private var errorNotice: some View {
-        if isFailed, let error {
-            notice(title: Text("Download Failed"), message: Text(error.message))
+        if error == .recoveryRequired {
+            Button("Show Installer Storage in Finder") {
+                NSWorkspace.shared.open(InstallerArtifactStore().root)
+            }
+            .buttonStyle(.secondary)
         } else if let block {
             notice(title: Text("Download Unavailable"), message: Text(block.message))
         }

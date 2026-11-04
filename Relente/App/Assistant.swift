@@ -34,7 +34,6 @@ final class Assistant {
     /// The run shown on Creating (and Error), or `nil` before the first one.
     private(set) var creation: CreationState?
     /// Timestamped command output for the current Creating or Error screen, never persisted.
-    private(set) var creationOutput: [CreationOutputLine] = []
     /// What that run is making. Kept apart from the selection, which Start Over clears while
     /// Creating is still fading out.
     private(set) var creationInstaller: InstallerSource?
@@ -69,6 +68,7 @@ final class Assistant {
     private(set) var isLoadingAvailableInstallers = false
     private(set) var isShowingDownloadCancelled = false
     private(set) var downloadFailureID: UUID?
+    private(set) var catalogErrorNotificationID: UUID?
     private(set) var downloadCompletionID: UUID?
     private(set) var downloadTransfer: InstallerTransferProgress?
     private(set) var isDownloadingInstaller = false
@@ -377,6 +377,7 @@ final class Assistant {
             catalogLoadedSuccessfully = false
             selectedAvailableInstallerID = nil
             acquisitionError = error
+            catalogErrorNotificationID = UUID()
         }
     }
 
@@ -687,7 +688,6 @@ final class Assistant {
                 phase: .format, phaseFraction: nil, installerSize: installer.size,
                 isLive: creationService.simulation == nil,
                 isPreparingInstaller: creationService.simulation == nil))
-        creationOutput = []
         creationInstaller = installer
         creationDrive = drive
         result = nil
@@ -700,13 +700,12 @@ final class Assistant {
                 switch event {
                 case .progress(let progress):
                     creation = .running(progress)
-                case .output(let line):
-                    creationOutput.append(line)
+                case .output:
+                    break
                 case .finished:
                     // The drive as it is now: the format gave it a new id.
                     result = CreationResult(
                         installer: installer, drive: creationDrive ?? drive, duration: start.duration(to: .now))
-                    creationOutput = []
                     creationTask = nil
                     change(to: .done, .forward, .crossfade, byUser: false)
                 case .failed(let failure):
@@ -735,7 +734,6 @@ final class Assistant {
     /// again, even if it's connected again.
     func tryAgain() {
         guard step == .creating, let failure = creation?.failure else { return }
-        creationOutput = []
         if failure.reason.sendsBackToDriveScreen {
             selectedDriveID = nil
         }
@@ -793,7 +791,6 @@ final class Assistant {
     /// Back to the Installer screen, keeping the installer and forgetting the drive.
     private func restart() {
         guard !isChangingScreen else { return }
-        creationOutput = []
         selectedDriveID = nil
         change(to: .installer, .back, .crossfade)
     }

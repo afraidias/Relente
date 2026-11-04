@@ -342,7 +342,7 @@ struct AssistantView: View {
                 let creation = assistant.creation
             {
                 CreatingView(
-                    installer: installer, drive: drive, state: creation, output: assistant.creationOutput,
+                    installer: installer, drive: drive, state: creation,
                     simulation: assistant.simulation,
                     onOpenFullDiskAccessSettings: assistant.openFullDiskAccessSettings)
             }

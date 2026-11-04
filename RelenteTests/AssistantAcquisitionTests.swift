@@ -5,6 +5,21 @@ import Testing
 
 @MainActor
 struct AssistantAcquisitionTests {
+    private actor FailedCatalogAcquisition: InstallerAcquisitionService {
+        private(set) var requestCount = 0
+
+        func availableInstallers() async throws(InstallerAcquisitionError) -> [AvailableInstaller] {
+            requestCount += 1
+            throw .recoveryRequired
+        }
+
+        func download(_ installer: AvailableInstaller) async -> AsyncStream<InstallerAcquisitionEvent> {
+            AsyncStream { $0.finish() }
+        }
+
+        func cancelDownload() async {}
+    }
+
     private actor ControlledAcquisition: InstallerAcquisitionService {
         let installer = AvailableInstaller(title: "macOS Ventura", version: "13.7.8", build: "22H730")
         private var events: AsyncStream<InstallerAcquisitionEvent>.Continuation?
@@ -80,5 +95,26 @@ struct AssistantAcquisitionTests {
         #expect(!model.isDownloadingInstaller)
         #expect(model.downloadCompletionID != nil)
         #expect(!model.isShowingDownloadCancelled)
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func catalogRecoveryFailureNotifiesAndCanBeRetried() async throws {
+        let service = FailedCatalogAcquisition()
+        let model = Assistant(installers: [], drives: [], acquisitionService: service)
+        model.showDownload()
+        let deadline = ContinuousClock.now.advanced(by: .seconds(5))
+        while model.catalogErrorNotificationID == nil && ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        let firstNotification = try #require(model.catalogErrorNotificationID)
+        #expect(model.acquisitionError == .recoveryRequired)
+        #expect(await service.requestCount == 1)
+
+        model.retryAvailableInstallers()
+        while model.catalogErrorNotificationID == firstNotification && ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(model.catalogErrorNotificationID != firstNotification)
+        #expect(await service.requestCount == 2)
     }
 }

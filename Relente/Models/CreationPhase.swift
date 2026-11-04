@@ -26,6 +26,24 @@ nonisolated enum CreationPhase: CaseIterable, Hashable, Sendable {
         }
     }
 
+    var identifier: String {
+        switch self {
+        case .format: "format"
+        case .copy: "copy"
+        case .makeBootable: "makeBootable"
+        case .verify: "verify"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .format: "externaldrive.fill"
+        case .copy: "doc.on.doc.fill"
+        case .makeBootable: "bolt.fill"
+        case .verify: "checkmark.shield.fill"
+        }
+    }
+
     /// Name shown under the phase bar.
     var name: LocalizedStringResource {
         switch self {
