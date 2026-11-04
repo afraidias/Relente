@@ -15,7 +15,7 @@ Relente is a native Mac app that creates a bootable USB drive from a macOS insta
 It is written in Swift and SwiftUI, and only works with macOS installers and removable drives (USB drives and SD cards). Internal disks and external SSDs or hard drives are never offered as a destination.
 
 > [!WARNING]
-> Relente is in early development and is **not usable yet**. When it is, it will **erase** the drive you choose. Always double-check the drive before confirming.
+> Relente is in early development and will **erase** the drive you choose. Always double-check the drive before confirming.
 
 ## Get started
 
@@ -30,17 +30,18 @@ It is written in Swift and SwiftUI, and only works with macOS installers and rem
 
 ### Install
 
-There are no releases yet. Signed and notarized builds will be published on the [Releases](../../releases) page.
+[Version 0.11.0](https://github.com/afraidias/Relente/releases/tag/v0.11.0) is published.
+Recorded validation and its limitations are described in [release readiness](docs/release-readiness.md).
 
 To build it yourself, see [BUILDING.md](BUILDING.md).
 
 ### Create a bootable USB drive
 
 1. Open Relente and approve its system helper when macOS asks. For live USB creation, enable Relente in **System Settings → Privacy & Security → Full Disk Access** and allow its helper under **General → Login Items**. You can browse installers and choose a USB before enabling Full Disk Access; Relente checks write access before starting an erase.
-2. **Installer:** choose one of the macOS installers found on your Mac. The direct Apple download flow is under validation; see [download status](docs/product.md#download-status).
+2. **Installer:** choose a local macOS installer or download a compatible installer from Apple; see [download status](docs/product.md#download-status).
 3. **USB drive:** choose the drive to use. Drives that are too small are marked.
 4. **Review:** check what will be erased, confirm, and authorize the erase with Touch ID when available or your administrator password otherwise.
-5. **Creating:** Relente asks its helper to run Apple's signed `createinstallmedia`, shows available progress and elapsed time, and verifies the resulting installer volume before marking it ready. Activity offers a compact history and technical output. The command erases the selected drive.
+5. **Creating:** Relente asks its helper to run Apple's signed `createinstallmedia`, shows available progress and elapsed time, and verifies the resulting installer volume before marking it ready. The creation screen shows the current phase; copied bytes appear when measured. The command erases the selected drive.
 
 When it's done, the app explains how to start up from the drive on a Mac with Apple silicon or with an Intel processor. Apple's guide [Create a bootable installer for macOS](https://support.apple.com/en-us/101578) covers the same steps from the command line.
 
@@ -64,21 +65,10 @@ This is a personal project and **pull requests aren't accepted for now**. Bug re
 
 ## Project status
 
-Early development. Roadmap:
-
-1. [x] Project setup
-2. [x] Folder structure and design system
-3. [x] Static screens with sample data: Installer, USB drive, Review, Creating, Error and Done
-4. [x] Assistant navigation and animations
-5. [x] Real disk and installer detection
-6. [x] System helper, XPC and security checks (includes the Permissions screen)
-7. [ ] `createinstallmedia` with live progress — implementation present; remaining validation and follow-up are in [release readiness](docs/release-readiness.md)
-8. [ ] Signing, notarization, Authorization Services compatibility across supported Macs, and first release
-9. [ ] Download installers from Apple (Download screen)
+Relente is in early development. See [release readiness](docs/release-readiness.md) for recorded validation and remaining follow-up.
 
 Relente follows an [AI-native software development lifecycle](docs/development.md). Change artifacts live in [`intent/`](intent/), and project rules are in [AGENTS.md](AGENTS.md).
 
-Before distribution, complete the [release readiness checklist](docs/release-readiness.md).
 
 ## License
 

@@ -85,7 +85,7 @@ The app version lives in `Config/Version.xcconfig` (`MARKETING_VERSION` and `CUR
 
 Releases are managed by [release-please](https://github.com/googleapis/release-please): on every push to `main` it opens or updates a release pull request with the next version (based on the Conventional Commits since the last release) and the `CHANGELOG.md`. Merging that pull request creates the `vX.Y.Z` tag and the GitHub release.
 
-release-please only updates `MARKETING_VERSION`. The build number (`CURRENT_PROJECT_VERSION`) stays at `1` and isn't bumped by hand; it will be automated before the first signed build is distributed (roadmap step 8).
+release-please only updates `MARKETING_VERSION`. The build number (`CURRENT_PROJECT_VERSION`) stays at `1` and isn't bumped by hand; it will be automated before the first signed build is distributed.
 
 ## Build from the command line
 
