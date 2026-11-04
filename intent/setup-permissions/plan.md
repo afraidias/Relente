@@ -4,7 +4,7 @@
 - State: Accepted
 - Implementation: In progress
 - Issue: N/A — owner-led screen review
-- PR: Pending
+- PR: [#52](https://github.com/afraidias/Relente/pull/52) (draft)
 - Approval: Owner, 2026-11-04, revision 1; conversation: “acepto” in response to the explicit plan acceptance request.
 - Intent: [Accepted revision 1](intent.md)
 - Design: [Accepted revision 2](spec.md)
@@ -43,3 +43,5 @@ The owner requested restoring the original icon and halo, equal callout widths, 
 - Debug unit suite passed after the final change; focused UI tests for the setup flow and simulated failure/retry passed (the latter preceded the final retry-icon adjustment). Release compile and strict full-scope swift-format lint passed after the final change. `git diff --check` passed.
 - Accessibility tree exposes both settings and primary buttons; a manual Tab attempt did not establish full keyboard navigation. VoiceOver, Accessibility Inspector, Reduce Motion and actual settings destinations remain unverified. Do not claim these checks passed or request integration until resolved or the owner accepts a deferral.
 - The owner chose to omit the erase-authorization explanation from this screen. Design revision 2 records that decision; erase authorization remains unchanged.
+
+- Draft PR #52 was opened for review with the manual checks above still pending; it is not a request to merge.
