@@ -51,11 +51,15 @@ The owner requested restoring the original icon and halo, equal callout widths, 
 - In English light appearance, initial and failure screens fit in the window. The test also ran with Reduce Motion enabled. In a separate slow-registration simulation, the spinner was found to animate with Reduce Motion; it was corrected and manually verified as static. Appearance and Reduce Motion settings were restored.
 - With keyboard navigation enabled, Tab focused both actions. The original keyboard setting was restored. The Full Disk Access button opened the expected System Settings page; no permission was changed.
 - `performAccessibilityAudit()` failed on an unnamed group encompassing the window. The same audit against an isolated `origin/main` archive failed with the same message and a full-window element capture. The warning remains unresolved; no audit exception was added. Details and reproduction are in [accessibility-audit.md](accessibility-audit.md).
-- VoiceOver automated activation timed out. A second attempt while it was manually active was rejected by automatic approval review over the risk of leaving VoiceOver active; VoiceOver was restored to off. Spoken output and status announcements remain unverified.
-- Still pending: manual VoiceOver validation, resolving or separately accepting the pre-existing audit warning, visual inspection of the revoked-helper state, and verifying Login Items navigation on supported systems. The PR remains draft.
+- VoiceOver automated activation timed out. A second attempt while it was manually active was rejected by automatic approval review over the risk of leaving VoiceOver active; VoiceOver was restored to off. Spoken output and status announcements were not verified by that automated attempt; see the later owner review below.
+- At that point pending: manual VoiceOver validation, the pre-existing audit warning, the revoked-helper state and Login Items navigation; see subsequent checks below. The PR remains draft.
 
 ### Further checks
 
 - A simulated revocation returned to setup, retained the selection and exposed the settings action; the focused UI test passed and the owner-visible Spanish dark state was inspected.
 - The Login Items action opened the expected settings page on macOS 27.2 without changing any setting. Its visible Spanish section label was “Actividad de apps en segundo plano”; the Spanish copy was aligned to it. Other supported versions remain unverified.
 - Re-ran the focused revocation UI test after adding an opt-in simulated route to the real Login Items settings entry point; it passed. Full Debug unit tests, Release compile, strict lint and diff checks passed after these changes. No real helper or system permission was modified. macOS 26 remains unverified on this host.
+
+### Owner VoiceOver review
+
+The owner reported that VoiceOver read the title, both callouts and both buttons on the initial screen and, in response to a follow-up, that both installation-start and helper-ready changes were announced. VoiceOver was restored to off. This is owner-reported evidence, not a passing automated audit; the unnamed window-group warning remains unresolved.
