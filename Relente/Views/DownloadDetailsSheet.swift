@@ -162,7 +162,7 @@ struct DownloadDetailsSheet: View {
         } else if isDownloading {
             ProgressRing(
                 fraction: progress ?? 0,
-                label: Text("Download progress") + Text(verbatim: ", ") + progressValue,
+                label: Text("Download progress, \(progressValue)"),
                 value: Text(verbatim: ""),
                 diameter: 176,
                 lineWidth: 5
@@ -266,7 +266,7 @@ struct DownloadDetailsSheet: View {
     private var progressValue: Text {
         let value = progress.map { Text($0, format: .percent.precision(.fractionLength(0))) } ?? Text(stage.title)
         guard let bytes = downloadedBytes else { return value }
-        return value + Text(verbatim: ", ") + bytes
+        return Text("\(value), \(bytes)")
     }
 
     private var stages: some View {
