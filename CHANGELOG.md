@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.11.0](https://github.com/afraidias/Relente/compare/v0.10.0...v0.11.0) (2026-11-04)
+
+
+### Features
+
+* **download:** acquire installers with clear creation feedback ([#47](https://github.com/afraidias/Relente/issues/47)) ([cff04a2](https://github.com/afraidias/Relente/commit/cff04a2f51488be6693fb438e88827e2e2cbfcfc))
+
+
+### Documentation
+
+* migrate Relente to the AI-native SDLC ([#45](https://github.com/afraidias/Relente/issues/45)) ([20d5d23](https://github.com/afraidias/Relente/commit/20d5d23daf4aab27c643a25ba3d1f2de6e90ebeb))
+
 ## [0.10.0](https://github.com/afraidias/Relente/compare/v0.9.0...v0.10.0) (2026-10-28)
 
 
