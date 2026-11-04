@@ -69,37 +69,40 @@ final class RelenteAppDelegate: NSObject, NSApplicationDelegate, UNUserNotificat
             NSApp.terminate(nil)
             return
         }
+        let alert = makeQuitConfirmation()
+        guard let window = NSApp.keyWindow else { return }
+        alert.beginSheetModal(for: window) { [weak self] response in
+            guard response == .alertSecondButtonReturn, let self else { return }
+            self.isCancellingForQuit = true
+            Task {
+                guard await assistant.prepareForTermination() else {
+                    self.isCancellingForQuit = false
+                    return
+                }
+                await self.notifyQuitCancellation()
+                NotificationCenter.default.post(name: Self.dismissDownloadSheets, object: nil)
+                while NSApp.windows.contains(where: { $0.attachedSheet != nil }) {
+                    try? await Task.sleep(for: .milliseconds(100))
+                }
+                NSApp.terminate(nil)
+            }
+        }
+    }
+
+    private func makeQuitConfirmation() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = String(localized: "Installer Acquisition in Progress")
         alert.informativeText = String(
             localized: "Keep waiting, or cancel and wait for incomplete work to be cleaned up before quitting.")
         alert.addButton(withTitle: String(localized: "Keep Waiting"))
         alert.addButton(withTitle: String(localized: "Cancel Download and Quit"))
-        guard alert.runModal() == .alertSecondButtonReturn else { return }
-        isCancellingForQuit = true
-        Task {
-            guard await assistant.prepareForTermination() else {
-                isCancellingForQuit = false
-                return
-            }
-            await notifyQuitCancellation()
-            NotificationCenter.default.post(name: Self.dismissDownloadSheets, object: nil)
-            while NSApp.windows.contains(where: { $0.attachedSheet != nil }) {
-                try? await Task.sleep(for: .milliseconds(100))
-            }
-            NSApp.terminate(nil)
-        }
+        return alert
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard let assistant else { return .terminateNow }
         if assistant.isDownloadingInstaller {
-            let alert = NSAlert()
-            alert.messageText = String(localized: "Installer Acquisition in Progress")
-            alert.informativeText = String(
-                localized: "Keep waiting, or cancel and wait for incomplete work to be cleaned up before quitting.")
-            alert.addButton(withTitle: String(localized: "Keep Waiting"))
-            alert.addButton(withTitle: String(localized: "Cancel Download and Quit"))
+            let alert = makeQuitConfirmation()
             guard alert.runModal() == .alertSecondButtonReturn else { return .terminateCancel }
         } else if !assistant.isLoadingAvailableInstallers {
             return .terminateNow
