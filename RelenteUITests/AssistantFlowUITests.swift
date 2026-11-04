@@ -70,6 +70,15 @@ final class AssistantFlowUITests: XCTestCase {
     }
 
     @MainActor
+    func testHelperRegistrationShowsInstallingState() {
+        app = .relente(extraArguments: ["-sampleHelper", "slowRegistration"])
+        expectScreen("Set Up Relente")
+        app.buttons["Install Helper"].click()
+        XCTAssertTrue(app.element("Installing helper…").waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Continue"].exists)
+    }
+
+    @MainActor
     func testHelperRegistrationFailureCanBeRetried() {
         app = .relente(extraArguments: ["-sampleHelper", "registrationFailure"])
         expectScreen("Set Up Relente")

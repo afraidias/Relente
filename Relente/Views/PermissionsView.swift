@@ -132,6 +132,7 @@ struct PermissionsFooter: View {
     let onInstall: () -> Void
     let onOpenSettings: () -> Void
     let onContinue: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         AssistantFooter(for: .permissions) {
@@ -156,7 +157,9 @@ struct PermissionsFooter: View {
         Button(action: onInstall) {
             if isInstalling {
                 HStack(spacing: 8) {
-                    ProgressView().controlSize(.small)
+                    if !reduceMotion {
+                        ProgressView().controlSize(.small)
+                    }
                     Text(progressTitle)
                 }
             } else {

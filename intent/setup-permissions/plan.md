@@ -45,3 +45,11 @@ The owner requested restoring the original icon and halo, equal callout widths, 
 - The owner chose to omit the erase-authorization explanation from this screen. Design revision 2 records that decision; erase authorization remains unchanged.
 
 - Draft PR #52 was opened for review with the manual checks above still pending; it is not a request to merge.
+
+### Follow-up checks — 2026-11-04
+
+- In English light appearance, initial and failure screens fit in the window. The test also ran with Reduce Motion enabled. In a separate slow-registration simulation, the spinner was found to animate with Reduce Motion; it was corrected and manually verified as static. Appearance and Reduce Motion settings were restored.
+- With keyboard navigation enabled, Tab focused both actions. The original keyboard setting was restored. The Full Disk Access button opened the expected System Settings page; no permission was changed.
+- `performAccessibilityAudit()` failed on an unnamed group encompassing the window. The same audit against an isolated `origin/main` archive failed with the same message and a full-window element capture. The warning remains unresolved; no audit exception was added. Details and reproduction are in [accessibility-audit.md](accessibility-audit.md).
+- VoiceOver automated activation timed out. A second attempt while it was manually active was rejected by automatic approval review over the risk of leaving VoiceOver active; VoiceOver was restored to off. Spoken output and status announcements remain unverified.
+- Still pending: manual VoiceOver validation, resolving or separately accepting the pre-existing audit warning, visual inspection of the revoked-helper state, and verifying Login Items navigation on supported systems. The PR remains draft.

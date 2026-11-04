@@ -124,6 +124,8 @@ struct RelenteApp: App {
             switch UserDefaults.standard.string(forKey: "sampleHelper") {
             case "notInstalled":
                 return SampleHelperService(status: .notInstalled)
+            case "slowRegistration":
+                return SampleHelperService(status: .notInstalled, registrationDelay: .seconds(15))
             case "registrationFailure":
                 return SampleHelperService(
                     status: .notInstalled, registerError: .registrationFailed(reason: nil))

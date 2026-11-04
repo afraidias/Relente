@@ -13,16 +13,18 @@ import os
 nonisolated final class SampleHelperService: HelperService {
     /// How long until a registration is approved by itself, or `nil` to wait for `approve()`.
     private let approvalDelay: Duration?
+    private let registrationDelay: Duration?
     private let registerError: HelperError?
     private let unregisterError: HelperError?
     private let state: OSAllocatedUnfairLock<HelperStatus>
 
     init(
         status: HelperStatus = .ready, approvalDelay: Duration? = .seconds(1), registerError: HelperError? = nil,
-        unregisterError: HelperError? = nil
+        unregisterError: HelperError? = nil, registrationDelay: Duration? = nil
     ) {
         state = OSAllocatedUnfairLock(initialState: status)
         self.approvalDelay = approvalDelay
+        self.registrationDelay = registrationDelay
         self.registerError = registerError
         self.unregisterError = unregisterError
     }
@@ -32,6 +34,7 @@ nonisolated final class SampleHelperService: HelperService {
     }
 
     func register() async throws(HelperError) {
+        if let registrationDelay { try? await Task.sleep(for: registrationDelay) }
         if let registerError { throw registerError }
         state.withLock { $0 = .needsApproval }
         guard let approvalDelay else { return }
