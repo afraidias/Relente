@@ -454,17 +454,6 @@
         }
       }
     },
-    "Cancelling download" : {
-      "comment" : "Accessible label while Relente waits for an installer download to stop.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancelando la descarga"
-          }
-        }
-      }
-    },
     "Check it's the right drive and choose it again." : {
       "comment" : "Error screen: what to do when the drive changed after confirming it.",
       "localizations" : {

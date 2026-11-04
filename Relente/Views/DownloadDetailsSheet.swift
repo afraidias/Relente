@@ -102,7 +102,6 @@ struct DownloadDetailsSheet: View {
                         .foregroundStyle(Theme.Colors.secondary)
                     }
 
-                    status
                     stages
                 }
                 .fixedSize(horizontal: true, vertical: false)
@@ -162,7 +161,7 @@ struct DownloadDetailsSheet: View {
         } else if isDownloading {
             ProgressRing(
                 fraction: progress ?? 0,
-                label: Text("Download progress, \(progressValue)"),
+                label: isCancelling ? Text("Download progress") : Text("Download progress, \(progressValue)"),
                 value: Text(verbatim: ""),
                 diameter: 176,
                 lineWidth: 5
@@ -184,7 +183,7 @@ struct DownloadDetailsSheet: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     }
-                    if let bytes = downloadedBytes {
+                    if !isCancelling, let bytes = downloadedBytes {
                         bytes
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(Theme.Colors.secondary)
@@ -205,15 +204,6 @@ struct DownloadDetailsSheet: View {
             insertion: .opacity.combined(with: .scale(scale: 0.94)),
             removal: .opacity.combined(with: .scale(scale: 0.98))
         )
-    }
-
-    @ViewBuilder
-    private var status: some View {
-        if isCancelling {
-            Text("Cancelling download")
-                .font(.callout)
-                .foregroundStyle(Theme.Colors.secondary)
-        }
     }
 
     @ViewBuilder

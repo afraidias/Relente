@@ -104,6 +104,7 @@ final class InstallerAcquisitionUITests: XCTestCase {
         let app = XCUIApplication.relente(extraArguments: [
             "-sampleEmpty", "installers",
             "-sampleDownloadDelayMilliseconds", "60000",
+            "-sampleCancellationDelayMilliseconds", "3000",
         ])
         let window = app.windows.firstMatch
         XCTAssertTrue(window.buttons["Download from Apple…"].waitForExistence(timeout: 5))
@@ -145,6 +146,18 @@ final class InstallerAcquisitionUITests: XCTestCase {
         cancel.click()
         XCTAssertTrue(alert.waitForExistence(timeout: 5))
         alert.buttons["Cancel Download"].click()
+        XCTAssertTrue(cancel.waitForExistence(timeout: 5))
+        XCTAssertFalse(cancel.isEnabled)
+        XCTAssertTrue(sheet.descendants(matching: .any)["Download progress"].exists)
+        XCTAssertFalse(
+            sheet.descendants(matching: .any).matching(
+                NSPredicate(format: "label CONTAINS %@", "4.2 GB")
+            ).firstMatch.exists)
+        XCTAssertFalse(sheet.staticTexts["Cancelling download"].exists)
+        let cancellingScreenshot = XCTAttachment(screenshot: window.screenshot())
+        cancellingScreenshot.name = "Cancelling download"
+        cancellingScreenshot.lifetime = .keepAlways
+        add(cancellingScreenshot)
         XCTAssertTrue(cancel.waitForNonExistence(timeout: 5))
         XCTAssertTrue(window.sheets.buttons["Retry Download"].exists)
         XCTAssertTrue(window.sheets.firstMatch.descendants(matching: .any)["Download cancelled"].exists)
