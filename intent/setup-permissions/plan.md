@@ -2,9 +2,9 @@
 
 - Revision: 1
 - State: Accepted
-- Implementation: In progress
+- Implementation: Verified
 - Issue: N/A — owner-led screen review
-- PR: [#52](https://github.com/afraidias/Relente/pull/52) (draft)
+- PR: [#52](https://github.com/afraidias/Relente/pull/52)
 - Approval: Owner, 2026-11-04, revision 1; conversation: “acepto” in response to the explicit plan acceptance request.
 - Intent: [Accepted revision 1](intent.md)
 - Design: [Accepted revision 2](spec.md)
@@ -23,7 +23,7 @@ Task 2 follows the baseline; task 3 depends on the presentation and state mappin
 
 ## Execution evidence
 
-Not started. Baseline Debug build on main `c548e5e` succeeded with configured signing for visual inspection; no tests or accessibility checks are claimed. Branch `design/setup-permissions` is published; worktree `/private/tmp/relente-setup-permissions`. Draft artifacts are uncommitted. The language selector is deferred to issue #51.
+Baseline Debug build on main `c548e5e` succeeded with configured signing for visual inspection; no tests or accessibility checks are claimed. Branch `design/setup-permissions` is published; worktree `/private/tmp/relente-setup-permissions`. Draft artifacts are uncommitted. The language selector is deferred to issue #51.
 
 ### Progress — 2026-11-04
 
@@ -63,3 +63,9 @@ The owner requested restoring the original icon and halo, equal callout widths, 
 ### Owner VoiceOver review
 
 The owner reported that VoiceOver read the title, both callouts and both buttons on the initial screen and, in response to a follow-up, that both installation-start and helper-ready changes were announced. VoiceOver was restored to off. This is owner-reported evidence, not a passing automated audit; the unnamed window-group warning remains unresolved.
+
+### Accepted follow-up and review
+
+On 2026-11-04, the owner accepted recording the pre-existing unnamed-window-group audit warning and the unavailable macOS 26 verification as follow-up (“acepto” in response to the explicit request). Both are tracked in [#53](https://github.com/afraidias/Relente/issues/53). No merge or release was authorized. Current-host manual and automated evidence remains as recorded above.
+
+The implementation session reviewed the diff against the accepted artifacts and helper security invariants; this is self-review, not independent review. As a mutation check, removing the new `helperTurnedOff` reset caused `AssistantHelperTests.once ready again, Continue goes to Installer with the choices kept` to fail; the implementation was restored immediately and the focused helper tests passed again. CI for `c1cfcea` passed build and tests, lint and title checks before this documentation-only update.

@@ -48,3 +48,7 @@ Apple's [privacy guidance](https://developer.apple.com/design/human-interface-gu
 These strings are working copy; confirm system terminology and final layout before implementation. No HIG exception has been identified at this stage.
 
 The observed Spanish label on macOS 27.2 is “Actividad de apps en segundo plano”; the settings button opened that page without changing a permission. Other supported versions remain to be checked.
+
+## Owner-accepted follow-up
+
+On 2026-11-04, the owner explicitly accepted deferring investigation of the pre-existing unnamed window-group audit warning and validation of System Settings destinations on macOS 26, and agreed to track both in [#53](https://github.com/afraidias/Relente/issues/53) (“acepto” in response to the proposed follow-up). This does not establish that the warning is harmless or authorize merging or release publication.
