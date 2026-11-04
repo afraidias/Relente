@@ -101,8 +101,11 @@ struct RelenteApp: App {
             ? .recoveryRequired
             : UserDefaults.standard.bool(forKey: "sampleCatalogUnavailable")
                 ? .catalogUnavailable : nil
+        let downloadError: InstallerAcquisitionError? =
+            UserDefaults.standard.bool(forKey: "sampleDownloadFailure") ? .downloadSizeUnexpected : nil
         return SampleInstallerAcquisitionService(
-            catalogError: catalogError, downloadDelay: .milliseconds(delay > 0 ? delay : 30))
+            catalogError: catalogError, downloadError: downloadError,
+            downloadDelay: .milliseconds(delay > 0 ? delay : 30))
     }
 
     private static var driveService: any DriveService {

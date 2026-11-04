@@ -150,6 +150,16 @@
         }
       }
     },
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
     "%@, on %@" : {
       "comment" : "VoiceOver, Done screen drive. First value: its new name; second: the drive, e.g. SanDisk Ultra.",
       "localizations" : {
@@ -258,6 +268,7 @@
       }
     },
     "Activity" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -341,6 +352,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se ha podido cargar la lista de instaladores de Apple."
+          }
+        }
+      }
+    },
+    "Apple’s server couldn’t provide the installer. Try again later." : {
+      "comment" : "Safe explanation for a rejected installer response.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor de Apple no pudo proporcionar el instalador. Inténtalo más tarde."
           }
         }
       }
@@ -465,7 +487,9 @@
         }
       }
     },
-    "Checking USB Access…" : {},
+    "Checking USB Access…" : {
+
+    },
     "Choose a full installer available for this Mac." : {
       "comment" : "Subtitle of the Download screen; availability applies to this Mac.",
       "localizations" : {
@@ -473,6 +497,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elige un instalador completo disponible para este Mac."
+          }
+        }
+      }
+    },
+    "Choose a local installer or try again later." : {
+      "comment" : "Empty state description when Apple successfully returns no compatible full installers.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un instalador local o inténtalo de nuevo más tarde."
           }
         }
       }
@@ -684,6 +719,7 @@
       }
     },
     "Creation Log" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -763,7 +799,6 @@
     },
     "Download Failed" : {
       "comment" : "Title in the download details sheet warning when the installer download fails.",
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1016,6 +1051,7 @@
     },
     "Formatting the USB drive" : {
       "comment" : "VoiceOver label of the single progress bar shown while the USB is being erased and formatted.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1155,6 +1191,16 @@
         }
       }
     },
+    "Installer List Unavailable" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista de instaladores no disponible"
+          }
+        }
+      }
+    },
     "Installer preparation needs recovery." : {
       "comment" : "Error screen: helper preparation could not confirm safe cleanup.",
       "localizations" : {
@@ -1168,6 +1214,7 @@
     },
     "Installer preparation stopped" : {
       "comment" : "VoiceOver label for the progress indicator when installer validation or preparation fails.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1199,6 +1246,7 @@
       }
     },
     "Installer Recovery Needed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1286,6 +1334,7 @@
       }
     },
     "Keep Relente Open" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1360,7 +1409,9 @@
         }
       }
     },
-    "macOS" : {},
+    "macOS" : {
+
+    },
     "macOS %@" : {
       "comment" : "Accessible label for an ambiguous installer option.",
       "localizations" : {
@@ -1452,6 +1503,7 @@
     },
     "Measuring installer image…" : {
       "comment" : "Creating screen fallback while waiting for a measurable installer image size.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1595,6 +1647,16 @@
         }
       }
     },
+    "Open Folder in Finder" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir carpeta en el Finder"
+          }
+        }
+      }
+    },
     "Open Full Disk Access Settings…" : {
       "localizations" : {
         "es" : {
@@ -1637,6 +1699,17 @@
         }
       }
     },
+    "Open the download details to see progress or cancel." : {
+      "comment" : "VoiceOver hint for an active installer card; cancellation is available only in its details sheet.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre los detalles de la descarga para ver el progreso o cancelarla."
+          }
+        }
+      }
+    },
     "Pending" : {
       "localizations" : {
         "es" : {
@@ -1660,6 +1733,7 @@
     },
     "Phase %lld of %lld, %@" : {
       "comment" : "VoiceOver label of the phase bar. Values: phase number, total phases, phase name (e.g. Copy).",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1734,6 +1808,16 @@
         }
       }
     },
+    "Previous Download Needs Review" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa la descarga anterior"
+          }
+        }
+      }
+    },
     "Quit Relente" : {
       "localizations" : {
         "es" : {
@@ -1778,6 +1862,7 @@
       }
     },
     "Relente cannot confirm that its incomplete work is safely stopped and cleaned up. Keep the app open and review the recovery details." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1821,6 +1906,26 @@
         }
       }
     },
+    "Relente couldn’t confirm that the previous work finished safely." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relente no ha podido confirmar que el trabajo anterior haya terminado de forma segura."
+          }
+        }
+      }
+    },
+    "Relente couldn’t load Apple’s installer list. Try again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relente no ha podido cargar la lista de instaladores de Apple. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
     "Relente needs a small system helper to erase drives. You only do this once." : {
       "comment" : "Permissions: subtitle.",
       "extractionState" : "stale",
@@ -1857,6 +1962,7 @@
     },
     "REMAINING" : {
       "comment" : "Creating screen figure: estimated time left.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1895,6 +2001,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Revisar y crear"
+          }
+        }
+      }
+    },
+    "Review the pending work before downloading." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa el trabajo pendiente antes de descargar."
           }
         }
       }
@@ -2088,6 +2204,7 @@
     },
     "Stopped in phase %lld of %lld, %@" : {
       "comment" : "VoiceOver label of the phase bar after a failure. Values: phase number, total phases, phase name.",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2132,6 +2249,7 @@
       }
     },
     "Technical messages reported by macOS while creating the installer." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2268,6 +2386,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se ha cancelado la descarga del instalador y se ha eliminado el trabajo incompleto."
+          }
+        }
+      }
+    },
+    "The installer download was incomplete or had an unexpected size. Try again." : {
+      "comment" : "Safe explanation for installer size mismatch.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La descarga estaba incompleta o tenía un tamaño inesperado. Vuelve a intentarlo."
+          }
+        }
+      }
+    },
+    "The installer download was redirected to an untrusted destination. Try again later." : {
+      "comment" : "Safe explanation for a blocked installer redirect.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La descarga se redirigió a un destino no confiable. Inténtalo más tarde."
+          }
+        }
+      }
+    },
+    "The network connection was interrupted. Check your connection and try again." : {
+      "comment" : "Safe explanation for an interrupted installer download.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La conexión de red se interrumpió. Comprueba la conexión y vuelve a intentarlo."
           }
         }
       }
@@ -2475,6 +2626,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Intenta descargar de nuevo esta versión de macOS."
+          }
+        }
+      }
+    },
+    "Try loading the list again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intenta cargar la lista de nuevo."
           }
         }
       }
@@ -2700,11 +2861,22 @@
       }
     },
     "Waiting for macOS activity…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esperando la actividad de macOS…"
+          }
+        }
+      }
+    },
+    "Waiting…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando…"
           }
         }
       }
@@ -2782,108 +2954,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Has detenido el proceso."
-          }
-        }
-      }
-    },
-    "Open the download details to see progress or cancel." : {
-      "comment" : "VoiceOver hint for an active installer card; cancellation is available only in its details sheet.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abre los detalles de la descarga para ver el progreso o cancelarla."
-          }
-        }
-      }
-    },
-    "Choose a local installer or try again later." : {
-      "comment" : "Empty state description when Apple successfully returns no compatible full installers.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige un instalador local o inténtalo de nuevo más tarde."
-          }
-        }
-      }
-    },
-    "Installer List Unavailable" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lista de instaladores no disponible"
-          }
-        }
-      }
-    },
-    "Open Folder in Finder" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir carpeta en el Finder"
-          }
-        }
-      }
-    },
-    "Previous Download Needs Review" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa la descarga anterior"
-          }
-        }
-      }
-    },
-    "Relente couldn’t confirm that the previous work finished safely." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Relente no ha podido confirmar que el trabajo anterior haya terminado de forma segura."
-          }
-        }
-      }
-    },
-    "Relente couldn’t load Apple’s installer list. Try again." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Relente no ha podido cargar la lista de instaladores de Apple. Inténtalo de nuevo."
-          }
-        }
-      }
-    },
-    "Review the pending work before downloading." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa el trabajo pendiente antes de descargar."
-          }
-        }
-      }
-    },
-    "Try loading the list again." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Intenta cargar la lista de nuevo."
-          }
-        }
-      }
-    },
-    "Waiting…" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esperando…"
           }
         }
       }

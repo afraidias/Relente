@@ -195,7 +195,11 @@ struct DownloadView: View {
     ) -> some View {
         let match = installer.localMatch(in: localInstallers)
         let isActive = downloadingID == installer.id && isDownloading
-        let canRetry = error == .downloadFailed && selectedID == installer.id
+        let downloadErrors: [InstallerAcquisitionError] = [
+            .downloadFailed, .downloadInterrupted, .downloadResponseRejected, .downloadSizeUnexpected,
+            .downloadRedirectBlocked,
+        ]
+        let canRetry = error.map(downloadErrors.contains) == true && selectedID == installer.id
         let artworkSide = itemSize.iconSide
         let artworkContainerSide = itemSize.plateSide
         let sizeText = installer.sizeInBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }

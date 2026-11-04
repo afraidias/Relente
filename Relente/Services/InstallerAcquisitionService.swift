@@ -17,10 +17,24 @@ nonisolated protocol InstallerAcquisitionService: Sendable {
 nonisolated enum InstallerAcquisitionError: Error, Hashable, Sendable {
     case catalogUnavailable
     case downloadFailed
+    case downloadInterrupted
+    case downloadResponseRejected
+    case downloadSizeUnexpected
+    case downloadRedirectBlocked
     case alreadyDownloading
     case verificationFailed
     case preparationFailed
     case recoveryRequired
+
+    static func downloadFailure(for failure: InstallerDownload.Failure) -> Self {
+        switch failure {
+        case .networkInterrupted: .downloadInterrupted
+        case .unexpectedResponse: .downloadResponseRejected
+        case .sizeMismatch: .downloadSizeUnexpected
+        case .unsafeRedirect: .downloadRedirectBlocked
+        default: .downloadFailed
+        }
+    }
 
     var message: LocalizedStringResource {
         switch self {
@@ -32,6 +46,22 @@ nonisolated enum InstallerAcquisitionError: Error, Hashable, Sendable {
             LocalizedStringResource(
                 "The installer download failed.",
                 comment: "Download screen error when downloading a macOS installer fails.")
+        case .downloadInterrupted:
+            LocalizedStringResource(
+                "The network connection was interrupted. Check your connection and try again.",
+                comment: "Safe explanation for an interrupted installer download.")
+        case .downloadResponseRejected:
+            LocalizedStringResource(
+                "Apple’s server couldn’t provide the installer. Try again later.",
+                comment: "Safe explanation for a rejected installer response.")
+        case .downloadSizeUnexpected:
+            LocalizedStringResource(
+                "The installer download was incomplete or had an unexpected size. Try again.",
+                comment: "Safe explanation for installer size mismatch.")
+        case .downloadRedirectBlocked:
+            LocalizedStringResource(
+                "The installer download was redirected to an untrusted destination. Try again later.",
+                comment: "Safe explanation for a blocked installer redirect.")
         case .verificationFailed:
             LocalizedStringResource(
                 "The downloaded package couldn’t be verified as Apple software.",

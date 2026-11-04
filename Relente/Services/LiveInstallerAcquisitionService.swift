@@ -180,6 +180,8 @@ actor LiveInstallerAcquisitionService: InstallerAcquisitionService {
                 finish(.cancelled)
             } else if let error = error as? InstallerAcquisitionError {
                 finish(.failed(error))
+            } else if stage == .downloading, let failure = error as? InstallerDownload.Failure {
+                finish(.failed(InstallerAcquisitionError.downloadFailure(for: failure)))
             } else {
                 finish(
                     .failed(

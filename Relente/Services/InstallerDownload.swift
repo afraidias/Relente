@@ -5,6 +5,7 @@ import os
 nonisolated final class InstallerDownload: NSObject, URLSessionDownloadDelegate, Sendable {
     enum Failure: Error, Equatable {
         case invalidRequest, alreadyStarted, unexpectedResponse, sizeMismatch, unsafeRedirect, cleanupFailed
+        case networkInterrupted
     }
 
     private struct State {
@@ -159,7 +160,7 @@ nonisolated final class InstallerDownload: NSObject, URLSessionDownloadDelegate,
             return result
         }
         guard let finished, let continuation = finished.continuation else { return }
-        var failure: (any Error)? = finished.failure ?? error
+        var failure: (any Error)? = finished.failure ?? error.map { _ in Failure.networkInterrupted }
         if finished.cancellationRequested { failure = CancellationError() }
         if !finished.ownedDestination && failure == nil { failure = Failure.unexpectedResponse }
         if failure != nil && finished.ownedDestination {

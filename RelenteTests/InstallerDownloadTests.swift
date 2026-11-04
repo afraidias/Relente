@@ -5,6 +5,14 @@ import os
 @testable import Relente
 
 struct InstallerDownloadTests {
+    @Test func failureMappingIsSafe() {
+        #expect(InstallerAcquisitionError.downloadFailure(for: .networkInterrupted) == .downloadInterrupted)
+        #expect(InstallerAcquisitionError.downloadFailure(for: .unexpectedResponse) == .downloadResponseRejected)
+        #expect(InstallerAcquisitionError.downloadFailure(for: .sizeMismatch) == .downloadSizeUnexpected)
+        #expect(InstallerAcquisitionError.downloadFailure(for: .unsafeRedirect) == .downloadRedirectBlocked)
+        #expect(InstallerAcquisitionError.downloadFailure(for: .invalidRequest) == .downloadFailed)
+    }
+
     private func directory() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appending(path: "Relente-download-test-\(UUID())")
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: false)

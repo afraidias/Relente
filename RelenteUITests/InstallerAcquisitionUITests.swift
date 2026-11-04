@@ -34,6 +34,19 @@ final class InstallerAcquisitionUITests: XCTestCase {
     }
 
     @MainActor
+    func testRecoveryPendingDoesNotPreventNormalQuit() {
+        let app = XCUIApplication.relente(extraArguments: [
+            "-sampleEmpty", "installers", "-sampleRecoveryRequired", "YES",
+        ])
+        XCTAssertTrue(app.buttons["Download from Apple…"].waitForExistence(timeout: 5))
+        app.buttons["Download from Apple…"].click()
+        XCTAssertTrue(app.buttons["Open Folder in Finder"].waitForExistence(timeout: 5))
+        app.menuBars.menuBarItems["Relente"].click()
+        app.menuBars.menuItems["Quit Relente"].click()
+        XCTAssertTrue(app.wait(for: .notRunning, timeout: 5))
+    }
+
+    @MainActor
     func testCompletedSampleBecomesSelectableBeforeTheUSBStep() {
         let app = XCUIApplication.relente(extraArguments: ["-sampleEmpty", "installers"])
         XCTAssertTrue(app.buttons["Download from Apple…"].waitForExistence(timeout: 5))
@@ -53,6 +66,27 @@ final class InstallerAcquisitionUITests: XCTestCase {
         app.buttons["Continue"].click()
         XCTAssertTrue(app.element("Choose a USB Drive").waitForExistence(timeout: 5))
         XCTAssertTrue(app.element("Installer: macOS Tahoe 26.1, 16.8 GB").exists)
+    }
+
+    @MainActor
+    func testFailedSampleDownloadExplainsReasonAndOffersRecoveryAction() {
+        let app = XCUIApplication.relente(extraArguments: [
+            "-sampleEmpty", "installers", "-sampleDownloadFailure", "YES",
+        ])
+        XCTAssertTrue(app.buttons["Download from Apple…"].waitForExistence(timeout: 5))
+        app.buttons["Download from Apple…"].click()
+        let download = app.buttons["installer-action-26.1|25B354|macOS Tahoe"]
+        XCTAssertTrue(download.waitForExistence(timeout: 5))
+        download.click()
+        let reason = app.descendants(matching: .any).matching(
+            NSPredicate(
+                format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
+                "The installer download was incomplete or had an unexpected size. Try again.",
+                "The installer download was incomplete or had an unexpected size. Try again."
+            )
+        ).firstMatch
+        XCTAssertTrue(reason.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.sheets.buttons["Retry Download"].exists)
     }
 
     @MainActor

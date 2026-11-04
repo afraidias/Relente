@@ -346,7 +346,7 @@ final class Assistant {
         let refreshing = catalogTask
         refreshing?.cancel()
         await refreshing?.value
-        return !isDownloadingInstaller && acquisitionError != .recoveryRequired
+        return !isDownloadingInstaller
     }
 
     func retryAvailableInstallers() {

@@ -93,17 +93,6 @@ final class RelenteAppDelegate: NSObject, NSApplicationDelegate, UNUserNotificat
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard let assistant else { return .terminateNow }
-        if assistant.acquisitionError == .recoveryRequired {
-            let alert = NSAlert()
-            alert.messageText = String(localized: "Installer Recovery Needed")
-            alert.informativeText = String(
-                localized:
-                    "Relente cannot confirm that its incomplete work is safely stopped and cleaned up. Keep the app open and review the recovery details."
-            )
-            alert.addButton(withTitle: String(localized: "Keep Relente Open"))
-            alert.runModal()
-            return .terminateCancel
-        }
         if assistant.isDownloadingInstaller {
             let alert = NSAlert()
             alert.messageText = String(localized: "Installer Acquisition in Progress")

@@ -1,6 +1,6 @@
 # Direct installer download — design
 
-Revision: 8 · State: Accepted
+Revision: 11 · State: Accepted
 Related issue: N/A — no dedicated issue verified during conversion; roadmap step 9.
 Approval: Afraidias, 2026-11-03, revision 8 — "vale, aplica lo ultimo del diseño que hemos visto y continua con lo que nos quede".
 Previous approval: Afraidias, 2026-11-03, revision 7 — "vale me gusta, vamos con ello" after iterating the interactive prototype.
@@ -11,6 +11,13 @@ Intent: [intent.md](intent.md) — revision 1 accepted by the owner on 2026-11-0
 
 Converted from the [existing draft](https://github.com/afraidias/Relente/blob/92a1608cd0f20476b79dab44794b5f718e02292e/specs/012-direct-installer-download/spec.md)
 on 2026-11-02. This migration preserves proposed requirements, not evidence of implementation.
+
+## Revision 11 — allow normal quit from an idle recovery state (Accepted)
+
+Approved by Afraidias on 2026-11-04: an instance with no active acquisition must be allowed to
+quit even when it has detected pending recovery work. Quitting leaves that work untouched and does
+not clear the recovery block; a later launch still requires recovery before another download.
+The existing wait/cancel behavior remains for an instance with an active acquisition.
 
 ## Revision 9 — proposed acquisition error and recovery presentation
 
@@ -256,6 +263,8 @@ merge or release approval is implied.
   selectable partial installer. Verify after the UI returns to idle and again after relaunch.
 - [ ] Normal quit during transfer offers waiting or cancellation and does not exit before a
   confirmed cancellation and safe cleanup. A force quit or crash never makes a partial selectable.
+- [ ] An idle instance can quit while recovery work is pending; quitting preserves the pending work
+  and does not make another download available.
 - [ ] A completed real download is verified, prepared and detected as the requested version/build;
   it is usable by the existing USB creation flow without installing macOS on the host.
 - [ ] Redirect, host, signature, integrity, version/build ambiguity, collision, interrupted transfer,

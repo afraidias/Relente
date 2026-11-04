@@ -223,6 +223,8 @@ struct DownloadDetailsSheet: View {
                 NSWorkspace.shared.open(InstallerArtifactStore().root)
             }
             .buttonStyle(.secondary)
+        } else if let error {
+            notice(title: Text("Download Failed"), message: Text(error.message))
         } else if let block {
             notice(title: Text("Download Unavailable"), message: Text(block.message))
         }

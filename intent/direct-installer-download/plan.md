@@ -1,13 +1,13 @@
 # Direct installer download — implementation plan
 
-Revision: 4 · State: Accepted
+Revision: 6 · State: Accepted
 Related issue: N/A — no dedicated issue verified; roadmap step 9.
 Approval: Afraidias, 2026-11-03, revision 3 — "apruebo" to the explicit plan approval question.
 Previous approval: Afraidias, 2026-11-03, revision 2 — "okey" to the explicit implementation-plan approval question.
 Implementation state: In progress
 PR: [#47](https://github.com/afraidias/Relente/pull/47) — draft, awaiting manual checks and owner review.
 
-Intent: [intent.md](intent.md) · Accepted design: [spec.md](spec.md), revision 10.
+Intent: [intent.md](intent.md) · Accepted design: [spec.md](spec.md), revision 11.
 
 ## Revision 4 — acquisition error and recovery presentation (Accepted)
 
@@ -829,3 +829,56 @@ with zero failures; universal Release build succeeded; full strict swift-format 
 interruption failures; the focused creation suite was then run sequentially and passed. The live
 Ventura USB creation separately completed through Relente and showed “Installer Ready” after 34
 minutes. No commit, push or PR was created here.
+
+## Revision 6 — recovery exit and actionable download failures (Accepted)
+
+Design revision 11 was approved by Afraidias on 2026-11-04. This plan covers normal quit from an
+idle recovery state and refines the accepted requirement to explain download failures clearly. It
+does not inspect, delete or unblock pending recovery work.
+
+Approved by Afraidias on 2026-11-04 — "aprobamos el plan".
+
+1. Remove the unconditional recovery-error veto from `applicationShouldTerminate`. After catalog
+   loading settles, allow a recovery-only instance to terminate normally; leave its pending files
+   in place so the next launch still shows recovery. Preserve the existing wait/cancel confirmation
+   and terminal cleanup requirement when this instance is actively downloading.
+2. Extend the focused acquisition UI test to open the recovery state, choose Quit Relente from the
+   app menu and verify normal termination. Retain the existing active-download quit test as coverage
+   that the owning instance still waits or cancels safely.
+3. Preserve safe failure categories through the transfer and acquisition layers. Give localized,
+   actionable reasons for common cases such as a network interruption, rejected server response,
+   unexpected package size or blocked redirect; keep explicit user cancellation distinct and retain
+   a generic fallback for unknown errors. Do not show raw URLs, headers or private system details.
+4. Add focused mapping tests and a UI check that a failed transfer presents its reason and recovery
+   action. Run the acquisition UI tests and strict Swift lint; inspect the diff for privacy and
+   confirm no cleanup or disk-creation behavior changed.
+
+Acceptance evidence: an idle recovery instance can quit without deleting pending work or enabling a
+new download; an active download still offers wait/cancel and waits for terminal cleanup; common
+download failures explain the safe reason and next step without exposing sensitive network detail.
+No commit, push or merge is included.
+
+Implementation checkpoint, 2026-11-04: normal quit now permits a recovery-only idle instance;
+`prepareForTermination` still waits for the owning active download to reach terminal cleanup. The
+transfer failure categories map to localized, privacy-safe messages for interrupted network,
+rejected response, unexpected size and blocked redirect, with a generic fallback. Cancellation
+remains its own event. English and Spanish strings, focused mapping coverage, and UI cases for
+recovery quit and a failed download with retry were added. No recovery files are removed and no
+disk-creation code changed.
+
+Verification, 2026-11-04: Xcode's `RelenteTests` run passed 380 unit tests, with 5 opt-in tests
+excluded; `InstallerDownloadTests.failureMappingIsSafe()` passed. After cleaning the build folder,
+all 7 `InstallerAcquisitionUITests` passed in the focused class run, with the failed-sample case
+repeated and passing after its accessibility query was corrected. That test also exposed that transfer
+failure reasons were not rendered in the details sheet; the localized reason and Retry Download
+action are now visible and VoiceOver-accessible. Tests use sample data only; no actual download or
+disk creation was started. Strict repository swift-format lint, String Catalog JSON parsing and
+`git diff --check` passed.
+
+The initial all-scheme UI run had one unrelated failure in
+`AssistantFlowUITests.testEscAndGoBackMenuGoBack()` (expected “Choose an Installer” after Return);
+it was stopped before the remaining suite completed, so a full end-to-end scheme result is not
+claimed. The terminal `xcodebuild` attempt was blocked by the isolated shell's unavailable CoreSimulator
+connection and Mac Development private key; running from Xcode after a clean build succeeded. The
+universal Release build was not rerun. PR #47 was not updated because these local changes were not
+published.
