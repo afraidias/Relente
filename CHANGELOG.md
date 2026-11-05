@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.12.0](https://github.com/afraidias/Relente/compare/v0.11.0...v0.12.0) (2026-11-05)
+
+
+### Features
+
+* clarify helper setup ([#52](https://github.com/afraidias/Relente/issues/52)) ([caa6eea](https://github.com/afraidias/Relente/commit/caa6eeabd6fa9f8b6ffb45c7b66f4fb35cc22f14))
+
+
+### Documentation
+
+* reconcile download evidence and cancellation feedback ([#49](https://github.com/afraidias/Relente/issues/49)) ([c548e5e](https://github.com/afraidias/Relente/commit/c548e5e8f96706b92e0331ad8b587e126b441025))
+
 ## [0.11.0](https://github.com/afraidias/Relente/compare/v0.10.0...v0.11.0) (2026-11-04)
 
 
