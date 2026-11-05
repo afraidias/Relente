@@ -2,12 +2,9 @@
 //  PermissionsView.swift
 //  Relente
 //
-//  Permissions: installs the system helper, shown before Installer only while the helper isn't
-//  ready. Laid out like the other screens (option E of the canvas "Relente · Permissions"): the
-//  header, the app icon as the hero with a halo and badge for the helper's status, the waiting
-//  indicator while macOS waits for the user, a callout about the authorization each erase asks
-//  for, and one footer button that is always the next thing to do. The assistant reads the
-//  helper's status again every 2 s and when the app becomes active, so the screen follows it.
+//  Guides helper setup and provides access to disk privacy settings. The assistant
+//  refreshes the helper status when the app becomes active and periodically.
+
 //
 
 import AppKit
@@ -15,42 +12,96 @@ import SwiftUI
 
 struct PermissionsView: View {
     let helperStatus: HelperStatus
-    let authenticationMethod: AuthenticationMethod
+    var isInstalling = false
+    var helperTurnedOff = false
+    var onOpenFullDiskAccessSettings: () -> Void = {}
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScreenHeader(
-                title: "Set Up Relente",
-                subtitle: "The system helper prepares your chosen drive with administrator authorization."
-            )
-
-            Spacer(minLength: 8)
-
-            PermissionsHero(status: helperStatus)
-
-            Spacer(minLength: 8)
-
-            AuthorizationCallout(method: authenticationMethod)
-                .frame(width: Theme.Sizes.contentWidth)
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text("macOS protects access to disks and removable drives.")
-                    .font(Theme.Fonts.footnote.weight(.semibold))
-                Text(
-                    "To create an installer, allow Relente in Full Disk Access and keep it enabled in Login Items so its helper can run. You can still choose an installer and USB before granting access; Relente checks the selected USB before it erases it."
-                )
-                .font(Theme.Fonts.footnote)
-                .foregroundStyle(Theme.Colors.secondary)
+        VStack(spacing: 12) {
+            ScreenHeader(title: "Set Up Relente", subtitle: "Prepare the system helper to create your installer.")
+            Spacer(minLength: 4)
+            HeroArtwork(size: 104, haloColor: heroColor) {
+                Image(nsImage: NSApplication.shared.applicationIconImage).resizable()
+            } badge: {
+                if !isInstalling {
+                    switch helperStatus {
+                    case .ready: StatusBadge(kind: .success)
+                    case .failed: StatusBadge(kind: .failure)
+                    case .notInstalled, .needsApproval: EmptyView()
+                    }
+                }
             }
-            .frame(width: Theme.Sizes.contentWidth, alignment: .leading)
-            .padding(.top, 10)
-
-            Spacer(minLength: 8)
+            Spacer(minLength: 20)
+            statusCallout
+                .frame(width: Theme.Sizes.contentWidth)
+            Callout(
+                tone: .secondary(systemImage: "externaldrive"),
+                title: "Drive access",
+                message: "You may need to allow Relente in Full Disk Access to create the installer."
+            ) {
+                Button("Open Full Disk Access Settings…", action: onOpenFullDiskAccessSettings)
+                    .buttonStyle(.secondary)
+            }
+            .frame(width: Theme.Sizes.contentWidth)
+            Spacer(minLength: 4)
         }
         .padding(.top, Theme.Sizes.headerTopPadding)
+        .onChange(of: isInstalling) { _, installing in
+            if installing {
+                AccessibilityNotification.Announcement(String(localized: "Installing helper…")).post()
+            }
+        }
         .onChange(of: helperStatus) { _, status in
             if let announcement = Self.announcement(for: status) {
                 AccessibilityNotification.Announcement(String(localized: announcement)).post()
+            }
+        }
+    }
+
+    private var heroColor: Color {
+        if isInstalling { return Theme.Colors.accent }
+        switch helperStatus {
+        case .ready: return Theme.Colors.success
+        case .failed: return Theme.Colors.danger
+        case .notInstalled, .needsApproval: return Theme.Colors.accent
+        }
+    }
+
+    @ViewBuilder private var statusCallout: some View {
+        if isInstalling {
+            Callout(
+                tone: .info(systemImage: "clock"), title: "Installing helper…",
+                message: "Please wait while macOS registers the helper.")
+        } else {
+            switch helperStatus {
+            case .notInstalled where helperTurnedOff:
+                Callout(
+                    tone: .info(systemImage: "info.circle"), title: "Helper disabled",
+                    message: "Your selections are preserved. Install the helper to continue.")
+            case .notInstalled:
+                Callout(
+                    tone: .info(systemImage: "info.circle"), title: "Helper not installed",
+                    message: "Install the helper to prepare your USB drive.")
+            case .needsApproval where helperTurnedOff:
+                Callout(
+                    tone: .info(systemImage: "clock"), title: "Helper disabled",
+                    message:
+                        "Your selections are preserved. Turn on Relente under App Background Activity in System Settings to continue."
+                )
+            case .needsApproval:
+                Callout(
+                    tone: .info(systemImage: "clock"), title: "Waiting for activation",
+                    message:
+                        "In the window that opens, find Relente under App Background Activity and turn it on. Then return here."
+                )
+            case .ready:
+                Callout(
+                    tone: .success, title: "Helper enabled",
+                    message: "You can continue and choose an installer and a drive.")
+            case .failed:
+                Callout(
+                    tone: .failure, title: "Couldn’t install the helper",
+                    message: "Try again. If the problem continues, make sure Relente is in your Applications folder.")
             }
         }
     }
@@ -72,104 +123,6 @@ struct PermissionsView: View {
     }
 }
 
-// MARK: - Hero
-
-/// The app icon in a halo colored by the helper's status, with a badge once it's ready or failed,
-/// like the drive on Done and Error; below it, where the helper stands.
-struct PermissionsHero: View {
-    let status: HelperStatus
-
-    var body: some View {
-        VStack(spacing: 12) {
-            HeroArtwork(size: 104, haloColor: haloColor) {
-                Image(nsImage: NSApplication.shared.applicationIconImage)
-                    .resizable()
-            } badge: {
-                switch status {
-                case .ready:
-                    StatusBadge(kind: .success)
-                case .failed:
-                    StatusBadge(kind: .failure)
-                case .notInstalled, .needsApproval:
-                    EmptyView()
-                }
-            }
-
-            Text(statusLine)
-                .font(.body.weight(.semibold))
-                .multilineTextAlignment(.center)
-
-            // One line under it, whose space is always kept so the hero never moves when the
-            // status changes: the waiting indicator, macOS's reason for a failure, or nothing.
-            ZStack {
-                WaitingIndicator(text: "Waiting for approval…")
-                    .hidden()
-                switch status {
-                case .needsApproval:
-                    WaitingIndicator(text: "Waiting for approval…")
-                case .failed(let error):
-                    Text(error.message)
-                        .font(Theme.Fonts.footnote)
-                        .foregroundStyle(Theme.Colors.secondary)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(1)
-                case .notInstalled, .ready:
-                    EmptyView()
-                }
-            }
-        }
-    }
-
-    private var haloColor: Color {
-        switch status {
-        case .notInstalled, .needsApproval: Theme.Colors.accent
-        case .ready: Theme.Colors.success
-        case .failed: Theme.Colors.danger
-        }
-    }
-
-    private var statusLine: LocalizedStringResource {
-        switch status {
-        case .notInstalled:
-            LocalizedStringResource(
-                "The system helper isn't installed.", comment: "Permissions, under the hero: before installing.")
-        case .needsApproval:
-            LocalizedStringResource(
-                "Turn on Relente in System Settings › General › Login Items.",
-                comment: "Permissions, under the hero: macOS waits for the user to turn the helper on.")
-        case .ready:
-            LocalizedStringResource("System helper ready.", comment: "VoiceOver, when the helper is turned on.")
-        case .failed:
-            LocalizedStringResource(
-                "The system helper couldn't be installed.", comment: "VoiceOver, when registering the helper failed.")
-        }
-    }
-}
-
-// MARK: - Callout
-
-/// What each erase will ask for through the current Authorization Services flow.
-struct AuthorizationCallout: View {
-    let method: AuthenticationMethod
-
-    var body: some View {
-        Callout(
-            tone: .info(systemImage: method.symbolName),
-            title: LocalizedStringResource(
-                "Each erase asks for your permission", comment: "Permissions: title of the callout about authorizing."),
-            message: message)
-    }
-
-    private var message: LocalizedStringResource {
-        switch method {
-        case .touchID:
-            "With Touch ID or your administrator password, every time. Relente never erases a drive without asking you first."
-        case .password:
-            "With your administrator password, every time. Relente never erases a drive without asking you first."
-        }
-    }
-}
-
 // MARK: - Footer
 
 /// One button, the default action: always the next thing to do.
@@ -179,6 +132,7 @@ struct PermissionsFooter: View {
     let onInstall: () -> Void
     let onOpenSettings: () -> Void
     let onContinue: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         AssistantFooter(for: .permissions) {
@@ -187,7 +141,7 @@ struct PermissionsFooter: View {
                 case .notInstalled:
                     helperButton(title: "Install Helper", progressTitle: "Installing Helper…")
                 case .needsApproval:
-                    Button("Open Settings…", action: onOpenSettings)
+                    Button("Open System Settings…", action: onOpenSettings)
                 case .ready:
                     Button("Continue", action: onContinue)
                 case .failed:
@@ -203,7 +157,9 @@ struct PermissionsFooter: View {
         Button(action: onInstall) {
             if isInstalling {
                 HStack(spacing: 8) {
-                    ProgressView().controlSize(.small)
+                    if !reduceMotion {
+                        ProgressView().controlSize(.small)
+                    }
                     Text(progressTitle)
                 }
             } else {
@@ -219,11 +175,10 @@ struct PermissionsFooter: View {
 /// The whole screen as it will appear in the window: content and footer.
 private struct PermissionsScreenPreview: View {
     let status: HelperStatus
-    var method = AuthenticationMethod.password
 
     var body: some View {
         VStack(spacing: 0) {
-            PermissionsView(helperStatus: status, authenticationMethod: method)
+            PermissionsView(helperStatus: status)
                 .padding(.horizontal, 32)
                 .padding(.bottom, 24)
                 .frame(maxHeight: .infinity)
@@ -246,8 +201,7 @@ private struct PermissionsScreenPreview: View {
 }
 
 #Preview("Failed · Without Touch ID") {
-    PermissionsScreenPreview(
-        status: .failed(.registrationFailed(reason: "Operation not permitted")), method: .password)
+    PermissionsScreenPreview(status: .failed(.registrationFailed(reason: "Operation not permitted")))
 }
 
 #Preview("Needs approval · Dark") {

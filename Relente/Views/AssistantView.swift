@@ -293,7 +293,10 @@ struct AssistantView: View {
     private func screen(for step: AssistantStep, showingDownload: Bool) -> some View {
         switch step {
         case .permissions:
-            PermissionsView(helperStatus: assistant.helperStatus, authenticationMethod: authenticationMethod)
+            PermissionsView(
+                helperStatus: assistant.helperStatus,
+                isInstalling: assistant.isInstallingHelper, helperTurnedOff: assistant.helperTurnedOff != nil,
+                onOpenFullDiskAccessSettings: assistant.openFullDiskAccessSettings)
         case .installer:
             if showingDownload {
                 DownloadView(

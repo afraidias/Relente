@@ -1,6 +1,186 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Open System Settings…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Ajustes del Sistema…"
+          }
+        }
+      }
+    },
+    "Prepare the system helper to create your installer." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepara el ayudante del sistema para crear tu instalador."
+          }
+        }
+      }
+    },
+    "Drive access" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso a la memoria"
+          }
+        }
+      }
+    },
+    "You may need to allow Relente in Full Disk Access to create the installer." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede que necesites permitir Relente en Acceso total al disco para crear el instalador."
+          }
+        }
+      }
+    },
+    "Each erase requires your administrator authorization." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada borrado requiere tu autorización de administrador."
+          }
+        }
+      }
+    },
+    "Installing helper…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalando ayudante…"
+          }
+        }
+      }
+    },
+    "Please wait while macOS registers the helper." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espera un momento mientras macOS registra el ayudante."
+          }
+        }
+      }
+    },
+    "Helper not installed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayudante no instalado"
+          }
+        }
+      }
+    },
+    "Install the helper to prepare your USB drive." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instala el ayudante para preparar tu memoria USB."
+          }
+        }
+      }
+    },
+    "Waiting for activation" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando activación"
+          }
+        }
+      }
+    },
+    "In the window that opens, find Relente under App Background Activity and turn it on. Then return here." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En la ventana que se abre, busca Relente en Actividad de apps en segundo plano y actívalo. Después vuelve aquí."
+          }
+        }
+      }
+    },
+    "Helper enabled" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayudante activado"
+          }
+        }
+      }
+    },
+    "You can continue and choose an installer and a drive." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya puedes continuar y elegir un instalador y una memoria."
+          }
+        }
+      }
+    },
+    "Couldn’t install the helper" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido instalar el ayudante"
+          }
+        }
+      }
+    },
+    "Try again. If the problem continues, make sure Relente is in your Applications folder." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuelve a intentarlo. Si el problema continúa, comprueba que Relente está en la carpeta Aplicaciones."
+          }
+        }
+      }
+    },
+    "Helper disabled" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ayudante está desactivado"
+          }
+        }
+      }
+    },
+    "Your selections are preserved. Install the helper to continue." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu selección se conserva. Instala el ayudante para continuar."
+          }
+        }
+      }
+    },
+    "Your selections are preserved. Turn on Relente under App Background Activity in System Settings to continue." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu selección se conserva. Activa Relente en Actividad de apps en segundo plano en Ajustes del Sistema para continuar."
+          }
+        }
+      }
+    },
     "“%@”" : {
       "comment" : "Done screen, under the drive: the name it has now, in quotes, e.g. “Install macOS Tahoe”.",
       "localizations" : {
