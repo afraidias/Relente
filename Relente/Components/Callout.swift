@@ -45,16 +45,19 @@ struct Callout<Content: View>: View {
     let title: LocalizedStringResource
     let message: LocalizedStringResource
     let content: Content
+    let emphasizesMessage: Bool
 
     init(
         tone: Tone = .warning,
         title: LocalizedStringResource,
         message: LocalizedStringResource,
+        emphasizesMessage: Bool = false,
         @ViewBuilder content: () -> Content
     ) {
         self.tone = tone
         self.title = title
         self.message = message
+        self.emphasizesMessage = emphasizesMessage
         self.content = content()
     }
 
@@ -70,7 +73,7 @@ struct Callout<Content: View>: View {
                     .font(.body.weight(.semibold))
                 Text(message)
                     .font(Theme.Fonts.footnote)
-                    .foregroundStyle(Theme.Colors.secondary)
+                    .foregroundStyle(emphasizesMessage ? Color.primary.opacity(0.8) : Theme.Colors.secondary)
 
                 content
                     .padding(.top, 6)
@@ -88,8 +91,11 @@ struct Callout<Content: View>: View {
 
 extension Callout where Content == EmptyView {
     /// A callout with only its title and message.
-    init(tone: Tone = .warning, title: LocalizedStringResource, message: LocalizedStringResource) {
-        self.init(tone: tone, title: title, message: message) { EmptyView() }
+    init(
+        tone: Tone = .warning, title: LocalizedStringResource, message: LocalizedStringResource,
+        emphasizesMessage: Bool = false
+    ) {
+        self.init(tone: tone, title: title, message: message, emphasizesMessage: emphasizesMessage) { EmptyView() }
     }
 }
 
