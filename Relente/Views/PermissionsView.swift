@@ -18,7 +18,11 @@ struct PermissionsView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            ScreenHeader(title: "Set Up Relente", subtitle: "Prepare the system helper to create your installer.")
+            ScreenHeader(
+                title: "Set Up Relente",
+                subtitle: Text("Prepare the system helper to create your installer.")
+                    .foregroundColor(.primary.opacity(0.8))
+            )
             Spacer(minLength: 4)
             HeroArtwork(size: 104, haloColor: heroColor) {
                 Image(nsImage: NSApplication.shared.applicationIconImage).resizable()
@@ -37,7 +41,8 @@ struct PermissionsView: View {
             Callout(
                 tone: .secondary(systemImage: "externaldrive"),
                 title: "Drive access",
-                message: "You may need to allow Relente in Full Disk Access to create the installer."
+                message: "You may need to allow Relente in Full Disk Access to create the installer.",
+                emphasizesMessage: true
             ) {
                 Button("Open Full Disk Access Settings…", action: onOpenFullDiskAccessSettings)
                     .buttonStyle(.secondary)
@@ -71,37 +76,40 @@ struct PermissionsView: View {
         if isInstalling {
             Callout(
                 tone: .info(systemImage: "clock"), title: "Installing helper…",
-                message: "Please wait while macOS registers the helper.")
+                message: "Please wait while macOS registers the helper.", emphasizesMessage: true)
         } else {
             switch helperStatus {
             case .notInstalled where helperTurnedOff:
                 Callout(
                     tone: .info(systemImage: "info.circle"), title: "Helper disabled",
-                    message: "Your selections are preserved. Install the helper to continue.")
+                    message: "Your selections are preserved. Install the helper to continue.", emphasizesMessage: true)
             case .notInstalled:
                 Callout(
                     tone: .info(systemImage: "info.circle"), title: "Helper not installed",
-                    message: "Install the helper to prepare your USB drive.")
+                    message: "Install the helper to prepare your USB drive.", emphasizesMessage: true)
             case .needsApproval where helperTurnedOff:
                 Callout(
                     tone: .info(systemImage: "clock"), title: "Helper disabled",
                     message:
-                        "Your selections are preserved. Turn on Relente under App Background Activity in System Settings to continue."
+                        "Your selections are preserved. Turn on Relente under App Background Activity in System Settings to continue.",
+                    emphasizesMessage: true
                 )
             case .needsApproval:
                 Callout(
                     tone: .info(systemImage: "clock"), title: "Waiting for activation",
                     message:
-                        "In the window that opens, find Relente under App Background Activity and turn it on. Then return here."
+                        "In the window that opens, find Relente under App Background Activity and turn it on. Then return here.",
+                    emphasizesMessage: true
                 )
             case .ready:
                 Callout(
                     tone: .success, title: "Helper enabled",
-                    message: "You can continue and choose an installer and a drive.")
+                    message: "You can continue and choose an installer and a drive.", emphasizesMessage: true)
             case .failed:
                 Callout(
                     tone: .failure, title: "Couldn’t install the helper",
-                    message: "Try again. If the problem continues, make sure Relente is in your Applications folder.")
+                    message: "Try again. If the problem continues, make sure Relente is in your Applications folder.",
+                    emphasizesMessage: true)
             }
         }
     }

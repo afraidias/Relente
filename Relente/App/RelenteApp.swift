@@ -21,6 +21,8 @@ struct RelenteApp: App {
     var body: some Scene {
         WindowGroup {
             AssistantView(assistant: assistant, thisMac: .current)
+                .preferredColorScheme(Self.testDarkAppearance)
+                .background(AssistantWindowAccessibility())
                 .environment(\.usesClassicControls, Self.forcesClassicControls)
                 .onAppear { appDelegate.assistant = assistant }
                 .onChange(of: assistant.isShowingDownloadCancelled) {
@@ -57,6 +59,14 @@ struct RelenteApp: App {
         }
 
         .defaultSize(width: 800, height: 520)
+    }
+
+    private static var testDarkAppearance: ColorScheme? {
+        #if DEBUG
+            ProcessInfo.processInfo.arguments.contains("-auditDarkAppearance") ? .dark : nil
+        #else
+            nil
+        #endif
     }
 
     // MARK: - Services
@@ -183,5 +193,19 @@ struct RelenteApp: App {
         #else
             false
         #endif
+    }
+}
+
+// Name the window's outer accessibility group, which is outside the SwiftUI hierarchy.
+private struct AssistantWindowAccessibility: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView { WindowObserver() }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+
+    private final class WindowObserver: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            window?.contentView?.setAccessibilityLabel("Relente")
+        }
     }
 }

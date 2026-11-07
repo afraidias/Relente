@@ -34,6 +34,116 @@ final class AssistantFlowUITests: XCTestCase {
     // MARK: - Tests
 
     @MainActor
+    func testAssistantWindowHasAccessibleName() {
+        app = .relente(extraArguments: ["-sampleHelper", "notInstalled"])
+        expectScreen("Set Up Relente")
+        XCTAssertTrue(app.windows.firstMatch.groups["Relente"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Install Helper"].isEnabled)
+        XCTAssertTrue(app.buttons["Open Full Disk Access Settings…"].isEnabled)
+
+        app.buttons["Install Helper"].click()
+        XCTAssertTrue(app.buttons["Continue"].waitForExistence(timeout: 5))
+        app.buttons["Continue"].click()
+        expectScreen("Choose an Installer")
+        XCTAssertTrue(app.windows.firstMatch.groups["Relente"].exists)
+    }
+
+    @MainActor
+    func testSetupAccessibilityAudit() throws {
+        app = .relente(extraArguments: ["-sampleHelper", "notInstalled"])
+        expectScreen("Set Up Relente")
+        try app.performAccessibilityAudit { issue in
+            let details = "\(issue.debugDescription)\n\(issue.element?.debugDescription ?? "No element")"
+            let attachment = XCTAttachment(string: details)
+            attachment.name = "Accessibility issue details"
+            attachment.lifetime = .keepAlways
+            self.add(attachment)
+            return false
+        }
+    }
+
+    @MainActor
+    func testSetupAccessibilityAuditInSpanish() throws {
+        app = XCUIApplication()
+        app.launchArguments = [
+            "-sampleData", "YES", "-sampleHelper", "notInstalled", "-AppleLanguages", "(es)",
+            "-AppleLocale", "es_ES", "-ApplePersistenceIgnoreState", "YES",
+        ]
+        app.launch()
+        expectScreen("Configurar Relente")
+        try app.performAccessibilityAudit { issue in
+            let details = "\(issue.debugDescription)\n\(issue.element?.debugDescription ?? "No element")"
+            let attachment = XCTAttachment(string: details)
+            attachment.name = "Accessibility issue details"
+            attachment.lifetime = .keepAlways
+            self.add(attachment)
+            return false
+        }
+    }
+
+    @MainActor
+    func testSetupContrastInEnglish() throws {
+        app = .relente(extraArguments: ["-sampleHelper", "notInstalled"])
+        expectScreen("Set Up Relente")
+        try app.performAccessibilityAudit(for: .contrast)
+    }
+
+    @MainActor
+    func testSetupContrastInSpanish() throws {
+        app = XCUIApplication()
+        app.launchArguments = [
+            "-sampleData", "YES", "-sampleHelper", "notInstalled", "-AppleLanguages", "(es)",
+            "-AppleLocale", "es_ES", "-ApplePersistenceIgnoreState", "YES",
+        ]
+        app.launch()
+        expectScreen("Configurar Relente")
+        try app.performAccessibilityAudit(for: .contrast)
+    }
+
+    @MainActor
+    func testDarkAppearanceInvestigation() throws {
+        app = .relente(extraArguments: ["-sampleHelper", "notInstalled", "-auditDarkAppearance", "YES"])
+        expectScreen("Set Up Relente")
+        let screenshot = XCTAttachment(screenshot: app.windows.firstMatch.screenshot())
+        screenshot.name = "Dark setup window"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        try app.performAccessibilityAudit(for: .contrast)
+    }
+
+    @MainActor
+    func testDarkSetupContrastInSpanish() throws {
+        app = XCUIApplication()
+        app.launchArguments = [
+            "-sampleData", "YES", "-sampleHelper", "notInstalled", "-auditDarkAppearance", "YES",
+            "-AppleLanguages", "(es)", "-AppleLocale", "es_ES", "-ApplePersistenceIgnoreState", "YES",
+        ]
+        app.launch()
+        expectScreen("Configurar Relente", timeout: 15)
+        try app.performAccessibilityAudit(for: .contrast)
+    }
+
+    @MainActor
+    func testDarkSetupFailureContrast() throws {
+        app = .relente(extraArguments: ["-sampleHelper", "registrationFailure", "-auditDarkAppearance", "YES"])
+        expectScreen("Set Up Relente")
+        app.buttons["Install Helper"].click()
+        XCTAssertTrue(app.element("Couldn’t install the helper").waitForExistence(timeout: 5))
+        try app.performAccessibilityAudit(for: .contrast)
+    }
+
+    @MainActor
+    func testWindowNameAfterRelaunch() {
+        app = .relente(extraArguments: ["-sampleHelper", "notInstalled"])
+        expectScreen("Set Up Relente")
+        XCTAssertTrue(app.windows.firstMatch.groups["Relente"].waitForExistence(timeout: 5))
+        app.terminate()
+        app.launch()
+        expectScreen("Set Up Relente")
+        XCTAssertTrue(app.windows.firstMatch.groups["Relente"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testTheWholeFlow() {
         app = .relente(simulationSpeed: "fast")
         app.goToDone()
