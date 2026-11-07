@@ -144,24 +144,6 @@ final class AssistantFlowUITests: XCTestCase {
     }
 
     @MainActor
-    func testTouchBarInvestigation() throws {
-        app = .relente(extraArguments: ["-sampleHelper", "notInstalled"])
-        expectScreen("Set Up Relente")
-        let hierarchy = XCTAttachment(string: app.debugDescription)
-        hierarchy.name = "Accessibility hierarchy"
-        hierarchy.lifetime = .keepAlways
-        add(hierarchy)
-        try app.performAccessibilityAudit { issue in
-            let details = "\(issue.debugDescription)\n\(issue.element?.debugDescription ?? "No element")"
-            let attachment = XCTAttachment(string: details)
-            attachment.name = "Accessibility issue details"
-            attachment.lifetime = .keepAlways
-            self.add(attachment)
-            return false
-        }
-    }
-
-    @MainActor
     func testTheWholeFlow() {
         app = .relente(simulationSpeed: "fast")
         app.goToDone()

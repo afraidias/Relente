@@ -46,3 +46,5 @@ Implementation and verification are in progress; initial investigation is docume
 
 - 2026-11-07: the owner accepted the [draft review deviation](../setup-contrast-25/review-addendum.md), and draft PR [#55](https://github.com/afraidias/Relente/pull/55) was opened. The Touch Bar finding remains unsuppressed and the PR is not ready for integration.
 - 2026-11-07: in the simulated Spanish app, closed a setup window while another window was present, then chose File > New Window. The newly shown window exposed the `Relente` container, setup heading and both actions in the accessibility hierarchy. This checks a new window with an existing window present; it does not establish Dock reopening after all windows are closed.
+
+- 2026-11-07 scope correction: the owner requested keeping Touch Bar as a future enhancement outside this PR. The duplicate Touch Bar-only diagnostic test was removed; both original unfiltered setup audits remain unchanged. The latest execution of both passed, while earlier failures remain recorded in #54.
