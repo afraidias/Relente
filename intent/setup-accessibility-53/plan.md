@@ -6,7 +6,7 @@
 - Issue: [#53](https://github.com/afraidias/Relente/issues/53)
 - Intent: [Accepted revision 1](intent.md)
 - Design: [Accepted revision 1](spec.md)
-- PR: Not yet created
+- PR: [#55](https://github.com/afraidias/Relente/pull/55) (draft; not ready for integration)
 - Approval: Owner, 2026-11-05, revision 1; conversation: “acepto” in response to the explicit plan acceptance request.
 
 ## Ordered work and verification
@@ -43,3 +43,5 @@ Implementation and verification are in progress; initial investigation is docume
 - 2026-11-07: the owner requested deferring the Touch Bar finding as a future improvement, tracked in [#54](https://github.com/afraidias/Relente/issues/54). Three setup audits and three minimal-view audits each reproduced an unnamed disabled `TouchBar` with no children. This does not prove system ownership or lack of impact. Full setup audits and the Touch Bar diagnostic remain unsuppressed in the working tree and can still fail; issue #54 does not itself resolve or waive them.
 
 - 2026-11-07 integration review: `origin/main` was checked against GitHub and still points to `caa6eeabd6fa9f8b6ffb45c7b66f4fb35cc22f14`. Both unfiltered setup audits and the separate Touch Bar diagnostic were run without suppression and all failed on the unnamed `TouchBar` element (reports in `/private/tmp/relente-review-audits/`). The owner requested deferring that issue as [#54](https://github.com/afraidias/Relente/issues/54). This leaves the accepted plan's unsuppressed audit/integration criteria unmet; no PR or merge is claimed. Do not delete or suppress the failing audit to force progress.
+
+- 2026-11-07: the owner accepted the [draft review deviation](../setup-contrast-25/review-addendum.md), and draft PR [#55](https://github.com/afraidias/Relente/pull/55) was opened. The Touch Bar finding remains unsuppressed and the PR is not ready for integration.
